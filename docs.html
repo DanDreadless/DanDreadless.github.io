@@ -30,8 +30,10 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="index.html">Home</a>
-          <a class="nav-link" href="docs.html">Documentation</a>
+          <a class="nav-link"  href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="docs.html">Documentation</a>
         </li>
       </ul>
     </div>
@@ -39,25 +41,60 @@
 
 <div class="container-fluid content">
     <section id="home">
-        <center><h1>Vault1337 Documentation</h1></center>
+        <center><h1>Try Vault1337 for yourself!</h1></center>
     </section>
     <br>
-    <section id="introduction">
+    <section id="docs">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2>Introduction</h2>
+                    <h2>Installation</h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <p>Firstly, I would like to shout out the <a href="https://github.com/viper-framework" target="_blank">Viper-Framework</a> who has been the main inspiration /
-                    motivation for this project. I have been using Viper for a while now and I love it. I wanted to build on the idea and taylor it for my own needs.
-                    This project is also a way for me to learn more about Python and the Django web framework. I have used python for scripting and API integratoins but never 
-                    really had the time to learn Django.</p>
-    
-                    <p>It is my hope that this project will be useful to others and that it will grow into something that is useful to the community.</p>
-                    <p>Created by DanDreadless - <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Project Source Code</a></p>
+
+                    <p><b>Download the vault</b> - Clone the repository and make sure to take ownership of the files</p>
+                    
+                    <pre class="bash">
+                    git clone https://github.com/DanDreadless/Vault1337
+                    sudo chown -R your_user:your_user Vault1337/
+                    cd Vault1337/
+                    </pre>
+                    
+                    <p><b>python venv</b> - Create a python virtual environment and install the requirements</p>
+
+                    <pre class="python3">
+                    python3 -m venv ~/vault1337
+                    source ~/vault1337/bin/activate
+                    pip install -r requirements.txt
+                    </pre>
+                    
+                    
+                    <p><b>Generate a new APP Key</b> - rename the .env.sample to .env and copy your new key inside</p>
+                    
+                    <pre class="python3">
+                    python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+                    </pre>
+                    
+                    <b>Initialise database</b>
+                    
+                    <pre class="python3">
+                    python3 manage.py makemigrations
+                    python3 manage.py migrate
+                    </pre>
+                    
+                    <b>Create SuperUser</b>
+                    
+                    <pre class="python3">
+                    python3 manage.py createsuperuser
+                    </pre>
+                    
+                    <b>You're good to go! Run the app server</b>
+                    
+                    <pre class="python3">
+                    python3 manage.py runserver
+                    </pre>
                 </div>
             </div>
         </div>
