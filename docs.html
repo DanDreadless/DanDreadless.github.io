@@ -9,17 +9,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="custom.css">
     <link rel="shortcut icon" type="image/png" href="Images/favicon.png"/>
-    <style>
-        body {
-            padding-top: 56px;
-        }
-        .navbar {
-            margin-bottom: 20px;
-        }
-        .content {
-            margin: 20px;
-        }
-    </style>
 </head>
 <body>
 
@@ -51,39 +40,39 @@
                 <div class="col-md-12">
                     <h2>Installation</h2>
                     <p><b>Download the vault</b> - Clone the repository and make sure to take ownership of the files</p>
-                    <ul>
-                        <li>git clone https://github.com/DanDreadless/Vault1337</li>
-                        <li>sudo chown -R your_user:your_user Vault1337/</li>
-                        <li>cd Vault1337/</li>
+                    <ul class="list-group">
+                        <li class="list-group-item">git clone https://github.com/DanDreadless/Vault1337</li>
+                        <li class="list-group-item">sudo chown -R your_user:your_user Vault1337/</li>
+                        <li class="list-group-item">cd Vault1337/</li>
                     </ul>
 
                     <p><b>python venv</b> - Create a python virtual environment and install the requirements</p>
-                    <ul>
-                        <li>python3 -m venv ~/vault1337</li>
-                        <li>source ~/vault1337/bin/activate</li>
-                        <li>pip install -r requirements.txt</li>
+                    <ul class="list-group">
+                        <li class="list-group-item">python3 -m venv ~/vault1337</li>
+                        <li class="list-group-item">source ~/vault1337/bin/activate</li>
+                        <li class="list-group-item">pip install -r requirements.txt</li>
                     </ul>
 
                     <p><b>Generate a new APP Key</b> - rename the .env.sample to .env and copy your new key inside</p>
-                    <ul>
-                        <li>python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</li>
+                    <ul class="list-group">
+                        <li class="list-group-item">python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</li>
                     </ul>
 
                     <b>Initialise database</b>
-                    <ul>
-                        <li>python3 manage.py makemigrations</li>
-                        <li>python3 manage.py migrate</li>
+                    <ul class="list-group">
+                        <li class="list-group-item">python3 manage.py makemigrations</li>
+                        <li class="list-group-item">python3 manage.py migrate</li>
                     </ul>
 
                     <b>Create SuperUser</b>
-                    <ul>
-                        <li>python3 manage.py createsuperuser</li>
+                    <ul class="list-group">
+                        <li class="list-group-item">python3 manage.py createsuperuser</li>
                     </ul>
 
                     <b>You're good to go! Run the app server</b>
                     
-                    <ul>    
-                        <li>python3 manage.py runserver</li>
+                    <ul class="list-group">    
+                        <li class="list-group-item">python3 manage.py runserver</li>
                     </ul>
                 </div>
             </div>

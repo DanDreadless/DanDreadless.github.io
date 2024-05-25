@@ -6,6 +6,20 @@ div.code {
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
-  body {
-    overflow: hidden; /* Hide scrollbars */
+body {
+    padding-top: 56px;
+    overflow-x: hidden; /* Hide scrollbars */
+}
+.navbar {
+    margin-bottom: 20px;
+}
+.content {
+    margin: 20px;
+}
+img.vault {
+    max-width: auto;
+    height: 25em;
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
   }
