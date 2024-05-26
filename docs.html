@@ -39,8 +39,17 @@
             <div class="row">
                 <div class="col-md-12">
                     <h2>Installation</h2>
+                    <p><b>Update your distro</b>
+                    <ul class="list-group">
+                        <li class="list-group-item">sudo apt update && sudo apt upgrade -y</li>
+                    </ul>
+                    <p><b>Install extra dependancies</b>
+                    <ul class="list-group">
+                        <li class="list-group-item">sudo apt install exiftool libmpc-dev</li>
+                    </ul>
                     <p><b>Download the vault</b> - Clone the repository and make sure to take ownership of the files</p>
                     <ul class="list-group">
+                        <li class="list-group-item">cd /to/where/you/want/it</li>
                         <li class="list-group-item">git clone https://github.com/DanDreadless/Vault1337</li>
                         <li class="list-group-item">sudo chown -R your_user:your_user Vault1337/</li>
                         <li class="list-group-item">cd Vault1337/</li>
@@ -48,8 +57,8 @@
 
                     <p><b>python venv</b> - Create a python virtual environment and install the requirements</p>
                     <ul class="list-group">
-                        <li class="list-group-item">python3 -m venv ~/vault1337</li>
-                        <li class="list-group-item">source ~/vault1337/bin/activate</li>
+                        <li class="list-group-item">python3 -m venv env</li>
+                        <li class="list-group-item">source env/bin/activate</li>
                         <li class="list-group-item">pip install -r requirements.txt</li>
                     </ul>
 
@@ -67,6 +76,11 @@
                     <b>Create SuperUser</b>
                     <ul class="list-group">
                         <li class="list-group-item">python3 manage.py createsuperuser</li>
+                    </ul>
+
+                    <b>Create samples folder</b> - I'll fix this step in the code soon
+                    <ul class="list-group">
+                        <li class="list-group-item">mkdir vault/samples</li>
                     </ul>
 
                     <b>You're good to go! Run the app server</b>
