@@ -137,7 +137,7 @@
                             <td>Update your distro</td>
                             <td>
                                 <ul>
-                                    <li>sudo apt update && sudo apt upgrade -y</li>
+                                    <li class="center">sudo apt update && sudo apt upgrade -y</li>
                                 </ul>
                             </td>
                         </tr>
@@ -145,7 +145,7 @@
                             <td>Install extra dependancies</td>
                             <td>
                                 <ul>
-                                    <li>sudo apt install exiftool libmpc-dev</li>
+                                    <li class="center">sudo apt install exiftool libmpc-dev</li>
                                 </ul>
                             </td>
                         </tr>
@@ -153,10 +153,10 @@
                             <td>Download the vault - Clone the repository and make sure to take ownership of the files</td>
                             <td>
                                 <ul>
-                                    <li>cd /to/where/you/want/it</li>
-                                    <li>git clone https://github.com/DanDreadless/</li>
-                                    <li>sudo chown -R your_user:your_user Vault1337/</li>
-                                    <li>cd Vault1337/</li>
+                                    <li class="center">cd /to/where/you/want/it</li>
+                                    <li class="center">git clone https://github.com/DanDreadless/</li>
+                                    <li class="center">sudo chown -R your_user:your_user Vault1337/</li>
+                                    <li class="center">cd Vault1337/</li>
                                 </ul>
                             </td>
                         </tr>
@@ -164,9 +164,9 @@
                             <td>python venv - Create a python virtual environment and install the requirements</td>
                             <td>
                                 <ul>
-                                    <li>python3 -m venv env</li>
-                                    <li>source env/bin/activate</li>
-                                    <li>pip install -r requirements.txt</li>
+                                    <li class="center">python3 -m venv env</li>
+                                    <li class="center">source env/bin/activate</li>
+                                    <li class="center">pip install -r requirements.txt</li>
                                 </ul>
                             </td>
                         </tr>
@@ -174,7 +174,7 @@
                             <td>Generate a new APP Key - rename the .env.sample to .env and copy your new key inside</td>
                             <td>
                                 <ul>
-                                    <li>python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</li>
+                                    <li class="center">python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</li>
                                 </ul>
                             </td>
                         </tr>
@@ -182,8 +182,8 @@
                             <td>Initialise database</td>
                             <td>
                                 <ul>
-                                    <li>python3 manage.py makemigrations</li>
-                                    <li>python3 manage.py migrate</li>
+                                    <li class="center">python3 manage.py makemigrations</li>
+                                    <li class="center">python3 manage.py migrate</li>
                                 </ul>
                             </td>
                         </tr>
@@ -191,7 +191,7 @@
                             <td>Create SuperUser</td>
                             <td>
                                 <ul>
-                                    <li>python3 manage.py createsuperuser</li>
+                                    <li class="center">python3 manage.py createsuperuser</li>
                                 </ul>
                             </td>
                         </tr>
@@ -199,8 +199,8 @@
                             <td>Create samples folder - I'll fix this step in the code soon</td>
                             <td>
                                 <ul>
-                                    <li>mkdir vault/samples</li>
-                                    <li>mkdir vault/yara-rules</li>
+                                    <li class="center">mkdir vault/samples</li>
+                                    <li class="center">mkdir vault/yara-rules</li>
                                 </ul>
                             </td>
                         </tr>
@@ -208,7 +208,7 @@
                             <td>You're good to go! Run the app server</td>
                             <td>
                                 <ul>
-                                    <li>python3 manage.py runserver</li>
+                                    <li class="center">python3 manage.py runserver</li>
                                 </ul>
                             </td>
                         </tr>
