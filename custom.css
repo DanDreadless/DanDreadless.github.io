@@ -23,6 +23,9 @@ img.vault {
     margin: 0 auto;
     border-radius: 50%;
   }
-.custom ul, li {
+.custom.ul {
+    margin: 0; padding: 0;
+}
+.custom.li {
     margin: 0; padding: 0;
 }
