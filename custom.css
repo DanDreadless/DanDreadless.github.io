@@ -23,3 +23,6 @@ img.vault {
     margin: 0 auto;
     border-radius: 50%;
   }
+ul, li {
+    margin: 0; padding: 0;
+}
