@@ -26,3 +26,6 @@ img.vault {
 .custom ul, .custom li {
     margin: 0; padding: 0;
 }
+th {
+    text-align:center
+}
