@@ -124,56 +124,91 @@
             <div class="row">
                 <div class="col-md-12">
                     <h2>Installation</h2>
-                    <p><b>Update your distro</b>
-                    <ul class="list-group">
-                        <li class="list-group-item">sudo apt update && sudo apt upgrade -y</li>
-                    </ul>
-                    <p><b>Install extra dependancies</b>
-                    <ul class="list-group">
-                        <li class="list-group-item">sudo apt install exiftool libmpc-dev</li>
-                    </ul>
-                    <p><b>Download the vault</b> - Clone the repository and make sure to take ownership of the files</p>
-                    <ul class="list-group">
-                        <li class="list-group-item">cd /to/where/you/want/it</li>
-                        <li class="list-group-item">git clone https://github.com/DanDreadless/Vault1337</li>
-                        <li class="list-group-item">sudo chown -R your_user:your_user Vault1337/</li>
-                        <li class="list-group-item">cd Vault1337/</li>
-                    </ul>
-
-                    <p><b>python venv</b> - Create a python virtual environment and install the requirements</p>
-                    <ul class="list-group">
-                        <li class="list-group-item">python3 -m venv env</li>
-                        <li class="list-group-item">source env/bin/activate</li>
-                        <li class="list-group-item">pip install -r requirements.txt</li>
-                    </ul>
-
-                    <p><b>Generate a new APP Key</b> - rename the .env.sample to .env and copy your new key inside</p>
-                    <ul class="list-group">
-                        <li class="list-group-item">python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</li>
-                    </ul>
-
-                    <b>Initialise database</b>
-                    <ul class="list-group">
-                        <li class="list-group-item">python3 manage.py makemigrations</li>
-                        <li class="list-group-item">python3 manage.py migrate</li>
-                    </ul>
-
-                    <b>Create SuperUser</b>
-                    <ul class="list-group">
-                        <li class="list-group-item">python3 manage.py createsuperuser</li>
-                    </ul>
-
-                    <b>Create samples folder</b> - I'll fix this step in the code soon
-                    <ul class="list-group">
-                        <li class="list-group-item">mkdir vault/samples</li>
-                        <li class="list-group-item">mkdir vault/yara-rules</li>
-                    </ul>
-
-                    <b>You're good to go! Run the app server</b>
-                    
-                    <ul class="list-group">    
-                        <li class="list-group-item">python3 manage.py runserver</li>
-                    </ul>
+                    <table class="table table-striped table-sm">
+                        <tr>
+                            <th>Step</th>
+                            <th>Instruction</th>
+                        </tr>
+                        <tr>
+                            <td>Update your distro</td>
+                            <td>
+                                <pre>
+                                    sudo apt update && sudo apt upgrade -y
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Install extra dependancies</td>
+                            <td>
+                                <pre>
+                                    sudo apt install exiftool libmpc-dev
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Download the vault - Clone the repository <br> and make sure to take ownership of the files</td>
+                            <td>
+                                <pre>
+                                    cd /to/where/you/want/it<br>
+                                    git clone https://github.com/DanDreadless/<br>
+                                    sudo chown -R your_user:your_user Vault1337/<br>
+                                    cd Vault1337/<br>
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>python venv - Create a python virtual environment <br> and install the requirements</td>
+                            <td>
+                                <pre>
+                                    python3 -m venv env<br>
+                                    source env/bin/activate<br>
+                                    pip install -r requirements.txt<br>
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Generate a new APP Key - rename the .env.sample to .env <br> and copy your new key inside</td>
+                            <td>
+                                <pre>
+                                    python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Initialise database</td>
+                            <td>
+                                <pre>
+                                    python3 manage.py makemigrations<br>
+                                    python3 manage.py migrate<br>
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Create SuperUser</td>
+                            <td>
+                                <pre>
+                                    python3 manage.py createsuperuser
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Create samples folder - I'll fix this step in the code soon</td>
+                            <td>
+                                <pre>
+                                    mkdir vault/samples<br>
+                                    mkdir vault/yara-rules<br>
+                                </pre>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>You're good to go! Run the app server</td>
+                            <td>
+                                <pre>
+                                    python3 manage.py runserver
+                                </pre>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
