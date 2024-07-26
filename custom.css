@@ -26,8 +26,8 @@ img.vault {
 .custom {
     margin: 0; padding: 0;
 }
-th {
-    text-align:center
+.left {
+    text-align:left
 }
 .right {
     text-align:right
