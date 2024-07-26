@@ -23,7 +23,7 @@ img.vault {
     margin: 0 auto;
     border-radius: 50%;
   }
-.custom ul, .custom li {
+.custom {
     margin: 0; padding: 0;
 }
 th {
