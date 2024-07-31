@@ -26,9 +26,3 @@ img.vault {
 .custom {
     margin: 0; padding: 0;
 }
-pre.long {
-    overflow-x: scroll;
-    overflow-y: hidden;
-    margin: 0 auto;
-    width: 50%;
-}
