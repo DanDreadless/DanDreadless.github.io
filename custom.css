@@ -37,5 +37,5 @@ img.vault {
 }
 pre {
   overflow: scroll;
-  height: 500px;
+  margin: 0 auto;
 }
