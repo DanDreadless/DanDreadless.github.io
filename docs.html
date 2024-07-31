@@ -220,6 +220,41 @@
                             <td><code>python3 manage.py runserver</code></td>
                         </tr>
                     </table>
+                    <br>
+                    <h4>What does the script do?</h4>
+                    <ol type="1">
+                        <li>
+                            Create Necessary Directories<br>
+                            <code>mkdir -p vault/samples and mkdir -p vault/yara-rules are used to create the required directories.</code>
+                        </li>
+                        <li>Set Up Python Virtual Environment<br>
+                            <code>
+                                - python3 -m venv env creates a virtual environment named env.<br>
+                                - source env/bin/activate activates the virtual environment.
+                            </code>
+                        </li>
+                        <li>Install Required Python Packages with Error Handling<br>
+                            <code>
+                                - The pip install -r requirements.txt command is wrapped in an if statement to check if it succeeds.<br>
+                                - If the command fails, it prints an error message and exits the script with a non-zero status.
+                            </code>
+                        </li>
+                        <li>Apply Database Migrations with Error Handling<br>
+                            <code>
+                                - The python3 manage.py makemigrations and python3 manage.py migrate commands are also wrapped in an if statement to ensure they succeed.
+                            </code>
+                        </li>
+                        <li>Prompt User to Create a Superuser with Error Handling<br>
+                            <code>
+                                - The python3 manage.py createsuperuser command is wrapped in an if statement to ensure it succeeds.
+                            </code>
+                        </li>
+                        <li>Generate and Display Django Secret Key<br>
+                            <code>
+                                - The script generates a Django secret key using Python and displays it to the user.
+                            </code>
+                        </li>      
+                    </ol>
                 </div>
             </div>
         </div>
