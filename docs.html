@@ -135,28 +135,28 @@
                         </tr>
                         <tr>
                             <td>Update your distro</td>
-                            <td><pre lang="bash">sudo apt update && sudo apt upgrade -y</pre></td>
+                            <td><code>sudo apt update && sudo apt upgrade -y</code></td>
                         </tr>
                         <tr>
                             <td>Install extra dependancies</td>
-                            <td><pre lang="bash">sudo apt install exiftool libmpc-dev</pre></td>
+                            <td><code>sudo apt install exiftool libmpc-dev</code></td>
                         </tr>
                         <tr>
                             <td>Download the vault - Clone the repository and make sure to take ownership of the files</td>
-                            <td><pre lang="bash">
+                            <td><code>
                                 cd /to/where/you/want/it<br>
                                 git clone https://github.com/DanDreadless/Vault1337/<br>
                                 sudo chown -R your_user:your_user<br>
                                 cd Vault1337/<br>
-                            </pre></td>
+                            </code></td>
                         </tr>
                         <tr>
                             <td>python venv - Create a python virtual environment and install the requirements</td>
-                            <td><pre lang="python">
+                            <td><code>
                                 python3 -m venv env<br>
                                 source env/bin/activate<br>
                                 pip install -r requirements.txt<br>
-                            </pre></td>
+                            </code></td>
                         </tr>
                         <tr>
                             <td>Generate a new APP Key - rename the .env.sample to .env and copy your new key inside</td>
@@ -164,25 +164,25 @@
                         </tr>
                         <tr>
                             <td>Initialise database</td>
-                            <td><pre lang="python">
+                            <td><code>
                                 python3 manage.py makemigrations<br>
                                 python3 manage.py migrate<br>
-                            </pre></td>
+                            </code></td>
                         </tr>
                         <tr>
                             <td>Create SuperUser</td>
-                            <td><pre lang="python">python3 manage.py createsuperuser</pre></td>
+                            <td><code>python3 manage.py createsuperuser</code></td>
                         </tr>
                         <tr>
                             <td>Create samples folder - I'll fix this step in the code soon</td>
-                            <td><pre lang="bash">
+                            <td><code>
                                 mkdir vault/samples<br>
                                 mkdir vault/yara-rules<br>
-                            </pre></td>
+                            </code></td>
                         </tr>
                         <tr>
                             <td>You're good to go! Run the app server</td>
-                            <td><pre lang="python">python3 manage.py runserver</pre></td>
+                            <td><code>python3 manage.py runserver</code></td>
                         </tr>
                     </table>
                 </div>
