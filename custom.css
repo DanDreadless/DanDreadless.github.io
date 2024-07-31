@@ -26,7 +26,7 @@ img.vault {
 .custom {
     margin: 0; padding: 0;
 }
-.left {
+/* .left {
     text-align:left
 }
 .right {
@@ -34,7 +34,7 @@ img.vault {
 }
 .center {
     text-align:center
-}
+} */
 pre.long {
     overflow-x: scroll;
     overflow-y: hidden;
