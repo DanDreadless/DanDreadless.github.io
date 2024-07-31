@@ -41,3 +41,6 @@ pre.long {
     margin: 0 auto;
     width: 50%;
 }
+th {
+    width:50%;
+}
