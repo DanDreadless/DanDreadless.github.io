@@ -36,6 +36,8 @@ img.vault {
     text-align:center
 }
 pre {
-  overflow: scroll;
-  margin: 0 auto;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    margin: 0 auto;
+    width: 50px;
 }
