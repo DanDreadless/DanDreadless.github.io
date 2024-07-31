@@ -135,15 +135,15 @@
                         </tr>
                         <tr>
                             <td>Update your distro</td>
-                            <td class="center">sudo apt update && sudo apt upgrade -y</td>
+                            <td class="right">sudo apt update && sudo apt upgrade -y</td>
                         </tr>
                         <tr>
                             <td>Install extra dependancies</td>
-                            <td class="center">sudo apt install exiftool libmpc-dev</td>
+                            <td class="right">sudo apt install exiftool libmpc-dev</td>
                         </tr>
                         <tr>
                             <td>Download the vault - Clone the repository and make sure to take ownership of the files</td>
-                            <td class="center">
+                            <td class="right">
                                 cd /to/where/you/want/it<br>
                                 git clone https://github.com/DanDreadless/<br>
                                 sudo chown -R your_user:your_user Vault1337/<br>
@@ -152,7 +152,7 @@
                         </tr>
                         <tr>
                             <td>python venv - Create a python virtual environment and install the requirements</td>
-                            <td class="center">
+                            <td class="right">
                                 python3 -m venv env<br>
                                 source env/bin/activate<br>
                                 pip install -r requirements.txt<br>
@@ -160,29 +160,29 @@
                         </tr>
                         <tr>
                             <td>Generate a new APP Key - rename the .env.sample to .env and copy your new key inside</td>
-                            <td class="center">python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</td>
+                            <td class="right">python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</td>
                         </tr>
                         <tr>
                             <td>Initialise database</td>
-                            <td class="center">
+                            <td class="right">
                                 python3 manage.py makemigrations<br>
                                 python3 manage.py migrate<br>
                             </td>
                         </tr>
                         <tr>
                             <td>Create SuperUser</td>
-                            <td class="center">python3 manage.py createsuperuser</td>
+                            <td class="right">python3 manage.py createsuperuser</td>
                         </tr>
                         <tr>
                             <td>Create samples folder - I'll fix this step in the code soon</td>
-                            <td class="center">
+                            <td class="right">
                                 mkdir vault/samples<br>
                                 mkdir vault/yara-rules<br>
                             </td>
                         </tr>
                         <tr>
                             <td>You're good to go! Run the app server</td>
-                            <td class="center">python3 manage.py runserver</td>
+                            <td class="right">python3 manage.py runserver</td>
                         </tr>
                     </table>
                 </div>
