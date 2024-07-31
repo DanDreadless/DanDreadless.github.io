@@ -40,7 +40,7 @@
                     <h2>Contents</h2>
                     <ul>
                         <li><a href="#tools">Tools available</a></li>
-                        <li><a href="#install">Installation</a></li>
+                        <li><a href="#manual-install">Installation</a></li>
                     </ul>
                 </div>
             </div>
@@ -112,11 +112,11 @@
         </div>
     </section>
     <br>
-    <section id="install">
+    <section id="manual-install">
         <div class="code container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2>Installation</h2>
+                    <h2>Manual Installation</h2>
                     <table class="table table-striped table-sm align-middle">
                         <tr>
                             <th>Step</th>
@@ -168,6 +168,51 @@
                                 mkdir vault/samples<br>
                                 mkdir vault/yara-rules<br>
                             </code></td>
+                        </tr>
+                        <tr>
+                            <td>You're good to go! Run the app server</td>
+                            <td><code>python3 manage.py runserver</code></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <br>
+    <section id="install-script">
+        <div class="code container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Installation Script (Work in Progress)</h2>
+                    <table class="table table-striped table-sm align-middle">
+                        <tr>
+                            <th>Step</th>
+                            <th>Instruction</th>
+                        </tr>
+                        <tr>
+                            <td>Update your distro</td>
+                            <td><code>sudo apt update && sudo apt upgrade -y</code></td>
+                        </tr>
+                        <tr>
+                            <td>Install extra dependancies</td>
+                            <td><code>sudo apt install exiftool libmpc-dev</code></td>
+                        </tr>
+                        <tr>
+                            <td>Download the vault - Clone the repository and make sure to take ownership of the files</td>
+                            <td><code>
+                                cd /to/where/you/want/it<br>
+                                git clone https://github.com/DanDreadless/Vault1337/<br>
+                                sudo chown -R your_user:your_user<br>
+                                cd Vault1337/<br>
+                            </code></td>
+                        </tr>
+                        <tr>
+                            <td>Make the install script executable</td>
+                            <td><code>chmod +x install.sh</code></td>
+                        </tr>
+                        <tr>
+                            <td>Execute the script </td>
+                            <td><code>./install.sh</code></td>
                         </tr>
                         <tr>
                             <td>You're good to go! Run the app server</td>
