@@ -35,7 +35,7 @@ img.vault {
 .center {
     text-align:center
 }
-pre {
+pre.long {
     overflow-x: scroll;
     overflow-y: hidden;
     margin: 0 auto;
