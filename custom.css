@@ -17,7 +17,7 @@ body {
     margin: 20px;
 }
 img.vault {
-    max-width: 500px;
+    max-width: auto;
     height: 25em;
     display: block;
     margin: 0 auto;
@@ -30,9 +30,19 @@ img.vault {
     width: 100%;
     overflow-x: auto;
 }
-* {box-sizing: border-box}
-.mySlides {display: none}
-img.slideshow {vertical-align: middle;}
+* {
+    box-sizing: border-box
+}
+.mySlides {
+    display: none
+}
+img.slideshow {
+    vertical-align: middle;
+    max-width: auto;
+    height: 25em;
+    display: block;
+    margin: 0 auto;
+}
 
 /* Slideshow container */
 .slideshow-container {
