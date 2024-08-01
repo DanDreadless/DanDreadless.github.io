@@ -42,13 +42,11 @@ img.slideshow {
     height: 30em;
     display: block;
     margin: 0 auto;
-    border-style: solid;
-    border-radius: 5px;
 }
 
 /* Slideshow container */
 .slideshow-container {
-    padding-top: 56px;
+    padding-top: 8px;
     max-width: 1000px;
     position: relative;
     margin: auto;
