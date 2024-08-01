@@ -39,7 +39,7 @@ img.vault {
 img.slideshow {
     vertical-align: middle;
     max-width: auto;
-    height: 25em;
+    height: 30em;
     display: block;
     margin: 0 auto;
     border-style: solid;
@@ -93,7 +93,7 @@ img.slideshow {
   font-size: 12px;
   padding: 8px 12px;
   position: absolute;
-  top: 0;
+  top: ;
 }
 
 /* The dots/bullets/indicators */
