@@ -92,7 +92,8 @@ img.slideshow {
     font-size: 12px;
     padding: 8px 12px;
     position: absolute;
-    top: 56px;
+    bottom: 8px;
+    text-align: left;
 }
 
 /* The dots/bullets/indicators */
