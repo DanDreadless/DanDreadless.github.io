@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <meta name="description" content="Vault1337 Malware Repository and Analysis Platform Documentation">
+    <meta name="keywords" content="vault1337,malware,analysis,repository,github,static analysis, documentation">
+    <title>Vault1337 Documentation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="custom.css">
+    <link rel="shortcut icon" type="image/png" href="Images/favicon.png"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="index"><img src="Images/logo-no-background.png" width="200" height="auto" alt="vault"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="index">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="docs">Documentation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="screenshots">Screenshots</a>
+        </li>
+      </ul>
+    </div>
+</nav>
+
+<div class="container-fluid content">
+    <div class="slideshow-container">
+
+        <div class="mySlides fade">
+          <div class="numbertext">1 / 7</div>
+          <img src="images/Home_Screen_loggedIn.png" style="width:100%">
+          <div class="text">Home Screen LoggedIn</div>
+        </div>
+        
+        <div class="mySlides fade">
+          <div class="numbertext">2 / 7</div>
+          <img src="images/Vault.png" style="width:100%">
+          <div class="text">The Vault</div>
+        </div>
+        
+        <div class="mySlides fade">
+          <div class="numbertext">3 / 7</div>
+          <img src="images/Sample_View.png" style="width:100%">
+          <div class="text">Sample View</div>
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext">4 / 7</div>
+            <img src="images/Tool_View_Strings.png" style="width:100%">
+            <div class="text">Strings Tool</div>
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext">5 / 7</div>
+            <img src="images/Tool_View_LIEF.png" style="width:100%">
+            <div class="text">LIEF Tool</div>
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext">6 / 7</div>
+            <img src="images/ip_rep_1.png" style="width:100%">
+            <div class="text">Sample View</div>
+        </div>
+
+        <div class="mySlides fade">
+            <div class="numbertext">7 / 7</div>
+            <img src="images/ip_rep_2.png" style="width:100%">
+            <div class="text">Sample View</div>
+        </div>
+        
+        <a class="prev" onclick="plusSlides(-1)">❮</a>
+        <a class="next" onclick="plusSlides(1)">❯</a>
+        
+        </div>
+        <br>
+        
+        <div style="text-align:center">
+          <span class="dot" onclick="currentSlide(1)"></span> 
+          <span class="dot" onclick="currentSlide(2)"></span> 
+          <span class="dot" onclick="currentSlide(3)"></span>
+          <span class="dot" onclick="currentSlide(4)"></span>
+          <span class="dot" onclick="currentSlide(5)"></span>
+          <span class="dot" onclick="currentSlide(6)"></span>
+          <span class="dot" onclick="currentSlide(7)"></span> 
+        </div>
+    </div>
+</div>
+<script>
+    let slideIndex = 1;
+    showSlides(slideIndex);
+    
+    function plusSlides(n) {
+      showSlides(slideIndex += n);
+    }
+    
+    function currentSlide(n) {
+      showSlides(slideIndex = n);
+    }
+    
+    function showSlides(n) {
+      let i;
+      let slides = document.getElementsByClassName("mySlides");
+      let dots = document.getElementsByClassName("dot");
+      if (n > slides.length) {slideIndex = 1}    
+      if (n < 1) {slideIndex = slides.length}
+      for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";  
+      }
+      for (i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active", "");
+      }
+      slides[slideIndex-1].style.display = "block";  
+      dots[slideIndex-1].className += " active";
+    }
+    </script>
+</body>
+</html>
