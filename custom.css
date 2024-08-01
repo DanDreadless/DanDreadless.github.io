@@ -48,14 +48,14 @@ img.slideshow {
 .slideshow-container {
     padding-top: 8px;
     max-width: 1000px;
-    position: relative;
+/*     position: relative; */
     margin: auto;
 }
 
 /* Next & previous buttons */
 .prev, .next {
     cursor: pointer;
-    position: absolute;
+/*     position: absolute; */
     top: 50%;
     width: auto;
     margin-top: -22px;
@@ -79,7 +79,7 @@ img.slideshow {
     color: #000000;
     font-size: 15px;
     padding: 8px 12px;
-    position: absolute;
+/*     position: absolute; */
     bottom: 8px;
     width: 100%;
     text-align: center;
@@ -90,7 +90,7 @@ img.slideshow {
     color: #000000;
     font-size: 12px;
     padding: 8px 12px;
-    position: absolute;
+/*     position: absolute; */
     bottom: 8px;
     text-align: left;
 }
