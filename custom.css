@@ -7,11 +7,38 @@ div.code {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
 body {
+    background-color: #353E43;
+    font-family: Arial, sans-serif;
+    color: #ffffff;
     padding-top: 56px;
     overflow-x: hidden; /* Hide scrollbars */
 }
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #353E43;
+    color: white;
+    text-align: center;
+    padding: 10px;
+  }
 .navbar {
-    margin-bottom: 20px;
+position: fixed;
+top: 0;
+width: 100%;
+z-index: 1000;
+box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
+}
+
+.nav-link {
+color: #ffffff !important;
+}
+.nav-link:hover {
+color: #ffffffbe !important;
+}
+.nav-link.active {
+color: #ffffffbe !important;
 }
 .content {
     margin: 20px;
@@ -37,13 +64,19 @@ img.vault {
     display: none;
 }
 img.slideshow {
-    vertical-align: middle;
     max-width: auto;
     height: 30em;
     display: block;
     margin: 0 auto;
 }
-
+a {
+    color: #000000;
+    font-weight: bold;
+  }
+  a:hover {
+    color: #ffffffbe;
+    text-decoration: none;
+  }
 /* Slideshow container */
 .slideshow-container {
     padding-top: 8px;
