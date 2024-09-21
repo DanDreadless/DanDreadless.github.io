@@ -46,6 +46,9 @@ color: #ffffffbe !important;
 .code {
     background-color: #97a1a7;
 }
+code {
+    color: #000000;
+}
 img.vault {
     max-width: auto;
     height: 15em;
