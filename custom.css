@@ -139,9 +139,6 @@ a:hover {
     background-color: #ffffffbe;
 }
 
-span, .dot, .active {
-    background-color: #ffffffbe;
-}
 .arrow-container {
     display: flex;
     justify-content: space-between;
