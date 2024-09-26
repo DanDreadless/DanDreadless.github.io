@@ -11,7 +11,6 @@ body {
     font-family: Arial, sans-serif;
     color: #ffffff;
     padding-top: 56px;
-    overflow-y: scroll; /* Add the ability to scroll */
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
@@ -45,10 +44,15 @@ color: #ffffffbe !important;
 .nav-link.active {
 color: #ffffffbe !important;
 }
-
+.content::-webkit-scrollbar {
+    display: none;
+}
 
 .content {
     margin: 20px;
+    overflow-y: scroll; /* Add the ability to scroll */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 .code {
     background-color: #97a1a7;
