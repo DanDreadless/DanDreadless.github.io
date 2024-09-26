@@ -11,7 +11,7 @@ body {
     font-family: Arial, sans-serif;
     color: #ffffff;
     padding-top: 56px;
-    overflow-x: hidden; /* Hide scrollbars */
+    overflow: hidden; /* Hide scrollbars */
 }
 .footer {
   left: 0;
@@ -39,8 +39,19 @@ color: #ffffffbe !important;
 .nav-link.active {
 color: #ffffffbe !important;
 }
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+body {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 .content {
     margin: 20px;
+    overflow-y: scroll; /* Add the ability to scroll */
 }
 .code {
     background-color: #97a1a7;
