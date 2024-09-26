@@ -139,7 +139,7 @@ a:hover {
     background-color: #ffffffbe;
 }
 
-span .dot .active {
+span, .dot, .active {
     background-color: #ffffffbe;
 }
 .arrow-container {
