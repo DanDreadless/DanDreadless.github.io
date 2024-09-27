@@ -66,6 +66,10 @@ img.vault {
     margin: 0 auto;
     border-radius: 50%;
   }
+img.slideshow {
+    max-width: auto;
+    height: 300px;
+}
 .custom {
     margin: 0; padding: 0;
 }
