@@ -68,7 +68,7 @@ img.vault {
   }
 img.slideshow {
     max-width: auto;
-    height: 500px;
+    height: 1em;
 }
 .custom {
     margin: 0; padding: 0;
