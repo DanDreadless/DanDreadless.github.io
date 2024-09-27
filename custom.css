@@ -117,9 +117,7 @@ a:hover {
 .dot:hover {
     background-color: #ffffffbe;
 }
-.dot:active {
-    background-color: #ffffffbe;
-}
+
 .dot-navigation {
     display: flex;
     justify-content: center;
