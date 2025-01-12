@@ -36,7 +36,6 @@
     <center><h1>Progress Screenshots</h1></center>
     <div class="code container-fluid">
         <div class="slideshow-container">
-    
             <div class="mySlides">
                 <img class="slideshow" src="Images/Home_Screen_loggedIn.png" style="width:100%">
                 <div class="text">Home Screen LoggedIn</div>
@@ -78,25 +77,23 @@
                 <div class="text">IP Reputation Continued</div>
                 <div class="numbertext">7 / 7</div>
             </div>
-            
-            <a class="prev" onclick="plusSlides(-1)">❮</a>
-            <a class="next" onclick="plusSlides(1)">❯</a>
-            
-            </div>
-            <br>
-            
-            <div style="text-align:center">
-              <span class="dot" onclick="currentSlide(1)"></span> 
-              <span class="dot" onclick="currentSlide(2)"></span> 
-              <span class="dot" onclick="currentSlide(3)"></span>
-              <span class="dot" onclick="currentSlide(4)"></span>
-              <span class="dot" onclick="currentSlide(5)"></span>
-              <span class="dot" onclick="currentSlide(6)"></span>
-              <span class="dot" onclick="currentSlide(7)"></span> 
-            </div>
+        </div>
+
+        <!-- Dot and Arrow Navigation -->
+        <div class="dot-navigation">
+            <span class="arrow prev" onclick="plusSlides(-1)">❮</span>
+            <span class="dot" onclick="currentSlide(1)"></span> 
+            <span class="dot" onclick="currentSlide(2)"></span> 
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+            <span class="dot" onclick="currentSlide(5)"></span>
+            <span class="dot" onclick="currentSlide(6)"></span>
+            <span class="dot" onclick="currentSlide(7)"></span> 
+            <span class="arrow next" onclick="plusSlides(1)">❯</span>
         </div>
     </div>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -127,17 +124,19 @@
       slides[slideIndex-1].style.display = "block";  
       dots[slideIndex-1].className += " active";
     }
-    </script>
+</script>
+
+<footer class="footer">
+    <div class="container" align="center">
+        <script>                
+            var myElem = document.createElement("p");
+            myElem.innerHTML = 'Vault1337 | Malware Analysis | Copyright &copy; ' + new Date().getFullYear() + ' - <a href="https://github.com/DanDreadless/Vault1337/blob/094b423d30e146f7ee98dc60d9878e9153d83279/LICENSE">BSD 3 License</a>';
+            myElem.style.textAlign = "center"; // Center the text horizontally
+            myElem.style.margin = "0 auto";    // Center the element itself horizontally
+            document.body.appendChild(myElem);
+        </script>
+    </div>
+</footer>
+
 </body>
-    <footer class="footer">
-        <div class="container" align="center">
-                <script>                
-                    var myElem = document.createElement("p");
-                    myElem.innerHTML = 'Vault1337 | Malware Analysis | Copyright &copy; ' + new Date().getFullYear() + ' - <a href="https://github.com/DanDreadless/Vault1337/blob/094b423d30e146f7ee98dc60d9878e9153d83279/LICENSE">BSD 3 License</a>';
-                    myElem.style.textAlign = "center"; // Center the text horizontally
-                    myElem.style.margin = "0 auto";    // Center the element itself horizontally
-                    document.body.appendChild(myElem);
-                </script>
-        </div>
-    </footer>
 </html>
