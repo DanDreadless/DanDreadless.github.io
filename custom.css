@@ -40,10 +40,10 @@ box-shadow: 0 2px 4px 0 rgba(0,0,0,.2);
 color: #ffffff !important;
 }
 .nav-link:hover {
-color: #ffffffbe !important;
+color: #bd363a !important;
 }
 .nav-link.active {
-color: #ffffffbe !important;
+color: #bd363a !important;
 }
 .scrollable {
     width: 100%;
