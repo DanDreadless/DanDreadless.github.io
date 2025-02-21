@@ -64,8 +64,14 @@
                                 <th>Description</th>
                             </tr>
                             <tr>
-                                <td>Strings</td>
-                                <td>Shows all strings from a sample</td>
+                                <td>Strings<br>
+                                <code>- UTF-8<br></code>
+                                <code>- Latin-1<br></code>
+                                <code>- UTF-16<br></code>
+                                <code>- UTF-32<br></code>
+                                <code>- ASCII<br></code>
+                                </td>
+                                <td>Shows all strings from a sample using different encodings</td>
                             </tr>
                             <tr>
                                 <td>
@@ -76,6 +82,8 @@
                                     <code>- Engtrypoint<br></code>
                                     <code>- Sections<br></code>
                                     <code>- Imports<br></code>
+                                    <code>- Signature check<br></code>
+                                    <code>- Check Entropy<br></code>
                                 </td>
                                 <td>Utiliese the <a href="https://github.com/lief-project/LIEF" target="_blank">Lief-Project</a></td>
                             </tr>
@@ -85,7 +93,7 @@
                             </tr>
                             <tr>
                                 <td>PDF Parser</td>
-                                <td>Utilises <a href="https://pypi.org/project/PyPDF2/" target="_blank">PyPDF2</a> to dump the data from PDF samples</td>
+                                <td>Utilises <a href="https://pypi.org/project/PyMuPDF/" target="_blank">PyMuPDF</a> to extract MetaData, URLs and PDF Content</td>
                             </tr>
                             <tr>
                                 <td>
@@ -105,11 +113,23 @@
                             </tr>
                             <tr>
                                 <td>IOC Extractor (work in progress)</td>
-                                <td>A script I am working on to extract IOCs from samples</td>
+                                <td>This script extracts IOCs from a sample and populates the IOC database, linking to particular samples</td>
                             </tr>
                             <tr>
                                 <td>Yara</td>
                                 <td>Create, Edit and run Yara rules against samples</td>
+                            </tr>
+                            <tr>
+                                <td>Email Parser<br>
+                                <code>- Get Email Headers</code>
+                                <code>- Get Email body</code>
+                                <code>- Download Attachments</code>
+                            </td>
+                                <td>Work in progress script to analyse emails and download attachments into the vault for further analysis</td>
+                            </tr>
+                            <tr>
+                                <td>Zip Extractor (work in progress)</td>
+                                <td>Extract .zip and .7z files within the vault</td>
                             </tr>
                         </table>
                     </div>
