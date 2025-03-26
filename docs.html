@@ -161,7 +161,7 @@
                             </tr>
                             <tr>
                                 <td>Install extra dependancies</td>
-                                <td><code>sudo apt install exiftool libmpc-dev git-all -y</code></td>
+                                <td><code>sudo apt-get install git exiftool python3-venv python3-pip yara</code></td>
                             </tr>
                             <tr>
                                 <td>Download the vault - Clone the repository and make sure to take ownership of the files</td>
@@ -182,7 +182,11 @@
                             </tr>
                             <tr>
                                 <td>Generate a new APP Key - rename the .env.sample to .env and copy your new key inside</td>
-                                <td><code>python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</code></td>
+                                <td><code>
+                                    mv .env.sample .env<br>
+                                    python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'<br>
+                                    Update your .env file with the Django Secret Key and required API Keys<br>
+                                </code></td>
                             </tr>
                             <tr>
                                 <td>Initialise database</td>
@@ -196,15 +200,19 @@
                                 <td><code>python3 manage.py createsuperuser</code></td>
                             </tr>
                             <tr>
-                                <td>Create samples folder - I'll fix this step in the code soon</td>
+                                <td>Create required folders</td>
                                 <td><code>
-                                    mkdir vault/samples<br>
-                                    mkdir vault/yara-rules<br>
+                                    mkdir -p vault/samples<br>
+                                    mkdir -p vault/yara-rules<br>
+                                    mkdir -p vault/static/images/media<br>
                                 </code></td>
                             </tr>
                             <tr>
                                 <td>You're good to go! Run the app server</td>
-                                <td><code>python3 manage.py runserver</code></td>
+                                <td><code>
+                                    python3 manage.py runserver<br>
+                                    login at http://127.0.0.1:8000<br>
+                                </code></td>
                             </tr>
                         </table>
                     </div>
@@ -221,7 +229,7 @@
         <div class="code container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2>Installation Script (Work in Progress)</h2>
+                    <h2>Installation Script - Tested on Ubuntu 24.04.2</h2>
                     <div class="table-responsive">
                         <table class="table table-striped table-sm">
                             <tr>
@@ -234,7 +242,7 @@
                             </tr>
                             <tr>
                                 <td>Install extra dependancies</td>
-                                <td><code>sudo apt install exiftool libmpc-dev git-all -y</code></td>
+                                <td><code>sudo apt-get install git exiftool python3-venv python3-pip yara</code></td>
                             </tr>
                             <tr>
                                 <td>Download the vault - Clone the repository and <br> make sure to take ownership of the files</td>
@@ -255,7 +263,12 @@
                             </tr>
                             <tr>
                                 <td>You're good to go! Run the app server</td>
-                                <td><code>python3 manage.py runserver</code></td>
+                                <td><code>
+                                    Update your .env file with the Django Secret Key and required API Keys<br>
+                                    source env/bin/activate<br>
+                                    python3 manage.py runserver<br>
+                                    login at http://127.0.0.1:8000
+                                </code></td>
                             </tr>
                         </table>
                     </div>
@@ -265,7 +278,11 @@
                         <li>
                             Create Necessary Directories<br>
                             <code>
-                                - mkdir -p vault/samples and mkdir -p vault/yara-rules are used to create the required directories.
+                                The below are usesd to store samples, yara rules and static images<br>
+                                - mkdir -p vault/samples<br>
+                                - mkdir -p vault/yara-rules<br>
+                                - mkdir -p vault/static/images/media<br>
+                                - mv .env.sample .env
                             </code>
                         </li>
                         <li>Set Up Python Virtual Environment<br>
