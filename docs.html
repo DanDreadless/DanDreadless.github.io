@@ -172,6 +172,15 @@
                                 </code></td>
                             </tr>
                             <tr>
+                                <td>Create required folders</td>
+                                <td><code>
+                                    mkdir -p vault/samples<br>
+                                    mkdir -p vault/yara-rules<br>
+                                    mkdir -p vault/static/images/media<br>
+                                    mv .env.sample .env
+                                </code></td>
+                            </tr>
+                            <tr>
                                 <td>python venv - Create a python virtual environment and install the requirements</td>
                                 <td><code>
                                     python3 -m venv env<br>
@@ -180,22 +189,8 @@
                                 </code></td>
                             </tr>
                             <tr>
-                                <td>Generate a new APP Key - rename the .env.sample to .env</td>
-                                <td><code>
-                                    mv .env.sample .env<br>
-                                    python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>Update your .env file</td>
-                                <td><code>
-                                    nano .env<br>
-                                    SECRET_KEY = 'paste your Django secret key here'<br>
-                                    <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a> = 'paste your virustotal api key here'<br>
-                                    <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a> = 'paste your malware bazaar api key here'<br>
-                                    <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a> = 'paste your abuseipdb api key here'<br>
-                                    <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a> = 'paste your spur api key here'<br>
-                                </code></td>
+                                <td>Create SuperUser</td>
+                                <td><code>python3 manage.py createsuperuser</code></td>
                             </tr>
                             <tr>
                                 <td>Initialise database</td>
@@ -205,15 +200,20 @@
                                 </code></td>
                             </tr>
                             <tr>
-                                <td>Create SuperUser</td>
-                                <td><code>python3 manage.py createsuperuser</code></td>
+                                <td>Generate a new APP Key</td>
+                                <td><code>
+                                    python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'<br>
+                                </code></td>
                             </tr>
                             <tr>
-                                <td>Create required folders</td>
+                                <td>Update your .env file with required API Keys</td>
                                 <td><code>
-                                    mkdir -p vault/samples<br>
-                                    mkdir -p vault/yara-rules<br>
-                                    mkdir -p vault/static/images/media<br>
+                                    nano .env<br>
+                                    SECRET_KEY = 'paste your Django secret key here'<br>
+                                    <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a> = 'paste your virustotal api key here'<br>
+                                    <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a> = 'paste your malware bazaar api key here'<br>
+                                    <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a> = 'paste your abuseipdb api key here'<br>
+                                    <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a> = 'paste your spur api key here'<br>
                                 </code></td>
                             </tr>
                             <tr>
@@ -270,7 +270,7 @@
                                 <td><code>./install.sh</code></td>
                             </tr>
                             <tr>
-                                <td>Update your .env file</td>
+                                <td>Update your .env file with required API Keys</td>
                                 <td><code>
                                     nano .env<br>
                                     SECRET_KEY = 'paste your Django secret key here'<br>
