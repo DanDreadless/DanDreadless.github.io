@@ -72,12 +72,17 @@
                 the platform runs comfortably on a Raspberry Pi 5 via Gunicorn and NGINX in production.
             </p>
 
-            <p>
-                Key capabilities include uploading samples by file or URL, downloading directly from VirusTotal
-                or Malware Bazaar by hash, running 10+ static analysis tools, managing YARA rules with a
-                built-in editor, extracting and tracking IOCs, and checking IP reputation via AbuseIPDB, Spur,
-                and Shodan — all in one place.
-            </p>
+            <h5>Features</h5>
+            <ul>
+                <li>Upload samples by file or URL, or download directly from <strong>VirusTotal</strong> or <strong>Malware Bazaar</strong> by SHA256 hash</li>
+                <li><strong>10+ static analysis tools</strong>: Strings, LIEF Parser, Hex Viewer, PDF Parser, OLE Tools, ExifTool, IOC Extractor, YARA, Email Parser, Zip Extractor, QR Decode</li>
+                <li><strong>YARA rules</strong> — create, edit and run rules against samples via a built-in editor</li>
+                <li><strong>IOC tracking</strong> — extract and manage indicators of compromise linked to samples</li>
+                <li><strong>IP reputation</strong> — query AbuseIPDB, Spur, and Shodan from a single interface</li>
+                <li>Tag-based organisation with full-text search</li>
+                <li>JWT-authenticated REST API with staff/user role separation</li>
+                <li>API key management for all third-party integrations</li>
+            </ul>
 
             <p>
                 The platform ships as a Docker image for easy deployment, or can be installed manually on
