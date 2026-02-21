@@ -66,10 +66,6 @@ img.vault {
     margin: 0 auto;
     border-radius: 50%;
   }
-img.slideshow {
-    max-width: auto;
-    height: 31em;
-}
 .custom {
     margin: 0; padding: 0;
 }
@@ -87,61 +83,4 @@ a {
 a:hover {
     color: #ffffffbe;
     text-decoration: none;
-}
-.slideshow-container {
-    position: relative;
-    max-width: 100%;
-    margin: auto;
-}
-
-.mySlides {
-    display: none;
-}
-
-.dot-container {
-    text-align: center;
-    padding: 10px 0;
-}
-
-.dot {
-    cursor: pointer;
-    height: 15px;
-    width: 15px;
-    margin: 0 2px;
-    background-color: #fff;
-    border-radius: 50%;
-    display: inline-block;
-    transition: background-color 0.6s ease;
-}
-
-.dot:hover {
-    background-color: #ffffffbe;
-}
-
-.dot-navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.arrow {
-    font-size: 20px;
-    cursor: pointer;
-    color: #333;
-    user-select: none;
-    padding: 10px 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-.arrow:hover {
-    background-color: #ffffffbe;
-}
-
-@keyframes fade {
-    from {opacity: .4} 
-    to {opacity: 1}
 }

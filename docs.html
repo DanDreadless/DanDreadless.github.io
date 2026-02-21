@@ -20,119 +20,168 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link"  href="index">Home</a>
+          <a class="nav-link" href="index">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="docs">Documentation</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="screenshots">Screenshots</a>
-        </li>
       </ul>
     </div>
 </nav>
-    
+
 <div class="container-fluid content scrollable">
     <section id="top">
         <center><h1>Try Vault1337 for yourself!</h1></center>
     </section>
+
     <section id="contents">
         <div class="code container-fluid">
             <div class="row">
                 <div class="col-md-12">
                     <h2>Contents</h2>
                     <ul>
-                        <li><a href="#tools">Tools available</a></li>
-                        <li><a href="#manual-install">Manual Installation</a></li>
-                        <li><a href="#install-script">Installation Script</a></li>
-                        <li><a href="#install-docker">Pull and Run Docker Image</a></li>
+                        <li><a href="#stack">Tech Stack</a></li>
+                        <li><a href="#tools">Analysis Tools</a></li>
+                        <li><a href="#install-docker">Docker Installation (Recommended)</a></li>
+                        <li><a href="#manual-install">Manual Installation (Ubuntu 24.04)</a></li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
+
     <br>
+
+    <section id="stack">
+        <div class="code container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Tech Stack</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <tr>
+                                <th>Layer</th>
+                                <th>Technology</th>
+                            </tr>
+                            <tr>
+                                <td>Backend</td>
+                                <td>Python 3 / Django 5.2 / Django REST Framework</td>
+                            </tr>
+                            <tr>
+                                <td>Authentication</td>
+                                <td>JWT — djangorestframework-simplejwt</td>
+                            </tr>
+                            <tr>
+                                <td>Frontend</td>
+                                <td>React 19 / TypeScript / Vite 6 / Tailwind CSS 4</td>
+                            </tr>
+                            <tr>
+                                <td>Database</td>
+                                <td>PostgreSQL (production) / SQLite (development)</td>
+                            </tr>
+                            <tr>
+                                <td>Production</td>
+                                <td>Gunicorn + NGINX (runs on Raspberry Pi 5)</td>
+                            </tr>
+                            <tr>
+                                <td>Container</td>
+                                <td>Docker — <code>vault1337/vault1337:latest</code></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <ul>
+                        <li><a href="#top">Back to Top</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <br>
+
     <section id="tools">
         <div class="code container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2>Tools</h2>
-                    <p>These are the tools that are available in the Vault1337 project</p>
+                    <h2>Analysis Tools</h2>
+                    <p>Static analysis tools available inside Vault1337</p>
                     <div class="table-responsive">
                         <table class="table table-striped table-sm">
                             <tr>
-                                <th>Tool/Subtool</th>
+                                <th>Tool</th>
                                 <th>Description</th>
                             </tr>
                             <tr>
                                 <td>Strings<br>
-                                <code>- UTF-8<br></code>
-                                <code>- Latin-1<br></code>
-                                <code>- UTF-16<br></code>
-                                <code>- UTF-32<br></code>
-                                <code>- ASCII<br></code>
+                                    <code>- UTF-8</code><br>
+                                    <code>- Latin-1</code><br>
+                                    <code>- UTF-16</code><br>
+                                    <code>- UTF-32</code><br>
+                                    <code>- ASCII</code>
                                 </td>
-                                <td>Shows all strings from a sample using different encodings</td>
+                                <td>Extracts printable strings from a sample across multiple encodings</td>
                             </tr>
                             <tr>
-                                <td>
-                                    LIEF Parser<br>
-                                    <code>- DOS Header<br></code>
-                                    <code>- Rich Header<br></code>
-                                    <code>- PE Header<br></code>
-                                    <code>- Engtrypoint<br></code>
-                                    <code>- Sections<br></code>
-                                    <code>- Imports<br></code>
-                                    <code>- Signature check<br></code>
-                                    <code>- Check Entropy<br></code>
+                                <td>LIEF Parser<br>
+                                    <code>- DOS Header</code><br>
+                                    <code>- Rich Header</code><br>
+                                    <code>- PE Header</code><br>
+                                    <code>- Entrypoint</code><br>
+                                    <code>- Sections</code><br>
+                                    <code>- Imports</code><br>
+                                    <code>- Signature Check</code><br>
+                                    <code>- Entropy Analysis</code>
                                 </td>
-                                <td>Utiliese the <a href="https://github.com/lief-project/LIEF" target="_blank">Lief-Project</a></td>
+                                <td>PE binary analysis via the <a href="https://github.com/lief-project/LIEF" target="_blank">LIEF project</a></td>
                             </tr>
                             <tr>
                                 <td>Hex Viewer</td>
-                                <td>Returns a hex view of a sample</td>
+                                <td>Displays a hex dump of a sample</td>
                             </tr>
                             <tr>
                                 <td>PDF Parser</td>
-                                <td>Utilises <a href="https://pypi.org/project/PyMuPDF/" target="_blank">PyMuPDF</a> to extract MetaData, URLs and PDF Content</td>
+                                <td>Extracts metadata, embedded URLs and text content from PDFs using <a href="https://pypi.org/project/PyMuPDF/" target="_blank">PyMuPDF</a></td>
                             </tr>
                             <tr>
-                                <td>
-                                    OLE Tools<br>
-                                    <code>- OLEID<br></code>
-                                    <code>- OLEMETA<br></code>
-                                    <code>- OLEDUMP<br></code>
-                                    <code>- OLEVBA<br></code>
-                                    <code>- RTFOBJ<br></code>
-                                    <code>- OLEOBJ<br></code>
+                                <td>OLE Tools<br>
+                                    <code>- OLEID</code><br>
+                                    <code>- OLEMETA</code><br>
+                                    <code>- OLEDUMP</code><br>
+                                    <code>- OLEVBA</code><br>
+                                    <code>- RTFOBJ</code><br>
+                                    <code>- OLEOBJ</code>
                                 </td>
-                                <td>Utilises <a href="https://github.com/decalage2/oletools" target="_blank">OLE Tools</a> to analyse Microsoft OLE2 samples </td>
+                                <td>Analyses Microsoft OLE2 files (Office documents, RTF) via <a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a></td>
                             </tr>
                             <tr>
                                 <td>ExifTool</td>
-                                <td>Requires <a href="https://exiftool.org/" target="_blank">ExifTool</a> by Phil Harvey to display Exif data</td>
+                                <td>Reads Exif and metadata from files using <a href="https://exiftool.org/" target="_blank">ExifTool</a> by Phil Harvey</td>
                             </tr>
                             <tr>
-                                <td>IOC Extractor (work in progress)</td>
-                                <td>This script extracts IOCs from a sample and populates the IOC database, linking to particular samples</td>
+                                <td>IOC Extractor</td>
+                                <td>Extracts indicators of compromise from a sample and populates the IOC database, linked to the source sample</td>
                             </tr>
                             <tr>
-                                <td>Yara</td>
-                                <td>Create, Edit and run Yara rules against samples</td>
+                                <td>YARA</td>
+                                <td>Run custom YARA rules against samples; create and edit rules with the built-in editor</td>
                             </tr>
                             <tr>
                                 <td>Email Parser<br>
-                                <code>- Get Email Headers<br></code>
-                                <code>- Get Email body<br></code>
-                                <code>- Download Attachments<br></code>
-                            </td>
-                                <td>Work in progress script to analyse emails and download attachments into the vault for further analysis</td>
-                            </tr>
-                            <tr>
-                                <td>Zip Extractor (work in progress)<br>
-                                    <code>- With/Without Password<br></code>
+                                    <code>- Headers</code><br>
+                                    <code>- Body</code><br>
+                                    <code>- Attachments</code>
                                 </td>
-                                <td>Extract .zip and .7z files within the vault</td>
+                                <td>Parses .eml files; downloads attachments directly into the vault for further analysis</td>
+                            </tr>
+                            <tr>
+                                <td>Zip Extractor<br>
+                                    <code>- With/Without Password</code>
+                                </td>
+                                <td>Extracts .zip and .7z archives within the vault</td>
+                            </tr>
+                            <tr>
+                                <td>QR Decode</td>
+                                <td>Decodes QR codes from image samples using OpenCV</td>
                             </tr>
                         </table>
                     </div>
@@ -144,208 +193,15 @@
             </div>
         </div>
     </section>
+
     <br>
-    <section id="manual-install">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Manual Installation</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <tr>
-                                <th>Step</th>
-                                <th>Instruction</th>
-                            </tr>
-                            <tr>
-                                <td>Update your distro</td>
-                                <td><code>sudo apt update && sudo apt upgrade -y</code></td>
-                            </tr>
-                            <tr>
-                                <td>Install required dependancies</td>
-                                <td><code>sudo apt-get install git exiftool python3-venv python3-pip yara</code></td>
-                            </tr>
-                            <tr>
-                                <td>Download the vault - Clone the repository and make sure to take ownership of the files</td>
-                                <td><code>
-                                    cd /var/www (or where ever you want it to live)<br>
-                                    git clone https://github.com/DanDreadless/Vault1337/<br>
-                                    cd Vault1337/<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>Create required folders</td>
-                                <td><code>
-                                    mkdir -p vault/samples<br>
-                                    mkdir -p vault/yara-rules<br>
-                                    mkdir -p vault/static/images/media<br>
-                                    mv .env.sample .env
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>python venv - Create a python virtual environment and install the requirements</td>
-                                <td><code>
-                                    python3 -m venv env<br>
-                                    source env/bin/activate<br>
-                                    pip install -r requirements.txt<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>Create SuperUser</td>
-                                <td><code>python3 manage.py createsuperuser</code></td>
-                            </tr>
-                            <tr>
-                                <td>Initialise database</td>
-                                <td><code>
-                                    python3 manage.py makemigrations<br>
-                                    python3 manage.py migrate<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>Generate a new APP Key</td>
-                                <td><code>
-                                    python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>Update your .env file with required API Keys</td>
-                                <td><code>
-                                    nano .env<br>
-                                    SECRET_KEY = 'paste your Django secret key here'<br>
-                                    <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a> = 'paste your virustotal api key here'<br>
-                                    <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a> = 'paste your malware bazaar api key here'<br>
-                                    <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a> = 'paste your abuseipdb api key here'<br>
-                                    <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a> = 'paste your spur api key here'<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>You're good to go! Run the app server</td>
-                                <td><code>
-                                    python3 manage.py runserver<br>
-                                    login at http://127.0.0.1:8000<br>
-                                </code></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <br>
-                    <ul>
-                        <li><a href="#top">Back to Top</a></li>
-                    </ul> 
-                </div>
-            </div>
-        </div>
-    </section>
-    <br>
-    <section id="install-script">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Installation Script - Tested on Ubuntu 24.04.2</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <tr>
-                                <th>Step</th>
-                                <th>Instruction</th>
-                            </tr>
-                            <tr>
-                                <td>Update your distro</td>
-                                <td><code>sudo apt update && sudo apt upgrade -y</code></td>
-                            </tr>
-                            <tr>
-                                <td>Install required dependancies</td>
-                                <td><code>sudo apt-get install git exiftool python3-venv python3-pip yara</code></td>
-                            </tr>
-                            <tr>
-                                <td>Download the vault - Clone the repository and <br> make sure to take ownership of the files</td>
-                                <td><code>
-                                    cd /var/www (or where ever you want it to live)<br>
-                                    git clone https://github.com/DanDreadless/Vault1337/<br>
-                                    cd Vault1337/<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>Make the install script executable</td>
-                                <td><code>chmod +x install.sh</code></td>
-                            </tr>
-                            <tr>
-                                <td>Execute the script </td>
-                                <td><code>./install.sh</code></td>
-                            </tr>
-                            <tr>
-                                <td>Update your .env file with required API Keys</td>
-                                <td><code>
-                                    nano .env<br>
-                                    SECRET_KEY = 'paste your Django secret key here'<br>
-                                    <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a> = 'paste your virustotal api key here'<br>
-                                    <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a> = 'paste your malware bazaar api key here'<br>
-                                    <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a> = 'paste your abuseipdb api key here'<br>
-                                    <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a> = 'paste your spur api key here'<br>
-                                </code></td>
-                            </tr>
-                            <tr>
-                                <td>You're good to go!</td>
-                                <td><code>
-                                    source env/bin/activate<br>
-                                    python3 manage.py runserver<br>
-                                    login at http://127.0.0.1:8000
-                                </code></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <br>
-                    <h4>What does the script do?</h4>
-                    <ol type="1">
-                        <li>
-                            Create Necessary Directories<br>
-                            <code>
-                                The below are usesd to store samples, yara rules and static images<br>
-                                - mkdir -p vault/samples<br>
-                                - mkdir -p vault/yara-rules<br>
-                                - mkdir -p vault/static/images/media<br>
-                                - mv .env.sample .env
-                            </code>
-                        </li>
-                        <li>Set Up Python Virtual Environment<br>
-                            <code>
-                                - python3 -m venv env creates a virtual environment named env.<br>
-                                - source env/bin/activate activates the virtual environment.
-                            </code>
-                        </li>
-                        <li>Install Required Python Packages with Error Handling<br>
-                            <code>
-                                - The pip install -r requirements.txt command is wrapped in an if statement to check if it succeeds.<br>
-                                - If the command fails, it prints an error message and exits the script with a non-zero status.
-                            </code>
-                        </li>
-                        <li>Apply Database Migrations with Error Handling<br>
-                            <code>
-                                - The python3 manage.py makemigrations and python3 manage.py migrate commands are also wrapped in an if statement to ensure they succeed.
-                            </code>
-                        </li>
-                        <li>Prompt User to Create a Superuser with Error Handling<br>
-                            <code>
-                                - The python3 manage.py createsuperuser command is wrapped in an if statement to ensure it succeeds.
-                            </code>
-                        </li>
-                        <li>Generate and Display Django Secret Key<br>
-                            <code>
-                                - The script generates a Django secret key using Python and displays it to the user.
-                            </code>
-                        </li>      
-                    </ol>
-                    <br>
-                    <ul>
-                        <li><a href="#top">Back to Top</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-    <br>
+
     <section id="install-docker">
         <div class="code container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <h2>Pull and Run the Docker Image</h2>
+                    <h2>Docker Installation (Recommended)</h2>
+                    <p>The quickest way to get Vault1337 running. Default credentials are intentionally weak — change them immediately.</p>
                     <div class="table-responsive">
                         <table class="table table-striped table-sm">
                             <tr>
@@ -354,61 +210,207 @@
                             </tr>
                             <tr>
                                 <td>Install Docker</td>
-                                <td><code>Check the <a href="https://docs.docker.com/engine/install/">docker website</a> for official instructions</code></td>
+                                <td><code>See the <a href="https://docs.docker.com/engine/install/" target="_blank">official Docker docs</a> for your OS</code></td>
                             </tr>
                             <tr>
-                                <td>Pull the Image</td>
+                                <td>Pull the image</td>
                                 <td><code>docker pull vault1337/vault1337:latest</code></td>
                             </tr>
                             <tr>
-                                <td>Run the Image</td>
-                                <td><code>docker run -p 8000:8000 vault1337/vault1337</code></td>
+                                <td>Run the container</td>
+                                <td><code>docker run -p 8000:8000 vault1337/vault1337:latest</code></td>
                             </tr>
                             <tr>
-                                <td>login with the default credentials</td>
-                                <td><code>** YES I KNOW THIS IS BAD **<br>
-                                Username: admin<br>
-                                Password: changeme123<br>
-                                </code></td>
+                                <td>Log in with the default credentials</td>
+                                <td>
+                                    <code>
+                                        Username: admin<br>
+                                        Password: changeme123<br>
+                                        <br>
+                                        http://localhost:8000
+                                    </code>
+                                </td>
                             </tr>
                             <tr>
-                                <td>CHANGE YOUR PASSWORD FROM THE DJANGO ADMIN AREA</td>
+                                <td>Change your password immediately</td>
                                 <td><code>http://localhost:8000/admin</code></td>
                             </tr>
                             <tr>
-                                <td>Add API Keys</td>
-                                <td><code>Click "Welcome, Admin" (top right)<br>
-                                Click "Manage API Keys"<br>
-                                Update all the API keys for the best experience</code></td>
+                                <td>Add API keys (staff only)</td>
+                                <td>
+                                    <code>
+                                        Navigate to: Admin &gt; API Keys<br>
+                                        (or http://localhost:8000/admin/keys)<br>
+                                        <br>
+                                        Add keys for the best experience:<br>
+                                        - <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a> — VirusTotal API key<br>
+                                        - <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a> — Malware Bazaar API key<br>
+                                        - <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a> — AbuseIPDB API key<br>
+                                        - <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a> — Spur Context API key<br>
+                                        - <a href="https://account.shodan.io/" target="_blank">SHODAN_KEY</a> — Shodan API key
+                                    </code>
+                                </td>
                             </tr>
                             <tr>
                                 <td>You're ready to go!</td>
-                                <td><code>Start safely statically analysing malware at http://localhost:8000</code></td>
+                                <td><code>Start statically analysing malware safely at http://localhost:8000</code></td>
                             </tr>
                         </table>
                     </div>
                     <br>
                     <ul>
                         <li><a href="#top">Back to Top</a></li>
-                    </ul> 
+                    </ul>
                 </div>
             </div>
         </div>
     </section>
+
+    <br>
+
+    <section id="manual-install">
+        <div class="code container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Manual Installation — Ubuntu 24.04</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-sm">
+                            <tr>
+                                <th>Step</th>
+                                <th>Instruction</th>
+                            </tr>
+                            <tr>
+                                <td>1. Update your system</td>
+                                <td><code>sudo apt update && sudo apt upgrade -y</code></td>
+                            </tr>
+                            <tr>
+                                <td>2. Install system dependencies</td>
+                                <td><code>sudo apt install -y git python3-venv python3-pip libimage-exiftool-perl libmagic1 nodejs npm</code></td>
+                            </tr>
+                            <tr>
+                                <td>3. Clone the repository</td>
+                                <td>
+                                    <code>
+                                        cd /var/www  # or wherever you want it<br>
+                                        git clone https://github.com/DanDreadless/Vault1337/<br>
+                                        cd Vault1337/
+                                    </code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4. Create required directories and copy env file</td>
+                                <td>
+                                    <code>
+                                        mkdir -p sample_storage<br>
+                                        cp .env.sample .env
+                                    </code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5. Create a Python virtual environment and install dependencies</td>
+                                <td>
+                                    <code>
+                                        python3 -m venv env<br>
+                                        source env/bin/activate<br>
+                                        pip install -r requirements.txt
+                                    </code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6. Generate a Django secret key</td>
+                                <td><code>python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</code></td>
+                            </tr>
+                            <tr>
+                                <td>7. Edit your .env file</td>
+                                <td>
+                                    <code>
+                                        nano .env<br>
+                                        <br>
+                                        SECRET_KEY='paste-your-generated-key-here'<br>
+                                        DEBUG=False<br>
+                                        <br>
+                                        # Optional — enables full feature set:<br>
+                                        <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a>='your-virustotal-api-key'<br>
+                                        <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a>='your-malware-bazaar-api-key'<br>
+                                        <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a>='your-abuseipdb-api-key'<br>
+                                        <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a>='your-spur-api-key'<br>
+                                        <a href="https://account.shodan.io/" target="_blank">SHODAN_KEY</a>='your-shodan-api-key'
+                                    </code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>8. Run database migrations</td>
+                                <td>
+                                    <code>
+                                        python3 manage.py makemigrations<br>
+                                        python3 manage.py migrate
+                                    </code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>9. Create a superuser</td>
+                                <td><code>python3 manage.py createsuperuser</code></td>
+                            </tr>
+                            <tr>
+                                <td>10. Build the React frontend</td>
+                                <td>
+                                    <code>
+                                        cd frontend<br>
+                                        npm install<br>
+                                        npm run build<br>
+                                        cd ..
+                                    </code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>11. Collect static files</td>
+                                <td><code>python3 manage.py collectstatic --noinput</code></td>
+                            </tr>
+                            <tr>
+                                <td>12. Run the development server</td>
+                                <td>
+                                    <code>
+                                        source env/bin/activate<br>
+                                        python3 manage.py runserver<br>
+                                        <br>
+                                        Open: http://127.0.0.1:8000
+                                    </code>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <br>
+                    <h4>Notes</h4>
+                    <ul>
+                        <li>For production, serve with <strong>Gunicorn</strong> behind <strong>NGINX</strong>. Set <code>DEBUG=False</code> and configure <code>ALLOWED_HOSTS</code> in <code>.env</code>.</li>
+                        <li>For a PostgreSQL database, add <code>DATABASE_URL</code> to your <code>.env</code> and install <code>psycopg2-binary</code>.</li>
+                        <li>Sample files are stored in <code>sample_storage/</code> and referenced by SHA256 hash — original filenames are never written to disk.</li>
+                        <li>YARA rules are stored in <code>vault/yara-rules/</code> as <code>.yar</code> files and can be managed via the web UI.</li>
+                        <li>API keys can be updated at any time from the <strong>Admin &gt; API Keys</strong> page (staff accounts only).</li>
+                    </ul>
+                    <br>
+                    <ul>
+                        <li><a href="#top">Back to Top</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </div>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-    <footer class="footer">
-        <div class="container" align="center">
-                <script>                
-                    var myElem = document.createElement("p");
-                    myElem.innerHTML = 'Vault1337 | Malware Analysis | Copyright &copy; ' + new Date().getFullYear() + ' - <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE">AGPL-3.0</a>';
-                    myElem.style.textAlign = "center"; // Center the text horizontally
-                    myElem.style.margin = "0 auto";    // Center the element itself horizontally
-                    document.body.appendChild(myElem);
-                </script>
-        </div>
-    </footer>
+<footer class="footer">
+    <div class="container" align="center">
+        <script>
+            var myElem = document.createElement("p");
+            myElem.innerHTML = 'Vault1337 | Malware Analysis | Copyright &copy; ' + new Date().getFullYear() + ' - <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE">AGPL-3.0</a>';
+            myElem.style.textAlign = "center";
+            myElem.style.margin = "0 auto";
+            document.body.appendChild(myElem);
+        </script>
+    </div>
+</footer>
 </html>
