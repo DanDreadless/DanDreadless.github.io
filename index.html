@@ -1,123 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-    <meta name="description" content="Vault1337 Malware Repository and Analysis Platform">
-    <meta name="keywords" content="vault1337,malware,analysis,repository,github,static analysis">
-    <title>Vault1337 - Home</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="custom.css">
-    <link rel="shortcut icon" type="image/png" href="Images/favicon.png"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Vault1337 — open-source self-hosted malware analysis platform with 10+ static analysis tools, YARA rules, IOC tracking and IP intelligence.">
+  <meta name="keywords" content="vault1337, malware analysis, static analysis, YARA, IOC, self-hosted, open source">
+  <title>Vault1337 — Malware Analysis Platform</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #353E43;">
-    <a class="navbar-brand" href="index"><img src="Images/white-logo-no-background.svg" width="200" height="auto" alt="vault"></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="Images/white-logo-no-background.svg" alt="Vault1337">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav mr-auto">
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="docs.html">Documentation</a></li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="index">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="docs">Documentation</a>
+          <a class="nav-link nav-gh" href="https://github.com/DanDreadless/Vault1337" target="_blank">
+            <i class="bi bi-github me-1"></i>GitHub
+          </a>
         </li>
       </ul>
     </div>
+  </div>
 </nav>
 
-<br>
-<section id="introduction">
-  <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-2">
-            <h4>Acknowledgements:</h4>
-            <ul>
-                <li><a href="https://www.python.org/" target="_blank">Python</a></li>
-                <li><a href="https://www.djangoproject.com/" target="_blank">Django</a></li>
-                <li><a href="https://www.django-rest-framework.org/" target="_blank">Django REST Framework</a></li>
-                <li><a href="https://react.dev/" target="_blank">React</a></li>
-                <li><a href="https://vitejs.dev/" target="_blank">Vite</a></li>
-                <li><a href="https://www.typescriptlang.org/" target="_blank">TypeScript</a></li>
-                <li><a href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a></li>
-                <li><a href="https://www.postgresql.org/" target="_blank">PostgreSQL</a></li>
-                <li><a href="https://exiftool.org/" target="_blank">ExifTool</a></li>
-                <li><a href="https://github.com/VirusTotal/yara-python" target="_blank">YARA</a></li>
-                <li><a href="https://github.com/lief-project/LIEF" target="_blank">LIEF</a></li>
-                <li><a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a></li>
-                <li><a href="https://github.com/VirusTotal/vt-py" target="_blank">Virus Total</a></li>
-                <li><a href="https://github.com/achillean/shodan-python" target="_blank">Shodan</a></li>
-                <li><a href="https://pymupdf.readthedocs.io/en/latest/" target="_blank">PyMuPDF</a></li>
-                <li><a href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a></li>
-                <li><a href="https://docs.spur.us/" target="_blank">Spur</a></li>
-                <li><a href="https://bazaar.abuse.ch/api/" target="_blank">Malware Bazaar</a></li>
-            </ul>
-        </div>
-        <div class="col-sm-8">
-            <h2 class="text-center">Welcome to Vault1337</h2>
-            <h3 class="text-center">Malware Storage and Static Analysis Platform</h3>
-            <p>
-                Vault1337 is a self-hosted malware analysis platform built for security researchers and analysts.
-                It provides a secure repository for storing malware samples along with a suite of static analysis
-                tools, all accessible through a modern React-based web interface backed by a Django REST API.
-            </p>
-
-            <p>
-                The project started as a hands-on learning exercise and has grown into a full-stack application
-                with a Django 5 / Django REST Framework backend, JWT authentication, and a React 19 + TypeScript
-                + Tailwind CSS frontend built with Vite. Security has been a core focus throughout development —
-                the platform runs comfortably on a Raspberry Pi 5 via Gunicorn and NGINX in production.
-            </p>
-
-            <h5>Features</h5>
-            <ul>
-                <li>Upload samples by file or URL, or download directly from <strong>VirusTotal</strong> or <strong>Malware Bazaar</strong> by SHA256 hash</li>
-                <li><strong>10+ static analysis tools</strong>: Strings, LIEF Parser, Hex Viewer, PDF Parser, OLE Tools, ExifTool, IOC Extractor, YARA, Email Parser, Zip Extractor, QR Decode</li>
-                <li><strong>YARA rules</strong> — create, edit and run rules against samples via a built-in editor</li>
-                <li><strong>IOC tracking</strong> — extract and manage indicators of compromise linked to samples</li>
-                <li><strong>IP reputation</strong> — query AbuseIPDB, Spur, and Shodan from a single interface</li>
-                <li>Tag-based organisation with full-text search</li>
-                <li>JWT-authenticated REST API with staff/user role separation</li>
-                <li>API key management for all third-party integrations</li>
-            </ul>
-
-            <p>
-                The platform ships as a Docker image for easy deployment, or can be installed manually on
-                Ubuntu 24.04. Check the <a href="docs">Documentation</a> page for full setup instructions.
-            </p>
-
-            <p>
-                Source code is available at the
-                <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Vault1337 GitHub Repository</a>.
-                Feel free to explore or open issues.
-            </p>
-
-            <p class="text-center"><strong>Created by DanDreadless</strong></p>
-        </div>
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <img src="Images/logo-no-background.png" alt="Vault1337" class="logo">
+    <h1>Vault1337</h1>
+    <p class="sub">Open-source self-hosted malware analysis platform for security researchers, educators, and enthusiasts.</p>
+    <div class="cta">
+      <a href="docs.html#install-docker" class="btn-v solid"><i class="bi bi-download me-1"></i>Get Started</a>
+      <a href="docs.html" class="btn-v outline"><i class="bi bi-book me-1"></i>Documentation</a>
+      <a href="https://github.com/DanDreadless/Vault1337" target="_blank" class="btn-v outline"><i class="bi bi-github me-1"></i>View on GitHub</a>
+    </div>
+    <div class="badge-row">
+      <img src="https://img.shields.io/badge/AGPL--3.0-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python">
+      <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white" alt="Django">
+      <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
+      <img src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker">
     </div>
   </div>
 </section>
-<div class="container-fluid">
-  <br>
-  <img class="vault" src="Images/neon_vault.jpg" alt="Vault1337">
-  <br>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-<footer class="footer">
-    <div class="container">
-        <script>
-            var myElem = document.createElement("p");
-            myElem.innerHTML = 'Vault1337 | Malware Analysis | Copyright &copy; ' + new Date().getFullYear() + ' - <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE">AGPL-3.0</a>';
-            myElem.style.textAlign = "center";
-            myElem.style.margin = "0 auto";
-            document.body.appendChild(myElem);
-        </script>
+
+<!-- ── About ─────────────────────────────────────────────────────────────── -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <p class="s-sub mb-1">About the project</p>
+        <h2 class="s-head">What is Vault1337?</h2>
+        <p class="mt-3" style="color:var(--muted); font-size:.95rem;">
+          Vault1337 is a self-hosted malware analysis platform built for security researchers and analysts.
+          It provides a secure repository for storing malware samples along with a suite of static analysis
+          tools, all accessible through a modern React-based web interface backed by a Django REST API.
+        </p>
+        <p style="color:var(--muted); font-size:.95rem;">
+          The project started as a hands-on learning exercise and has grown into a full-stack application
+          with JWT authentication, a documented REST API, and a full container deployment stack.
+          It runs comfortably on a Raspberry Pi 5 in production.
+        </p>
+        <p style="color:var(--muted); font-size:.95rem;">
+          All sample files are stored by SHA256 hash — original filenames are never written to disk.
+          Analysis tools run in isolated temporary contexts so file paths are never exposed to users.
+        </p>
+        <div class="mt-3" style="display:flex; gap:.6rem; flex-wrap:wrap;">
+          <a href="https://github.com/DanDreadless/Vault1337" target="_blank" class="btn-v solid" style="font-size:.85rem; padding:.4rem 1rem;">
+            <i class="bi bi-github me-1"></i>GitHub Repository
+          </a>
+          <a href="https://x.com/DanDreadless" target="_blank" class="btn-v outline" style="font-size:.85rem; padding:.4rem 1rem;">
+            <i class="bi bi-twitter-x me-1"></i>@DanDreadless
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <img src="Images/neon_vault.jpg" alt="Vault1337" style="max-width:100%; border-radius:12px; border:1px solid var(--border); box-shadow: 0 8px 32px rgba(0,0,0,.5);">
+      </div>
     </div>
+  </div>
+</section>
+
+<!-- ── Features ──────────────────────────────────────────────────────────── -->
+<section class="section section-alt" id="features">
+  <div class="container">
+    <p class="s-sub mb-1">What you get</p>
+    <h2 class="s-head">Features</h2>
+    <div class="row g-3 mt-1">
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-cloud-upload"></i></div>
+          <h5>Flexible Sample Ingestion</h5>
+          <p>Upload by file or URL, or pull directly from VirusTotal or MalwareBazaar by SHA256 hash.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-tools"></i></div>
+          <h5>10+ Static Analysis Tools</h5>
+          <p>Strings, LIEF PE parser, Hex viewer, PDF parser, OLE tools, ExifTool, IOC extractor, YARA, Email parser, Zip extractor, QR decode.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-code-square"></i></div>
+          <h5>YARA Rules Engine</h5>
+          <p>Create, edit, and run YARA rules against samples using the built-in web editor.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-crosshair"></i></div>
+          <h5>IOC Tracking</h5>
+          <p>Extract and manage indicators of compromise. Every IOC is linked back to its source sample.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-globe2"></i></div>
+          <h5>IP Intelligence</h5>
+          <p>Query AbuseIPDB, Spur, and Shodan from a single interface. Private/reserved IPs are rejected.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-shield-lock"></i></div>
+          <h5>Authenticated REST API</h5>
+          <p>JWT-secured API with staff/user role separation. Full OpenAPI docs at <code>/api/v1/docs/</code>.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-tags"></i></div>
+          <h5>Tags &amp; Search</h5>
+          <p>Tag samples with freeform labels. Full-text search across the vault with pagination.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-chat-text"></i></div>
+          <h5>Sample Comments</h5>
+          <p>Add titled notes to any sample for team collaboration or personal analysis records.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-box-seam"></i></div>
+          <h5>Docker Ready</h5>
+          <p>Single-command Docker run or a full Compose stack with PostgreSQL, persistent volumes, and Gunicorn.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Tech Stack ────────────────────────────────────────────────────────── -->
+<section class="section" id="stack">
+  <div class="container">
+    <p class="s-sub mb-1">Under the hood</p>
+    <h2 class="s-head">Tech Stack</h2>
+    <div class="v-wrap mt-3" style="max-width:680px;">
+      <table class="v-table">
+        <thead>
+          <tr><th>Layer</th><th>Technology</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Backend</td><td>Python 3.12 / Django 5.2 / Django REST Framework</td></tr>
+          <tr><td>Authentication</td><td>JWT — djangorestframework-simplejwt</td></tr>
+          <tr><td>API docs</td><td>drf-spectacular (Swagger UI at <code>/api/v1/docs/</code>)</td></tr>
+          <tr><td>Frontend</td><td>React 19 / TypeScript / Vite 6 / Tailwind CSS 4</td></tr>
+          <tr><td>Database</td><td>PostgreSQL (production) / SQLite (development)</td></tr>
+          <tr><td>Production</td><td>Gunicorn + NGINX + WhiteNoise (Raspberry Pi 5)</td></tr>
+          <tr><td>Container</td><td>Docker — <code>vault1337/vault1337:latest</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Quick Start ───────────────────────────────────────────────────────── -->
+<section class="section section-alt" id="quickstart">
+  <div class="container">
+    <p class="s-sub mb-1">Up and running in seconds</p>
+    <h2 class="s-head">Quick Start</h2>
+    <p class="mt-3" style="color:var(--muted); font-size:.92rem; max-width:560px;">
+      Pull and run the Docker image. Uses SQLite by default — data is not persisted when the container stops.
+      For persistent storage with PostgreSQL see the <a href="docs.html#compose" style="color:var(--accent);">Docker Compose guide</a>.
+    </p>
+    <pre>docker run -p 8000:8000 \
+  -e SECRET_KEY=change-me-to-a-long-random-string \
+  -e DEBUG=True \
+  vault1337/vault1337:latest</pre>
+    <p style="color:var(--muted); font-size:.875rem;">
+      Open <strong style="color:var(--text);">http://localhost:8000</strong> and log in with
+      <code>admin</code> / <code>changeme123</code>. Change the password immediately via the Django admin at <code>/admin/</code>.
+    </p>
+    <a href="docs.html" class="btn-v solid mt-2" style="font-size:.875rem; padding:.45rem 1.1rem;">
+      Full Installation Guide <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+</section>
+
+<!-- ── Acknowledgements ──────────────────────────────────────────────────── -->
+<section class="section" id="acknowledgements">
+  <div class="container">
+    <p class="s-sub mb-1">Built on the shoulders of giants</p>
+    <h2 class="s-head">Acknowledgements</h2>
+    <p class="mt-3" style="color:var(--muted); font-size:.92rem; max-width:620px;">
+      Vault1337 is made possible by a number of outstanding open-source projects and APIs.
+    </p>
+
+    <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:1.5rem;">Backend &amp; Analysis</p>
+    <div class="ack-wrap mb-3">
+      <a class="ack-pill" href="https://www.python.org/" target="_blank">Python</a>
+      <a class="ack-pill" href="https://www.djangoproject.com/" target="_blank">Django</a>
+      <a class="ack-pill" href="https://www.django-rest-framework.org/" target="_blank">Django REST Framework</a>
+      <a class="ack-pill" href="https://github.com/lief-project/LIEF" target="_blank">LIEF</a>
+      <a class="ack-pill" href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>
+      <a class="ack-pill" href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>
+      <a class="ack-pill" href="https://github.com/VirusTotal/yara-python" target="_blank">YARA-Python</a>
+      <a class="ack-pill" href="https://exiftool.org/" target="_blank">ExifTool</a>
+      <a class="ack-pill" href="https://github.com/Legrandin/pycryptodome" target="_blank">PyCryptodome</a>
+      <a class="ack-pill" href="https://github.com/nicowillis/pyzipper" target="_blank">pyzipper</a>
+      <a class="ack-pill" href="https://github.com/miurahr/py7zr" target="_blank">py7zr</a>
+      <a class="ack-pill" href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>
+      <a class="ack-pill" href="https://pandas.pydata.org/" target="_blank">pandas</a>
+      <a class="ack-pill" href="https://python-requests.org/" target="_blank">Requests</a>
+    </div>
+
+    <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Frontend</p>
+    <div class="ack-wrap mb-3">
+      <a class="ack-pill" href="https://react.dev/" target="_blank">React</a>
+      <a class="ack-pill" href="https://vitejs.dev/" target="_blank">Vite</a>
+      <a class="ack-pill" href="https://www.typescriptlang.org/" target="_blank">TypeScript</a>
+      <a class="ack-pill" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
+      <a class="ack-pill" href="https://axios-http.com/" target="_blank">Axios</a>
+      <a class="ack-pill" href="https://reactrouter.com/" target="_blank">React Router</a>
+    </div>
+
+    <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Intelligence APIs</p>
+    <div class="ack-wrap mb-3">
+      <a class="ack-pill" href="https://www.virustotal.com/" target="_blank">VirusTotal</a>
+      <a class="ack-pill" href="https://bazaar.abuse.ch/api/" target="_blank">MalwareBazaar</a>
+      <a class="ack-pill" href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a>
+      <a class="ack-pill" href="https://spur.us/context-api/" target="_blank">Spur</a>
+      <a class="ack-pill" href="https://account.shodan.io/" target="_blank">Shodan</a>
+    </div>
+
+    <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Infrastructure</p>
+    <div class="ack-wrap">
+      <a class="ack-pill" href="https://gunicorn.org/" target="_blank">Gunicorn</a>
+      <a class="ack-pill" href="https://whitenoise.readthedocs.io/" target="_blank">WhiteNoise</a>
+      <a class="ack-pill" href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>
+      <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
+      <a class="ack-pill" href="https://nginx.org/" target="_blank">NGINX</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="f-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Documentation</a>
+      <a href="https://github.com/DanDreadless/Vault1337" target="_blank">GitHub</a>
+      <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
+      <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
+    </div>
+    <p>Vault1337 &mdash; Malware Analysis Platform &mdash; &copy; <span id="yr"></span></p>
+  </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+</body>
 </html>

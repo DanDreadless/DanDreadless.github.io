@@ -1,416 +1,485 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
-    <meta name="description" content="Vault1337 Malware Repository and Analysis Platform Documentation">
-    <meta name="keywords" content="vault1337,malware,analysis,repository,github,static analysis, documentation">
-    <title>Vault1337 - Documentation</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="custom.css">
-    <link rel="shortcut icon" type="image/png" href="Images/favicon.png"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Vault1337 documentation — installation, configuration, analysis tools, and usage guide.">
+  <title>Vault1337 — Documentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #353E43;">
-    <a class="navbar-brand" href="index"><img src="Images/white-logo-no-background.svg" width="200" height="auto" alt="vault"></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="Images/white-logo-no-background.svg" alt="Vault1337">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav mr-auto">
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="docs.html">Documentation</a></li>
         <li class="nav-item">
-          <a class="nav-link" href="index">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="docs">Documentation</a>
+          <a class="nav-link nav-gh" href="https://github.com/DanDreadless/Vault1337" target="_blank">
+            <i class="bi bi-github me-1"></i>GitHub
+          </a>
         </li>
       </ul>
     </div>
+  </div>
 </nav>
 
-<div class="container-fluid content scrollable">
-    <section id="top">
-        <center><h1>Try Vault1337 for yourself!</h1></center>
-    </section>
+<!-- ── Docs body ──────────────────────────────────────────────────────────── -->
+<div class="container section">
+  <div class="docs-wrap">
 
-    <section id="contents">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Contents</h2>
-                    <ul>
-                        <li><a href="#stack">Tech Stack</a></li>
-                        <li><a href="#tools">Analysis Tools</a></li>
-                        <li><a href="#install-docker">Docker Installation (Recommended)</a></li>
-                        <li><a href="#manual-install">Manual Installation (Ubuntu 24.04)</a></li>
-                    </ul>
-                </div>
-            </div>
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <ul class="d-nav">
+        <li class="d-group">Installation</li>
+        <li><a href="#install-docker">Docker (Quick Start)</a></li>
+        <li><a href="#compose">Docker Compose</a></li>
+        <li><a href="#local">Local Development</a></li>
+
+        <li class="d-group">Configuration</li>
+        <li><a href="#env-vars">Environment Variables</a></li>
+        <li><a href="#api-keys">API Keys</a></li>
+
+        <li class="d-group">Using Vault1337</li>
+        <li><a href="#uploading">Uploading Samples</a></li>
+        <li><a href="#tools">Analysis Tools</a></li>
+        <li><a href="#yara">YARA Rules</a></li>
+        <li><a href="#ioc">IOC Management</a></li>
+        <li><a href="#ip">IP Intelligence</a></li>
+        <li><a href="#tags">Tags &amp; Search</a></li>
+
+        <li class="d-group">Reference</li>
+        <li><a href="#stack">Tech Stack</a></li>
+        <li><a href="#api-ref">REST API</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="docs-content">
+
+      <!-- ── Docker Quick Start ── -->
+      <h2 id="install-docker"><i class="bi bi-box-seam me-2" style="color:var(--accent);"></i>Docker (Quick Start)</h2>
+      <p>The fastest way to run Vault1337. Uses SQLite — data is not persisted after the container stops.</p>
+
+      <div class="callout"><strong>Requirements:</strong> Docker installed on your system. See the <a href="https://docs.docker.com/engine/install/" target="_blank">official Docker docs</a>.</div>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Pull the image</h5>
+          <pre>docker pull vault1337/vault1337:latest</pre>
         </div>
-    </section>
+      </div>
 
-    <br>
-
-    <section id="stack">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Tech Stack</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <tr>
-                                <th>Layer</th>
-                                <th>Technology</th>
-                            </tr>
-                            <tr>
-                                <td>Backend</td>
-                                <td>Python 3 / Django 5.2 / Django REST Framework</td>
-                            </tr>
-                            <tr>
-                                <td>Authentication</td>
-                                <td>JWT — djangorestframework-simplejwt</td>
-                            </tr>
-                            <tr>
-                                <td>Frontend</td>
-                                <td>React 19 / TypeScript / Vite 6 / Tailwind CSS 4</td>
-                            </tr>
-                            <tr>
-                                <td>Database</td>
-                                <td>PostgreSQL (production) / SQLite (development)</td>
-                            </tr>
-                            <tr>
-                                <td>Production</td>
-                                <td>Gunicorn + NGINX (runs on Raspberry Pi 5)</td>
-                            </tr>
-                            <tr>
-                                <td>Container</td>
-                                <td>Docker — <code>vault1337/vault1337:latest</code></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <ul>
-                        <li><a href="#top">Back to Top</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Run the container</h5>
+          <pre>docker run -p 8000:8000 \
+  -e SECRET_KEY=change-me-to-a-long-random-string \
+  -e DEBUG=True \
+  vault1337/vault1337:latest</pre>
         </div>
-    </section>
+      </div>
 
-    <br>
-
-    <section id="tools">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Analysis Tools</h2>
-                    <p>Static analysis tools available inside Vault1337</p>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <tr>
-                                <th>Tool</th>
-                                <th>Description</th>
-                            </tr>
-                            <tr>
-                                <td>Strings<br>
-                                    <code>- UTF-8</code><br>
-                                    <code>- Latin-1</code><br>
-                                    <code>- UTF-16</code><br>
-                                    <code>- UTF-32</code><br>
-                                    <code>- ASCII</code>
-                                </td>
-                                <td>Extracts printable strings from a sample across multiple encodings</td>
-                            </tr>
-                            <tr>
-                                <td>LIEF Parser<br>
-                                    <code>- DOS Header</code><br>
-                                    <code>- Rich Header</code><br>
-                                    <code>- PE Header</code><br>
-                                    <code>- Entrypoint</code><br>
-                                    <code>- Sections</code><br>
-                                    <code>- Imports</code><br>
-                                    <code>- Signature Check</code><br>
-                                    <code>- Entropy Analysis</code>
-                                </td>
-                                <td>PE binary analysis via the <a href="https://github.com/lief-project/LIEF" target="_blank">LIEF project</a></td>
-                            </tr>
-                            <tr>
-                                <td>Hex Viewer</td>
-                                <td>Displays a hex dump of a sample</td>
-                            </tr>
-                            <tr>
-                                <td>PDF Parser</td>
-                                <td>Extracts metadata, embedded URLs and text content from PDFs using <a href="https://pypi.org/project/PyMuPDF/" target="_blank">PyMuPDF</a></td>
-                            </tr>
-                            <tr>
-                                <td>OLE Tools<br>
-                                    <code>- OLEID</code><br>
-                                    <code>- OLEMETA</code><br>
-                                    <code>- OLEDUMP</code><br>
-                                    <code>- OLEVBA</code><br>
-                                    <code>- RTFOBJ</code><br>
-                                    <code>- OLEOBJ</code>
-                                </td>
-                                <td>Analyses Microsoft OLE2 files (Office documents, RTF) via <a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a></td>
-                            </tr>
-                            <tr>
-                                <td>ExifTool</td>
-                                <td>Reads Exif and metadata from files using <a href="https://exiftool.org/" target="_blank">ExifTool</a> by Phil Harvey</td>
-                            </tr>
-                            <tr>
-                                <td>IOC Extractor</td>
-                                <td>Extracts indicators of compromise from a sample and populates the IOC database, linked to the source sample</td>
-                            </tr>
-                            <tr>
-                                <td>YARA</td>
-                                <td>Run custom YARA rules against samples; create and edit rules with the built-in editor</td>
-                            </tr>
-                            <tr>
-                                <td>Email Parser<br>
-                                    <code>- Headers</code><br>
-                                    <code>- Body</code><br>
-                                    <code>- Attachments</code>
-                                </td>
-                                <td>Parses .eml files; downloads attachments directly into the vault for further analysis</td>
-                            </tr>
-                            <tr>
-                                <td>Zip Extractor<br>
-                                    <code>- With/Without Password</code>
-                                </td>
-                                <td>Extracts .zip and .7z archives within the vault</td>
-                            </tr>
-                            <tr>
-                                <td>QR Decode</td>
-                                <td>Decodes QR codes from image samples using OpenCV</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <br>
-                    <ul>
-                        <li><a href="#top">Back to Top</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Log in</h5>
+          <p>Open <strong>http://localhost:8000</strong> and log in with the default credentials:</p>
+          <pre>Username: admin
+Password: changeme123</pre>
+          <div class="callout"><strong>Important:</strong> Change your password immediately at <code>http://localhost:8000/admin/</code></div>
         </div>
-    </section>
+      </div>
 
-    <br>
-
-    <section id="install-docker">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Docker Installation (Recommended)</h2>
-                    <p>The quickest way to get Vault1337 running. Default credentials are intentionally weak — change them immediately.</p>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <tr>
-                                <th>Step</th>
-                                <th>Instruction</th>
-                            </tr>
-                            <tr>
-                                <td>Install Docker</td>
-                                <td><code>See the <a href="https://docs.docker.com/engine/install/" target="_blank">official Docker docs</a> for your OS</code></td>
-                            </tr>
-                            <tr>
-                                <td>Pull the image</td>
-                                <td><code>docker pull vault1337/vault1337:latest</code></td>
-                            </tr>
-                            <tr>
-                                <td>Run the container</td>
-                                <td><code>docker run -p 8000:8000 vault1337/vault1337:latest</code></td>
-                            </tr>
-                            <tr>
-                                <td>Log in with the default credentials</td>
-                                <td>
-                                    <code>
-                                        Username: admin<br>
-                                        Password: changeme123<br>
-                                        <br>
-                                        http://localhost:8000
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Change your password immediately</td>
-                                <td><code>http://localhost:8000/admin</code></td>
-                            </tr>
-                            <tr>
-                                <td>Add API keys (staff only)</td>
-                                <td>
-                                    <code>
-                                        Navigate to: Admin &gt; API Keys<br>
-                                        (or http://localhost:8000/admin/keys)<br>
-                                        <br>
-                                        Add keys for the best experience:<br>
-                                        - <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a> — VirusTotal API key<br>
-                                        - <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a> — Malware Bazaar API key<br>
-                                        - <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a> — AbuseIPDB API key<br>
-                                        - <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a> — Spur Context API key<br>
-                                        - <a href="https://account.shodan.io/" target="_blank">SHODAN_KEY</a> — Shodan API key
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>You're ready to go!</td>
-                                <td><code>Start statically analysing malware safely at http://localhost:8000</code></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <br>
-                    <ul>
-                        <li><a href="#top">Back to Top</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Add API keys (optional)</h5>
+          <p>Navigate to <strong>Admin → API Keys</strong> to add keys for the intelligence integrations. See the <a href="#api-keys">API Keys</a> section below.</p>
         </div>
-    </section>
+      </div>
 
-    <br>
+      <!-- ── Docker Compose ── -->
+      <h2 id="compose"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>Docker Compose</h2>
+      <p>Recommended for persistent deployments. Spins up Vault1337 with a PostgreSQL database and named volumes for samples and YARA rules.</p>
 
-    <section id="manual-install">
-        <div class="code container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Manual Installation — Ubuntu 24.04</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm">
-                            <tr>
-                                <th>Step</th>
-                                <th>Instruction</th>
-                            </tr>
-                            <tr>
-                                <td>1. Update your system</td>
-                                <td><code>sudo apt update && sudo apt upgrade -y</code></td>
-                            </tr>
-                            <tr>
-                                <td>2. Install system dependencies</td>
-                                <td><code>sudo apt install -y git python3-venv python3-pip libimage-exiftool-perl libmagic1 nodejs npm</code></td>
-                            </tr>
-                            <tr>
-                                <td>3. Clone the repository</td>
-                                <td>
-                                    <code>
-                                        cd /var/www  # or wherever you want it<br>
-                                        git clone https://github.com/DanDreadless/Vault1337/<br>
-                                        cd Vault1337/
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4. Create required directories and copy env file</td>
-                                <td>
-                                    <code>
-                                        mkdir -p sample_storage<br>
-                                        cp .env.sample .env
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5. Create a Python virtual environment and install dependencies</td>
-                                <td>
-                                    <code>
-                                        python3 -m venv env<br>
-                                        source env/bin/activate<br>
-                                        pip install -r requirements.txt
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>6. Generate a Django secret key</td>
-                                <td><code>python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'</code></td>
-                            </tr>
-                            <tr>
-                                <td>7. Edit your .env file</td>
-                                <td>
-                                    <code>
-                                        nano .env<br>
-                                        <br>
-                                        SECRET_KEY='paste-your-generated-key-here'<br>
-                                        DEBUG=False<br>
-                                        <br>
-                                        # Optional — enables full feature set:<br>
-                                        <a href="https://www.virustotal.com/" target="_blank">VT_KEY</a>='your-virustotal-api-key'<br>
-                                        <a href="https://bazaar.abuse.ch/api/" target="_blank">MALWARE_BAZAAR_KEY</a>='your-malware-bazaar-api-key'<br>
-                                        <a href="https://www.abuseipdb.com/api.html" target="_blank">ABUSEIPDB_KEY</a>='your-abuseipdb-api-key'<br>
-                                        <a href="https://spur.us/context-api/" target="_blank">SPUR_KEY</a>='your-spur-api-key'<br>
-                                        <a href="https://account.shodan.io/" target="_blank">SHODAN_KEY</a>='your-shodan-api-key'
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>8. Run database migrations</td>
-                                <td>
-                                    <code>
-                                        python3 manage.py makemigrations<br>
-                                        python3 manage.py migrate
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>9. Create a superuser</td>
-                                <td><code>python3 manage.py createsuperuser</code></td>
-                            </tr>
-                            <tr>
-                                <td>10. Build the React frontend</td>
-                                <td>
-                                    <code>
-                                        cd frontend<br>
-                                        npm install<br>
-                                        npm run build<br>
-                                        cd ..
-                                    </code>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>11. Collect static files</td>
-                                <td><code>python3 manage.py collectstatic --noinput</code></td>
-                            </tr>
-                            <tr>
-                                <td>12. Run the development server</td>
-                                <td>
-                                    <code>
-                                        source env/bin/activate<br>
-                                        python3 manage.py runserver<br>
-                                        <br>
-                                        Open: http://127.0.0.1:8000
-                                    </code>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <br>
-                    <h4>Notes</h4>
-                    <ul>
-                        <li>For production, serve with <strong>Gunicorn</strong> behind <strong>NGINX</strong>. Set <code>DEBUG=False</code> and configure <code>ALLOWED_HOSTS</code> in <code>.env</code>.</li>
-                        <li>For a PostgreSQL database, add <code>DATABASE_URL</code> to your <code>.env</code> and install <code>psycopg2-binary</code>.</li>
-                        <li>Sample files are stored in <code>sample_storage/</code> and referenced by SHA256 hash — original filenames are never written to disk.</li>
-                        <li>YARA rules are stored in <code>vault/yara-rules/</code> as <code>.yar</code> files and can be managed via the web UI.</li>
-                        <li>API keys can be updated at any time from the <strong>Admin &gt; API Keys</strong> page (staff accounts only).</li>
-                    </ul>
-                    <br>
-                    <ul>
-                        <li><a href="#top">Back to Top</a></li>
-                    </ul>
-                </div>
-            </div>
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Clone the repository</h5>
+          <pre>git clone https://github.com/DanDreadless/Vault1337.git
+cd Vault1337/Docker</pre>
         </div>
-    </section>
+      </div>
 
-</div>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-<footer class="footer">
-    <div class="container" align="center">
-        <script>
-            var myElem = document.createElement("p");
-            myElem.innerHTML = 'Vault1337 | Malware Analysis | Copyright &copy; ' + new Date().getFullYear() + ' - <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE">AGPL-3.0</a>';
-            myElem.style.textAlign = "center";
-            myElem.style.margin = "0 auto";
-            document.body.appendChild(myElem);
-        </script>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Configure the environment</h5>
+          <p>All settings live in <code>Docker/.env</code>. Open it and set at minimum:</p>
+          <div class="v-wrap mb-2">
+            <table class="v-table">
+              <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>SECRET_KEY</code></td><td>Long random string — generate with <code>openssl rand -hex 50</code></td></tr>
+                <tr><td><code>POSTGRES_PASSWORD</code></td><td>Password for the PostgreSQL database</td></tr>
+                <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Initial admin account password</td></tr>
+                <tr><td><code>ALLOWED_HOSTS</code></td><td>Comma-separated hostnames or IPs, e.g. <code>localhost,192.168.1.10</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Start the stack</h5>
+          <pre>docker compose up -d</pre>
+          <p>This builds the image (if not already built), starts PostgreSQL, waits for a health check, then starts Gunicorn. Migrations and superuser creation happen automatically on first run.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Open Vault1337</h5>
+          <p>Navigate to <strong>http://localhost:8000</strong> (or your configured <code>HOST_PORT</code>) and log in.</p>
+          <pre># View logs
+docker compose logs -f
+
+# Stop the stack (data preserved)
+docker compose down
+
+# Stop and wipe all data
+docker compose down -v</pre>
+        </div>
+      </div>
+
+      <!-- ── Local Dev ── -->
+      <h2 id="local"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Local Development</h2>
+      <p>Requires Python 3.12+, Node.js 22+, and (optionally) PostgreSQL.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Clone and set up a Python virtual environment</h5>
+          <pre>git clone https://github.com/DanDreadless/Vault1337.git
+cd Vault1337
+python3 -m venv env
+source env/bin/activate   # Windows: env\Scripts\activate
+pip install -r requirements.txt</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Install system dependencies</h5>
+          <pre># Ubuntu / Debian
+sudo apt install -y libimage-exiftool-perl libmpc-dev libgl1 libglib2.0-0</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Configure the environment</h5>
+          <p>Copy the Docker env template and edit it for local use:</p>
+          <pre>cp Docker/.env .env
+# Edit .env — set SECRET_KEY and DEBUG=True
+# Leave DATABASE_URL empty to use SQLite</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Run migrations and create a superuser</h5>
+          <pre>python manage.py migrate
+python manage.py createsuperuser</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-b">
+          <h5>Start the Django API</h5>
+          <pre>python manage.py runserver</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">6</div>
+        <div class="step-b">
+          <h5>Start the React frontend (second terminal)</h5>
+          <pre>cd frontend
+npm install
+npm run dev</pre>
+          <p>Open <strong>http://localhost:5173</strong>. The Vite dev server proxies <code>/api/</code> requests to Django on port 8000.</p>
+        </div>
+      </div>
+
+      <!-- ── Env Vars ── -->
+      <h2 id="env-vars"><i class="bi bi-gear me-2" style="color:var(--accent);"></i>Environment Variables</h2>
+      <p>All configuration is handled via environment variables loaded from a <code>.env</code> file (or passed directly to the container).</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>SECRET_KEY</code></td><td><em>required</em></td><td>Django secret key — use a long random string</td></tr>
+            <tr><td><code>DEBUG</code></td><td><code>False</code></td><td>Set <code>True</code> for local development only</td></tr>
+            <tr><td><code>ALLOWED_HOSTS</code></td><td><code>127.0.0.1</code></td><td>Comma-separated list of allowed hostnames/IPs</td></tr>
+            <tr><td><code>DATABASE_URL</code></td><td><em>SQLite</em></td><td>PostgreSQL connection string, e.g. <code>postgres://user:pass@host:5432/db</code></td></tr>
+            <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Comma-separated origins allowed for CORS requests</td></tr>
+            <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>200</code></td><td>Maximum file upload size in megabytes</td></tr>
+            <tr><td><code>POSTGRES_DB</code></td><td><code>vault1337</code></td><td>PostgreSQL database name (Compose only)</td></tr>
+            <tr><td><code>POSTGRES_USER</code></td><td><code>vault</code></td><td>PostgreSQL username (Compose only)</td></tr>
+            <tr><td><code>POSTGRES_PASSWORD</code></td><td><em>required</em></td><td>PostgreSQL password (Compose only)</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td><code>admin</code></td><td>Superuser created on first container startup</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td><code>admin@localhost</code></td><td>Superuser email</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><code>changeme123</code></td><td>Superuser initial password — change this</td></tr>
+            <tr><td><code>HOST_PORT</code></td><td><code>8000</code></td><td>Host port mapped to container port 8000</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── API Keys ── -->
+      <h2 id="api-keys"><i class="bi bi-key me-2" style="color:var(--accent);"></i>API Keys</h2>
+      <p>Third-party intelligence features require API keys. Add them via the web UI at <strong>Admin → API Keys</strong> (staff account required), or set them in your <code>.env</code> file before starting the container.</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Key</th><th>Service</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td><code>VT_KEY</code></td><td><a href="https://www.virustotal.com/" target="_blank">VirusTotal</a></td><td>Download samples by SHA256 hash</td></tr>
+            <tr><td><code>MALWARE_BAZAAR_KEY</code></td><td><a href="https://bazaar.abuse.ch/api/" target="_blank">MalwareBazaar</a></td><td>Download samples by SHA256 hash</td></tr>
+            <tr><td><code>ABUSEIPDB_KEY</code></td><td><a href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a></td><td>IP reputation lookups</td></tr>
+            <tr><td><code>SPUR_KEY</code></td><td><a href="https://spur.us/context-api/" target="_blank">Spur</a></td><td>VPN / proxy / residential IP context</td></tr>
+            <tr><td><code>SHODAN_KEY</code></td><td><a href="https://account.shodan.io/" target="_blank">Shodan</a></td><td>Open ports and banner data for an IP</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Uploading ── -->
+      <h2 id="uploading"><i class="bi bi-cloud-upload me-2" style="color:var(--accent);"></i>Uploading Samples</h2>
+      <p>Navigate to <strong>Upload</strong> in the navigation bar. Four ingestion methods are available:</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Method</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Upload File</strong></td><td>Direct file upload (max 200 MB). Optionally extract a ZIP or 7z archive with a password.</td></tr>
+            <tr><td><strong>Fetch URL</strong></td><td>Download a sample from an external URL. Private/internal IP ranges are blocked (SSRF protection).</td></tr>
+            <tr><td><strong>VirusTotal</strong></td><td>Download a sample by SHA256 hash using your VT API key.</td></tr>
+            <tr><td><strong>MalwareBazaar</strong></td><td>Download a sample by SHA256 hash using your MB API key.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>All samples are stored by SHA256 hash. Original filenames are preserved in the database but never used as file paths on disk. Add comma-separated tags during upload for easier organisation.</p>
+
+      <!-- ── Tools ── -->
+      <h2 id="tools"><i class="bi bi-tools me-2" style="color:var(--accent);"></i>Analysis Tools</h2>
+      <p>Open a sample from the vault and select a tool from the <strong>Analysis</strong> tab. Results are displayed inline and cached for the session.</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Strings</strong></td>
+              <td><code>UTF-8</code> <code>Latin-1</code> <code>UTF-16</code> <code>UTF-32</code> <code>ASCII</code></td>
+              <td>Extracts printable strings from a sample across multiple encodings.</td>
+            </tr>
+            <tr>
+              <td><strong>LIEF Parser</strong></td>
+              <td><code>DOS Header</code> <code>Rich Header</code> <code>PE Header</code> <code>Entrypoint</code> <code>Sections</code> <code>Imports</code> <code>Signature</code> <code>Entropy</code></td>
+              <td>PE binary analysis via the <a href="https://github.com/lief-project/LIEF" target="_blank">LIEF project</a>. Shows headers, imported functions, section entropy, and signature validity.</td>
+            </tr>
+            <tr>
+              <td><strong>Hex Viewer</strong></td>
+              <td>—</td>
+              <td>Renders a hex dump of the sample with ASCII sidebar.</td>
+            </tr>
+            <tr>
+              <td><strong>PDF Parser</strong></td>
+              <td>—</td>
+              <td>Extracts metadata, embedded URLs, and text content from PDFs using <a href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>.</td>
+            </tr>
+            <tr>
+              <td><strong>OLE Tools</strong></td>
+              <td><code>OLEID</code> <code>OLEMETA</code> <code>OLEDUMP</code> <code>OLEVBA</code> <code>RTFOBJ</code> <code>OLEOBJ</code></td>
+              <td>Analyses Microsoft OLE2 compound files (Office documents, RTF) via <a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>. Detects macros, embedded objects, and suspicious indicators.</td>
+            </tr>
+            <tr>
+              <td><strong>ExifTool</strong></td>
+              <td>—</td>
+              <td>Reads all metadata tags from a file using <a href="https://exiftool.org/" target="_blank">ExifTool</a> by Phil Harvey.</td>
+            </tr>
+            <tr>
+              <td><strong>IOC Extractor</strong></td>
+              <td>—</td>
+              <td>Parses the sample for indicators of compromise (IPs, domains, URLs, hashes, emails) and stores them in the IOC database linked to this sample.</td>
+            </tr>
+            <tr>
+              <td><strong>YARA</strong></td>
+              <td>—</td>
+              <td>Runs all saved YARA rules against the sample and reports any matches. Rules are managed from the <strong>YARA</strong> page.</td>
+            </tr>
+            <tr>
+              <td><strong>Email Parser</strong></td>
+              <td><code>Headers</code> <code>Body</code> <code>Attachments</code></td>
+              <td>Parses <code>.eml</code> files. Downloads email attachments directly into the vault for further analysis.</td>
+            </tr>
+            <tr>
+              <td><strong>Zip Extractor</strong></td>
+              <td><code>With password</code> <code>Without password</code></td>
+              <td>Extracts <code>.zip</code> and <code>.7z</code> archives. All extracted files are added to the vault as individual samples.</td>
+            </tr>
+            <tr>
+              <td><strong>QR Decode</strong></td>
+              <td>—</td>
+              <td>Decodes QR codes from image samples using OpenCV. Returns the decoded payload as text.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── YARA ── -->
+      <h2 id="yara"><i class="bi bi-code-square me-2" style="color:var(--accent);"></i>YARA Rules</h2>
+      <p>Navigate to <strong>YARA</strong> in the navigation bar to manage rules.</p>
+      <ul>
+        <li>Create new rules using the built-in editor — paste or write YARA syntax directly.</li>
+        <li>Edit existing rules at any time.</li>
+        <li>Run all rules against a specific sample from the sample detail page using the <strong>YARA</strong> tool.</li>
+        <li>Rules are stored as <code>.yar</code> files in <code>vault/yara-rules/</code> on the server.</li>
+      </ul>
+      <div class="callout">Rules with syntax errors will fail to save — the editor will report the parse error inline.</div>
+
+      <!-- ── IOC ── -->
+      <h2 id="ioc"><i class="bi bi-crosshair me-2" style="color:var(--accent);"></i>IOC Management</h2>
+      <p>Navigate to <strong>IOCs</strong> to view all extracted indicators of compromise across all samples.</p>
+      <ul>
+        <li>Run the <strong>IOC Extractor</strong> tool on a sample to populate its IOCs.</li>
+        <li>Each IOC is linked back to the sample it came from.</li>
+        <li>Mark IOCs as true positive or false positive using the toggle on the IOC page.</li>
+        <li>Filter the list by classification (true / false / unreviewed) and search by value.</li>
+      </ul>
+
+      <!-- ── IP ── -->
+      <h2 id="ip"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>IP Intelligence</h2>
+      <p>Navigate to <strong>IP Check</strong> to query an IP address against multiple threat intelligence sources simultaneously.</p>
+      <ul>
+        <li>Aggregates results from <strong>AbuseIPDB</strong>, <strong>Spur</strong>, and <strong>Shodan</strong> in a single request.</li>
+        <li>Private, loopback, and reserved IP ranges are rejected before any external query is made.</li>
+        <li>Requires at least one API key to be configured for results to be returned.</li>
+      </ul>
+
+      <!-- ── Tags ── -->
+      <h2 id="tags"><i class="bi bi-tags me-2" style="color:var(--accent);"></i>Tags &amp; Search</h2>
+      <ul>
+        <li>Add comma-separated tags when uploading a sample.</li>
+        <li>Add or remove tags from any sample on the sample detail page.</li>
+        <li>All tags are stored in lowercase automatically.</li>
+        <li>Use the search bar on the <strong>Vault</strong> page to filter samples by filename, hash, or tag.</li>
+        <li>Results are paginated — use the page controls at the bottom of the vault list.</li>
+      </ul>
+
+      <!-- ── Tech Stack ── -->
+      <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+          <tbody>
+            <tr><td>Backend</td><td>Python 3.12 / Django 5.2 / Django REST Framework</td></tr>
+            <tr><td>Authentication</td><td>JWT — djangorestframework-simplejwt with token blacklisting</td></tr>
+            <tr><td>API docs</td><td>drf-spectacular — Swagger UI at <code>/api/v1/docs/</code></td></tr>
+            <tr><td>Frontend</td><td>React 19 / TypeScript / Vite 6 / Tailwind CSS 4</td></tr>
+            <tr><td>Database</td><td>PostgreSQL (production) / SQLite (development)</td></tr>
+            <tr><td>Static files</td><td>WhiteNoise (serves React SPA + Django admin assets)</td></tr>
+            <tr><td>Production server</td><td>Gunicorn (4 workers) + NGINX</td></tr>
+            <tr><td>Container</td><td>Docker — <code>vault1337/vault1337:latest</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── API ── -->
+      <h2 id="api-ref"><i class="bi bi-braces me-2" style="color:var(--accent);"></i>REST API</h2>
+      <p>All endpoints are under <code>/api/v1/</code>. JWT Bearer token authentication is required on all endpoints except registration and token endpoints.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST /api/v1/auth/register/</code></td><td>Register a new user account</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/</code></td><td>Obtain JWT access + refresh token</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/refresh/</code></td><td>Refresh an access token</td></tr>
+            <tr><td><code>POST /api/v1/auth/logout/</code></td><td>Blacklist a refresh token</td></tr>
+            <tr><td><code>GET/PATCH /api/v1/auth/user/</code></td><td>Current user profile</td></tr>
+            <tr><td><code>GET/POST /api/v1/files/</code></td><td>List vault / upload a sample</td></tr>
+            <tr><td><code>GET/DELETE /api/v1/files/{id}/</code></td><td>Sample detail / delete</td></tr>
+            <tr><td><code>GET /api/v1/files/{id}/download/</code></td><td>Download sample file</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/run_tool/</code></td><td>Run an analysis tool</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/add_tag/</code></td><td>Add a tag to a sample</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/remove_tag/</code></td><td>Remove a tag from a sample</td></tr>
+            <tr><td><code>GET/POST /api/v1/files/{id}/comments/</code></td><td>List / add comments on a sample</td></tr>
+            <tr><td><code>POST /api/v1/files/fetch_url/</code></td><td>Fetch a sample from a URL</td></tr>
+            <tr><td><code>POST /api/v1/files/vt-download/</code></td><td>Download from VirusTotal by SHA256</td></tr>
+            <tr><td><code>POST /api/v1/files/mb-download/</code></td><td>Download from MalwareBazaar by SHA256</td></tr>
+            <tr><td><code>GET/PATCH /api/v1/iocs/</code></td><td>List and update IOCs</td></tr>
+            <tr><td><code>GET/POST/PUT/DELETE /api/v1/yara/</code></td><td>YARA rule management</td></tr>
+            <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup</td></tr>
+            <tr><td><code>GET/POST /api/v1/admin/keys/</code></td><td>API key management (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/tools/qr-decode/</code></td><td>Stateless QR code decode</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Interactive API documentation (Swagger UI) is available at <code>/api/v1/docs/</code> on any running instance.</p>
+
+    </main>
+  </div><!-- /docs-wrap -->
+</div><!-- /container -->
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="f-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Documentation</a>
+      <a href="https://github.com/DanDreadless/Vault1337" target="_blank">GitHub</a>
+      <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
+      <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
     </div>
+    <p>Vault1337 &mdash; Malware Analysis Platform &mdash; &copy; <span id="yr"></span></p>
+  </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Highlight active sidebar link on scroll
+  const headings = document.querySelectorAll('.docs-content h2, .docs-content h3');
+  const links = document.querySelectorAll('.d-nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector(`.d-nav a[href="#${e.target.id}"]`);
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-60px 0px -70% 0px' });
+  headings.forEach(h => { if (h.id) obs.observe(h); });
+</script>
+</body>
 </html>
