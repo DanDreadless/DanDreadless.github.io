@@ -59,6 +59,7 @@
         <li><a href="#ip">IP Intelligence</a></li>
         <li><a href="#tags">Tags &amp; Search</a></li>
         <li><a href="#report">Sample Report</a></li>
+        <li><a href="#pdf-report">PDF Report Export</a></li>
 
         <li class="d-group">Reference</li>
         <li><a href="#stack">Tech Stack</a></li>
@@ -501,6 +502,30 @@ npm run dev</pre>
       </ul>
       <div class="callout">VirusTotal data is only included if a VT enrichment has previously been run on the sample (automatically on upload if a VT API key is configured, or manually via the VT Enrich action).</div>
 
+      <!-- ── PDF Report ── -->
+      <h2 id="pdf-report"><i class="bi bi-file-earmark-pdf me-2" style="color:var(--accent);"></i>PDF Report Export</h2>
+      <p>Every sample detail page has a <strong>PDF Report</strong> button on the Info tab, placed between the <em>Download (.7z)</em> and <em>Delete</em> buttons. Clicking it generates a professional A4 PDF report entirely in-browser — no server round-trip is required beyond the initial page load.</p>
+      <p>The PDF is built from data already loaded on the page and downloads instantly with the filename:</p>
+      <pre>vault1337_report_&lt;sha256[:12]&gt;_&lt;YYYYMMDD&gt;.pdf</pre>
+      <p><strong>Report sections:</strong></p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Section</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Header</strong></td><td>Dark slate header band — report title, Vault1337 branding, generation timestamp, SHA256 sub-row, and "RESTRICTED — For authorised personnel only" classification label.</td></tr>
+            <tr><td><strong>Executive Summary</strong></td><td>Filename, detection ratio colour-coded by risk (red &gt;5 detections, amber 1–5, green 0), and VirusTotal threat label — or a "No VT data" message if not yet enriched.</td></tr>
+            <tr><td><strong>File Details</strong></td><td>Original filename, file size (human-readable + bytes), MIME type, magic bytes, upload date, uploaded by.</td></tr>
+            <tr><td><strong>Cryptographic Hashes</strong></td><td>MD5, SHA-1, SHA-256, and SHA-512 in monospace font.</td></tr>
+            <tr><td><strong>VirusTotal Intelligence</strong></td><td>Detection ratio, threat label, scan date, and a table of the top 10 engine detections (malicious and suspicious results only). Omitted if no VT data is present.</td></tr>
+            <tr><td><strong>Tags</strong></td><td>All tags applied to the sample, comma-separated.</td></tr>
+            <tr><td><strong>IOCs</strong></td><td>Confirmed true-positive IOCs only, grouped by type with a sub-header per type. Omitted if no confirmed IOCs exist.</td></tr>
+            <tr><td><strong>Analyst Notes</strong></td><td>Each saved comment rendered as a titled block (bold title + body text). Shows "No analyst notes recorded." if empty.</td></tr>
+            <tr><td><strong>Footer</strong></td><td>Appears on every page: "Vault1337 — Confidential | Generated: &lt;ISO datetime&gt; | Page N of M".</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">The PDF is generated entirely client-side using <a href="https://github.com/parallax/jsPDF" target="_blank">jsPDF</a> and <a href="https://github.com/simonbengtsson/jsPDF-AutoTable" target="_blank">jsPDF-AutoTable</a>. No analysis data leaves the browser and no additional API calls are made.</div>
+
       <!-- ── Tech Stack ── -->
       <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
       <div class="v-wrap">
@@ -597,6 +622,8 @@ npm run dev</pre>
         <a class="ack-pill" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
         <a class="ack-pill" href="https://axios-http.com/" target="_blank">Axios</a>
         <a class="ack-pill" href="https://reactrouter.com/" target="_blank">React Router</a>
+        <a class="ack-pill" href="https://github.com/parallax/jsPDF" target="_blank">jsPDF</a>
+        <a class="ack-pill" href="https://github.com/simonbengtsson/jsPDF-AutoTable" target="_blank">jsPDF-AutoTable</a>
       </div>
 
       <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Infrastructure</p>
