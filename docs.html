@@ -436,24 +436,7 @@ npm run dev</pre>
       </ul>
       <div class="callout">Rules with syntax errors will fail to save — the editor will report the parse error inline.</div>
 
-      <p class="mt-3"><strong>Bundled rules</strong> — Vault1337 ships with 10 detection rules covering common malware patterns:</p>
-      <div class="v-wrap">
-        <table class="v-table">
-          <thead><tr><th>Rule</th><th>Detects</th></tr></thead>
-          <tbody>
-            <tr><td><code>Win_AntiDebug_APIs</code></td><td>PE files importing ≥ 3 known anti-debugging APIs (IsDebuggerPresent, NtQueryInformationProcess, etc.)</td></tr>
-            <tr><td><code>Win_AntiVM_Artifacts</code></td><td>VMware, VirtualBox, QEMU, and common sandbox artifact strings in PE files</td></tr>
-            <tr><td><code>Win_Process_Injection</code></td><td>PE files combining APIs for remote thread injection, APC injection, or process hollowing</td></tr>
-            <tr><td><code>Win_Ransomware_Generic</code></td><td>Shadow copy deletion, crypto API imports, and ransom note keyword combinations</td></tr>
-            <tr><td><code>Linux_Suspicious_ELF</code></td><td>ELF binaries combining reverse shell and privilege escalation symbols</td></tr>
-            <tr><td><code>Linux_ELF_LD_Preload_Rootkit</code></td><td>LD_PRELOAD abuse combined with libc hooking function names</td></tr>
-            <tr><td><code>MacOS_LaunchAgent_Persistence</code></td><td>macOS LaunchAgent / LaunchDaemon plist persistence patterns</td></tr>
-            <tr><td><code>MacOS_DYLD_Injection</code></td><td>DYLD_INSERT_LIBRARIES environment variable injection</td></tr>
-            <tr><td><code>Script_PowerShell_Malicious</code></td><td>PowerShell download cradles, AMSI bypass, and encoded command patterns</td></tr>
-            <tr><td><code>Doc_Macro_Dropper</code></td><td>Office documents with auto-execution macros combined with shell launch or download mechanisms</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="callout"><strong>No rules are included by default</strong> — Vault1337 ships with an empty rules directory. You need to add your own <code>.yar</code> files via the web editor or by placing them in the <code>vault/yara-rules/</code> directory on the server.</div>
 
       <!-- ── IOC ── -->
       <h2 id="ioc"><i class="bi bi-crosshair me-2" style="color:var(--accent);"></i>IOC Management</h2>
