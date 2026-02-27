@@ -58,10 +58,12 @@
         <li><a href="#ioc">IOC Management</a></li>
         <li><a href="#ip">IP Intelligence</a></li>
         <li><a href="#tags">Tags &amp; Search</a></li>
+        <li><a href="#report">Sample Report</a></li>
 
         <li class="d-group">Reference</li>
         <li><a href="#stack">Tech Stack</a></li>
         <li><a href="#api-ref">REST API</a></li>
+        <li><a href="#ack">Acknowledgements</a></li>
       </ul>
     </aside>
 
@@ -291,20 +293,22 @@ npm run dev</pre>
 
       <!-- ── Tools ── -->
       <h2 id="tools"><i class="bi bi-tools me-2" style="color:var(--accent);"></i>Analysis Tools</h2>
-      <p>Open a sample from the vault and select a tool from the <strong>Analysis</strong> tab. Results are displayed inline and cached for the session.</p>
-      <div class="v-wrap">
+      <p>Open a sample from the vault and select the <strong>Tools</strong> tab. The tool selector automatically filters and groups available tools based on the detected file type (PE, ELF, Mach-O, document, archive, email, script). A <strong>Show all tools</strong> checkbox is available for edge cases such as polyglot files.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Universal — all file types</h3>
+      <div class="v-wrap mb-4">
         <table class="v-table">
           <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
           <tbody>
             <tr>
               <td><strong>Strings</strong></td>
-              <td><code>UTF-8</code> <code>Latin-1</code> <code>UTF-16</code> <code>UTF-32</code> <code>ASCII</code></td>
-              <td>Extracts printable strings from a sample across multiple encodings.</td>
+              <td><code>UTF-8</code> <code>ASCII</code> <code>Wide (UTF-16LE)</code> <code>Latin-1</code> <code>UTF-16</code> <code>UTF-32</code></td>
+              <td>Extracts printable strings across multiple encodings, including wide strings commonly used to hide Windows API calls.</td>
             </tr>
             <tr>
-              <td><strong>LIEF Parser</strong></td>
-              <td><code>DOS Header</code> <code>Rich Header</code> <code>PE Header</code> <code>Entrypoint</code> <code>Sections</code> <code>Imports</code> <code>Signature</code> <code>Entropy</code></td>
-              <td>PE binary analysis via the <a href="https://github.com/lief-project/LIEF" target="_blank">LIEF project</a>. Shows headers, imported functions, section entropy, and signature validity.</td>
+              <td><strong>Extract IOCs</strong></td>
+              <td>—</td>
+              <td>Scans the sample for indicators of compromise and saves them to the IOC database linked to this sample. Detects: IP addresses, domains, URLs, emails, Bitcoin addresses, CVE IDs, registry keys, named pipes/mutexes, Windows persistence paths (Run/RunOnce/Services), scheduled task paths, Linux cron paths, systemd unit paths, and macOS LaunchAgent/LaunchDaemon plists.</td>
             </tr>
             <tr>
               <td><strong>Hex Viewer</strong></td>
@@ -312,44 +316,109 @@ npm run dev</pre>
               <td>Renders a hex dump of the sample with ASCII sidebar.</td>
             </tr>
             <tr>
-              <td><strong>PDF Parser</strong></td>
+              <td><strong>Run YARA Rules</strong></td>
               <td>—</td>
-              <td>Extracts metadata, embedded URLs, and text content from PDFs using <a href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>.</td>
-            </tr>
-            <tr>
-              <td><strong>OLE Tools</strong></td>
-              <td><code>OLEID</code> <code>OLEMETA</code> <code>OLEDUMP</code> <code>OLEVBA</code> <code>RTFOBJ</code> <code>OLEOBJ</code></td>
-              <td>Analyses Microsoft OLE2 compound files (Office documents, RTF) via <a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>. Detects macros, embedded objects, and suspicious indicators.</td>
+              <td>Runs all saved YARA rules against the sample and reports matches with rule name, matched strings, and file offsets.</td>
             </tr>
             <tr>
               <td><strong>ExifTool</strong></td>
               <td>—</td>
               <td>Reads all metadata tags from a file using <a href="https://exiftool.org/" target="_blank">ExifTool</a> by Phil Harvey.</td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Windows (PE)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
             <tr>
-              <td><strong>IOC Extractor</strong></td>
+              <td><strong>LIEF Parser</strong></td>
+              <td><code>DOS Header</code> <code>Rich Header</code> <code>PE Header</code> <code>Entrypoint</code> <code>Sections</code> <code>Imports</code> <code>Signature Check</code> <code>Check Entropy</code> <code>Import Hash (LIEF)</code> <code>Overlay Detection</code> <code>Rich Header Hash</code> <code>Exports</code></td>
+              <td>Comprehensive PE binary analysis via the <a href="https://github.com/lief-project/LIEF" target="_blank">LIEF project</a>. Covers all standard PE structures including the export directory and digital signature verification.</td>
+            </tr>
+            <tr>
+              <td><strong>PE File</strong></td>
+              <td><code>Import Hash</code> <code>Rich Header Hash</code> <code>Resources</code> <code>Version Info</code> <code>Overlay</code> <code>Suspicious Imports</code> <code>Section Entropy</code> <code>Packer Detection</code> <code>Compile Timestamp</code> <code>Anti-VM Detection</code></td>
+              <td>PE-focused analysis via <a href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>. Highlights suspicious Windows API imports (62 APIs across 8 categories), detects known packers by section name and entropy heuristics, checks compile timestamp for anomalies (future dates, pre-1993, zeroed, known fakes), and scans raw bytes for 50+ anti-VM/sandbox artifact strings (VMware, VirtualBox, QEMU, Hyper-V, analysis tools).</td>
+            </tr>
+            <tr>
+              <td><strong>Disassembler</strong></td>
               <td>—</td>
-              <td>Parses the sample for indicators of compromise (IPs, domains, URLs, hashes, emails) and stores them in the IOC database linked to this sample.</td>
+              <td>Disassembles code at the entry point using <a href="https://www.capstone-engine.org/" target="_blank">Capstone</a>. Supports x86, x86-64, and ARM architectures with automatic detection.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Linux (ELF)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>LIEF Parser</strong></td>
+              <td><code>ELF Header</code> <code>ELF Sections</code> <code>ELF Symbols</code> <code>ELF Suspicious Symbols</code> <code>ELF Packer Detection</code> <code>ELF Segments</code> <code>ELF Binary Info</code></td>
+              <td>ELF binary analysis via LIEF. <em>ELF Suspicious Symbols</em> flags 67 dangerous dynamic symbols across Execution, Network, Privilege Escalation, Anti-Analysis/Injection, Dynamic Loading, Rootkit/File Hiding, and Surveillance categories. <em>ELF Segments</em> lists all program headers and flags W+X PT_LOAD segments. <em>ELF Binary Info</em> reports stripped status, linking type, and interpreter path.</td>
             </tr>
             <tr>
-              <td><strong>YARA</strong></td>
+              <td><strong>Disassembler</strong></td>
               <td>—</td>
-              <td>Runs all saved YARA rules against the sample and reports any matches. Rules are managed from the <strong>YARA</strong> page.</td>
+              <td>Entry point disassembly via Capstone with architecture auto-detection.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">macOS (Mach-O)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Mach-O Tool</strong></td>
+              <td><code>Header</code> <code>Load Commands</code> <code>Imported Libraries</code> <code>Exported Functions</code> <code>Symbols</code> <code>Sections &amp; Entropy</code> <code>Code Signature</code> <code>Entitlements</code> <code>Encrypted Segments</code></td>
+              <td>Mach-O binary analysis via LIEF. Supports fat binaries (reports all architectures). <em>Imported Libraries</em> annotates dylibs by capability category (Keychain, Network, Camera, Location, etc.). <em>Entitlements</em> extracts the embedded XML plist from the code signature blob. <em>Encrypted Segments</em> detects <code>LC_ENCRYPTION_INFO</code> / <code>LC_ENCRYPTION_INFO_64</code> load commands (App Store DRM / FairPlay) and high-entropy sections.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Documents &amp; PDFs</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>PDF Parser</strong></td>
+              <td><code>Extract Metadata</code> <code>Extract Content</code> <code>Extract Images</code> <code>Extract URLs</code> <code>JavaScript</code> <code>Embedded Files</code></td>
+              <td>PDF forensics via <a href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>. Surfaces embedded JavaScript, embedded files, URLs, and document metadata.</td>
             </tr>
             <tr>
-              <td><strong>Email Parser</strong></td>
-              <td><code>Headers</code> <code>Body</code> <code>Attachments</code></td>
-              <td>Parses <code>.eml</code> files. Downloads email attachments directly into the vault for further analysis.</td>
+              <td><strong>OLETools</strong></td>
+              <td><code>OLEID</code> <code>OLEMETA</code> <code>OLEDUMP</code> <code>OLEVBA</code> <code>RTFOBJ</code> <code>OLEOBJ</code></td>
+              <td>Analyses Microsoft OLE2 compound files (Office documents, RTF) via <a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>. Detects VBA macros, auto-execution triggers, embedded objects, and obfuscation.</td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Archives &amp; Email</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
             <tr>
               <td><strong>Zip Extractor</strong></td>
               <td><code>With password</code> <code>Without password</code></td>
-              <td>Extracts <code>.zip</code> and <code>.7z</code> archives. All extracted files are added to the vault as individual samples.</td>
+              <td>Extracts <code>.zip</code> and <code>.7z</code> archives. All extracted files are added to the vault as individual samples and automatically enriched with VirusTotal data.</td>
             </tr>
             <tr>
-              <td><strong>QR Decode</strong></td>
-              <td>—</td>
-              <td>Decodes QR codes from image samples using OpenCV. Returns the decoded payload as text.</td>
+              <td><strong>Email Parser</strong></td>
+              <td><code>Email Headers</code> <code>Email Body</code> <code>Download Attachments</code> <code>URL Extractor</code></td>
+              <td>Parses <code>.eml</code> and <code>.msg</code> files. Attachments are downloaded directly into the vault for further analysis.</td>
             </tr>
           </tbody>
         </table>
@@ -361,20 +430,61 @@ npm run dev</pre>
       <ul>
         <li>Create new rules using the built-in editor — paste or write YARA syntax directly.</li>
         <li>Edit existing rules at any time.</li>
-        <li>Run all rules against a specific sample from the sample detail page using the <strong>YARA</strong> tool.</li>
+        <li>Run all rules against a specific sample from the sample detail page using the <strong>Run YARA Rules</strong> tool.</li>
+        <li>Results show the matching rule name, tags, matched string identifiers, file offsets, and match lengths.</li>
         <li>Rules are stored as <code>.yar</code> files in <code>vault/yara-rules/</code> on the server.</li>
       </ul>
       <div class="callout">Rules with syntax errors will fail to save — the editor will report the parse error inline.</div>
+
+      <p class="mt-3"><strong>Bundled rules</strong> — Vault1337 ships with 10 detection rules covering common malware patterns:</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Rule</th><th>Detects</th></tr></thead>
+          <tbody>
+            <tr><td><code>Win_AntiDebug_APIs</code></td><td>PE files importing ≥ 3 known anti-debugging APIs (IsDebuggerPresent, NtQueryInformationProcess, etc.)</td></tr>
+            <tr><td><code>Win_AntiVM_Artifacts</code></td><td>VMware, VirtualBox, QEMU, and common sandbox artifact strings in PE files</td></tr>
+            <tr><td><code>Win_Process_Injection</code></td><td>PE files combining APIs for remote thread injection, APC injection, or process hollowing</td></tr>
+            <tr><td><code>Win_Ransomware_Generic</code></td><td>Shadow copy deletion, crypto API imports, and ransom note keyword combinations</td></tr>
+            <tr><td><code>Linux_Suspicious_ELF</code></td><td>ELF binaries combining reverse shell and privilege escalation symbols</td></tr>
+            <tr><td><code>Linux_ELF_LD_Preload_Rootkit</code></td><td>LD_PRELOAD abuse combined with libc hooking function names</td></tr>
+            <tr><td><code>MacOS_LaunchAgent_Persistence</code></td><td>macOS LaunchAgent / LaunchDaemon plist persistence patterns</td></tr>
+            <tr><td><code>MacOS_DYLD_Injection</code></td><td>DYLD_INSERT_LIBRARIES environment variable injection</td></tr>
+            <tr><td><code>Script_PowerShell_Malicious</code></td><td>PowerShell download cradles, AMSI bypass, and encoded command patterns</td></tr>
+            <tr><td><code>Doc_Macro_Dropper</code></td><td>Office documents with auto-execution macros combined with shell launch or download mechanisms</td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- ── IOC ── -->
       <h2 id="ioc"><i class="bi bi-crosshair me-2" style="color:var(--accent);"></i>IOC Management</h2>
       <p>Navigate to <strong>IOCs</strong> to view all extracted indicators of compromise across all samples.</p>
       <ul>
-        <li>Run the <strong>IOC Extractor</strong> tool on a sample to populate its IOCs.</li>
+        <li>Run the <strong>Extract IOCs</strong> tool on a sample to populate its IOCs.</li>
         <li>Each IOC is linked back to the sample it came from.</li>
         <li>Mark IOCs as true positive or false positive using the toggle on the IOC page.</li>
         <li>Filter the list by classification (true / false / unreviewed) and search by value.</li>
       </ul>
+      <p><strong>IOC types extracted:</strong></p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>ip</code></td><td>IPv4 addresses</td></tr>
+            <tr><td><code>domain</code></td><td>Domains validated against the public suffix list</td></tr>
+            <tr><td><code>url</code></td><td>HTTP / HTTPS / FTP URLs</td></tr>
+            <tr><td><code>email</code></td><td>Email addresses</td></tr>
+            <tr><td><code>bitcoin</code></td><td>Bitcoin wallet addresses</td></tr>
+            <tr><td><code>cve</code></td><td>CVE identifiers (e.g. CVE-2021-44228)</td></tr>
+            <tr><td><code>registry</code></td><td>Windows registry key paths (HKLM / HKCU etc.)</td></tr>
+            <tr><td><code>named_pipe</code></td><td>Named pipe and mutex paths</td></tr>
+            <tr><td><code>win_persistence</code></td><td>Windows Run / RunOnce / Services registry persistence paths</td></tr>
+            <tr><td><code>scheduled_task</code></td><td>Scheduled task file paths and schtasks command references</td></tr>
+            <tr><td><code>linux_cron</code></td><td>Linux cron paths (<code>/etc/cron*</code>, <code>/var/spool/cron</code>)</td></tr>
+            <tr><td><code>systemd_unit</code></td><td>Systemd service / timer / socket unit file paths</td></tr>
+            <tr><td><code>macos_launchagent</code></td><td>macOS LaunchAgent and LaunchDaemon plist paths</td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- ── IP ── -->
       <h2 id="ip"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>IP Intelligence</h2>
@@ -394,6 +504,19 @@ npm run dev</pre>
         <li>Use the search bar on the <strong>Vault</strong> page to filter samples by filename, hash, or tag.</li>
         <li>Results are paginated — use the page controls at the bottom of the vault list.</li>
       </ul>
+
+      <!-- ── Sample Report ── -->
+      <h2 id="report"><i class="bi bi-file-earmark-bar-graph me-2" style="color:var(--accent);"></i>Sample Report</h2>
+      <p>Every sample has a structured JSON report available at <code>GET /api/v1/files/{id}/report/</code>. The report aggregates all stored analysis data in a single response — no new analysis is run.</p>
+      <p>The report includes:</p>
+      <ul>
+        <li><strong>File metadata</strong> — name, size, magic bytes, MIME type, upload date, uploader</li>
+        <li><strong>Hashes</strong> — MD5, SHA1, SHA256, SHA512</li>
+        <li><strong>Tags</strong> — all tags applied to the sample</li>
+        <li><strong>VirusTotal summary</strong> — detection counts (malicious / suspicious / undetected / harmless), threat label, threat category, scan date, and known names</li>
+        <li><strong>IOCs</strong> — all confirmed (true positive) IOCs grouped by type</li>
+      </ul>
+      <div class="callout">VirusTotal data is only included if a VT enrichment has previously been run on the sample (automatically on upload if a VT API key is configured, or manually via the VT Enrich action).</div>
 
       <!-- ── Tech Stack ── -->
       <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
@@ -432,6 +555,8 @@ npm run dev</pre>
             <tr><td><code>POST /api/v1/files/{id}/add_tag/</code></td><td>Add a tag to a sample</td></tr>
             <tr><td><code>POST /api/v1/files/{id}/remove_tag/</code></td><td>Remove a tag from a sample</td></tr>
             <tr><td><code>GET/POST /api/v1/files/{id}/comments/</code></td><td>List / add comments on a sample</td></tr>
+            <tr><td><code>GET /api/v1/files/{id}/report/</code></td><td>Structured JSON report (hashes, VT, IOCs, tags)</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/vt-enrich/</code></td><td>Fetch / refresh VirusTotal data for a sample</td></tr>
             <tr><td><code>POST /api/v1/files/fetch_url/</code></td><td>Fetch a sample from a URL</td></tr>
             <tr><td><code>POST /api/v1/files/vt-download/</code></td><td>Download from VirusTotal by SHA256</td></tr>
             <tr><td><code>POST /api/v1/files/mb-download/</code></td><td>Download from MalwareBazaar by SHA256</td></tr>
@@ -444,6 +569,61 @@ npm run dev</pre>
         </table>
       </div>
       <p>Interactive API documentation (Swagger UI) is available at <code>/api/v1/docs/</code> on any running instance.</p>
+
+      <!-- ── Acknowledgements ── -->
+      <h2 id="ack"><i class="bi bi-heart me-2" style="color:var(--accent);"></i>Acknowledgements</h2>
+      <p>Vault1337 is built on outstanding open-source projects and public APIs.</p>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:1.5rem;">Analysis Libraries</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://github.com/lief-project/LIEF" target="_blank">LIEF</a>
+        <a class="ack-pill" href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>
+        <a class="ack-pill" href="https://www.capstone-engine.org/" target="_blank">Capstone</a>
+        <a class="ack-pill" href="https://github.com/VirusTotal/yara-python" target="_blank">YARA-Python</a>
+        <a class="ack-pill" href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>
+        <a class="ack-pill" href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>
+        <a class="ack-pill" href="https://exiftool.org/" target="_blank">ExifTool</a>
+        <a class="ack-pill" href="https://github.com/nicowillis/pyzipper" target="_blank">pyzipper</a>
+        <a class="ack-pill" href="https://github.com/miurahr/py7zr" target="_blank">py7zr</a>
+        <a class="ack-pill" href="https://github.com/john-kurkowski/tldextract" target="_blank">tldextract</a>
+        <a class="ack-pill" href="https://github.com/astanin/python-tabulate" target="_blank">tabulate</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Backend &amp; Framework</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://www.python.org/" target="_blank">Python</a>
+        <a class="ack-pill" href="https://www.djangoproject.com/" target="_blank">Django</a>
+        <a class="ack-pill" href="https://www.django-rest-framework.org/" target="_blank">Django REST Framework</a>
+        <a class="ack-pill" href="https://python-requests.org/" target="_blank">Requests</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Intelligence APIs</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://www.virustotal.com/" target="_blank">VirusTotal</a>
+        <a class="ack-pill" href="https://bazaar.abuse.ch/api/" target="_blank">MalwareBazaar</a>
+        <a class="ack-pill" href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a>
+        <a class="ack-pill" href="https://spur.us/context-api/" target="_blank">Spur</a>
+        <a class="ack-pill" href="https://account.shodan.io/" target="_blank">Shodan</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Frontend</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://react.dev/" target="_blank">React</a>
+        <a class="ack-pill" href="https://vitejs.dev/" target="_blank">Vite</a>
+        <a class="ack-pill" href="https://www.typescriptlang.org/" target="_blank">TypeScript</a>
+        <a class="ack-pill" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
+        <a class="ack-pill" href="https://axios-http.com/" target="_blank">Axios</a>
+        <a class="ack-pill" href="https://reactrouter.com/" target="_blank">React Router</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Infrastructure</p>
+      <div class="ack-wrap">
+        <a class="ack-pill" href="https://gunicorn.org/" target="_blank">Gunicorn</a>
+        <a class="ack-pill" href="https://whitenoise.readthedocs.io/" target="_blank">WhiteNoise</a>
+        <a class="ack-pill" href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>
+        <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
+        <a class="ack-pill" href="https://nginx.org/" target="_blank">NGINX</a>
+      </div>
 
     </main>
   </div><!-- /docs-wrap -->
