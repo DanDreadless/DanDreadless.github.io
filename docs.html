@@ -53,6 +53,7 @@
 
         <li class="d-group">Using Vault1337</li>
         <li><a href="#uploading">Uploading Samples</a></li>
+        <li><a href="#vault-page">Vault Page</a></li>
         <li><a href="#tools">Analysis Tools</a></li>
         <li><a href="#yara">YARA Rules</a></li>
         <li><a href="#ioc">IOC Management</a></li>
@@ -256,6 +257,9 @@ npm run dev</pre>
             <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td><code>admin@localhost</code></td><td>Superuser email</td></tr>
             <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><code>changeme123</code></td><td>Superuser initial password — change this</td></tr>
             <tr><td><code>HOST_PORT</code></td><td><code>8000</code></td><td>Host port mapped to container port 8000</td></tr>
+            <tr><td><code>IOC_VT_MALICIOUS_THRESHOLD</code></td><td><code>1</code></td><td>VirusTotal malicious engine count required to auto-mark an IOC as true positive</td></tr>
+            <tr><td><code>IOC_ABUSEIPDB_SCORE_THRESHOLD</code></td><td><code>25</code></td><td>AbuseIPDB confidence score (0–100) required to auto-mark an IP IOC as true positive</td></tr>
+            <tr><td><code>IOC_ENRICH_VT_DELAY_SECONDS</code></td><td><code>15</code></td><td>Delay between VirusTotal calls during batch IOC enrichment (free tier rate limit)</td></tr>
           </tbody>
         </table>
       </div>
@@ -291,6 +295,35 @@ npm run dev</pre>
         </table>
       </div>
       <p>All samples are stored by SHA256 hash. Original filenames are preserved in the database but never used as file paths on disk. Add comma-separated tags during upload for easier organisation.</p>
+
+      <!-- ── Vault Page ── -->
+      <h2 id="vault-page"><i class="bi bi-collection me-2" style="color:var(--accent);"></i>Vault Page</h2>
+      <p>The <strong>Vault</strong> page lists all stored samples with filtering, search, and bulk management controls.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">File Type Filter Chips</h3>
+      <p>A row of filter chips above the sample table lets you quickly narrow the list to a specific file category:</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Filter</th><th>Matches</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Windows</strong></td><td>PE executables and DLLs (MIME <code>application/x-dosexec</code> / <code>application/x-msdownload</code>)</td></tr>
+            <tr><td><strong>Linux</strong></td><td>ELF binaries</td></tr>
+            <tr><td><strong>macOS</strong></td><td>Mach-O binaries</td></tr>
+            <tr><td><strong>Documents</strong></td><td>PDF, Office, and other document types</td></tr>
+            <tr><td><strong>Archives</strong></td><td>ZIP, 7z, TAR, GZ, RAR, and other archive formats</td></tr>
+            <tr><td><strong>Email</strong></td><td><code>.eml</code> and <code>.msg</code> files</td></tr>
+            <tr><td><strong>Scripts</strong></td><td>Text/script MIME types and common script extensions, excluding URL-tagged items</td></tr>
+            <tr><td><strong>Images</strong></td><td>Image MIME types (PNG, JPEG, GIF, BMP, etc.)</td></tr>
+            <tr><td><strong>URLs</strong></td><td>Samples tagged with the auto-applied <code>url</code> tag (fetched via the Fetch URL ingestor)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk Delete</h3>
+      <p>Each row has a checkbox. Tick one or more rows (or use the header checkbox to select all on the current page) and a <strong>Delete N selected</strong> button appears in the page header. Clicking it prompts for confirmation then deletes all selected samples in parallel. The selection is cleared and the table reloads after deletion.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Pagination</h3>
+      <p>The bottom of the vault list shows <strong>« ‹ page X of Y › »</strong> controls — first, previous, next, and last page buttons alongside the current page indicator.</p>
 
       <!-- ── Tools ── -->
       <h2 id="tools"><i class="bi bi-tools me-2" style="color:var(--accent);"></i>Analysis Tools</h2>
@@ -343,7 +376,7 @@ npm run dev</pre>
             <tr>
               <td><strong>PE File</strong></td>
               <td><code>Import Hash</code> <code>Rich Header Hash</code> <code>Resources</code> <code>Version Info</code> <code>Overlay</code> <code>Suspicious Imports</code> <code>Section Entropy</code> <code>Packer Detection</code> <code>Compile Timestamp</code> <code>Anti-VM Detection</code></td>
-              <td>PE-focused analysis via <a href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>. Highlights suspicious Windows API imports (62 APIs across 8 categories), detects known packers by section name and entropy heuristics, checks compile timestamp for anomalies (future dates, pre-1993, zeroed, known fakes), and scans raw bytes for 50+ anti-VM/sandbox artifact strings (VMware, VirtualBox, QEMU, Hyper-V, analysis tools).</td>
+              <td>PE-focused analysis via <a href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>. Highlights suspicious Windows API imports (62 APIs across 8 categories). <em>Packer Detection</em> performs a raw byte signature scan across the full binary (35+ signatures), checks the overlay for packer markers, and detects minimal import profiles (LoadLibrary/GetProcAddress only) — outputs a structured VERDICT line naming the packer where possible (UPX, MPRESS, ASPack, VMProtect, Themida, Armadillo, AutoIt, PyInstaller, NSIS, Inno Setup, WinRAR SFX, .NET obfuscators, and more). Checks compile timestamp for anomalies (future dates, pre-1993, zeroed, known fakes) and scans raw bytes for 50+ anti-VM/sandbox artifact strings (VMware, VirtualBox, QEMU, Hyper-V, analysis tools).</td>
             </tr>
             <tr>
               <td><strong>Disassembler</strong></td>
@@ -394,8 +427,8 @@ npm run dev</pre>
           <tbody>
             <tr>
               <td><strong>PDF Parser</strong></td>
-              <td><code>Extract Metadata</code> <code>Extract Content</code> <code>Extract Images</code> <code>Extract URLs</code> <code>JavaScript</code> <code>Embedded Files</code></td>
-              <td>PDF forensics via <a href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>. Surfaces embedded JavaScript, embedded files, URLs, and document metadata.</td>
+              <td><code>Extract Metadata</code> <code>Extract Content</code> <code>Extract Images</code> <code>Extract URLs</code> <code>JavaScript</code> <code>Embedded Files</code> <code>Render Pages</code></td>
+              <td>PDF forensics via <a href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>. Surfaces embedded JavaScript, embedded files, URLs, and document metadata. <em>Render Pages</em> rasterises each page to a PNG image via <code>get_pixmap()</code> — pure pixel rendering with no JavaScript execution or active content triggered. Capped at 15 pages / 10 MB.</td>
             </tr>
             <tr>
               <td><strong>OLETools</strong></td>
@@ -425,6 +458,20 @@ npm run dev</pre>
         </table>
       </div>
 
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Images</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Image Viewer</strong></td>
+              <td>—</td>
+              <td>Renders the sample as an inline image using a data URI — useful for inspecting images that may contain steganography or hidden data. Format is detected via PIL. Capped at 10 MB.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- ── YARA ── -->
       <h2 id="yara"><i class="bi bi-code-square me-2" style="color:var(--accent);"></i>YARA Rules</h2>
       <p>Navigate to <strong>YARA</strong> in the navigation bar to manage rules.</p>
@@ -446,15 +493,46 @@ npm run dev</pre>
         <li>Run the <strong>Extract IOCs</strong> tool on a sample to populate its IOCs.</li>
         <li>Each IOC is linked back to the sample it came from.</li>
         <li>Mark IOCs as true positive or false positive using the toggle on the IOC page.</li>
-        <li>Filter the list by classification (true / false / unreviewed) and search by value.</li>
+        <li>Filter the list by classification (true / false / unreviewed) and by IOC type using the filter chips above the table.</li>
+        <li>Search by IOC value using the search box.</li>
       </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Auto-Enrichment</h3>
+      <p>When the <strong>Extract IOCs</strong> tool runs, newly extracted <code>ip</code> and <code>domain</code> IOCs are automatically enriched against threat intel APIs in a background thread — the tool response returns immediately while enrichment continues asynchronously.</p>
+      <ul>
+        <li><strong>IP IOCs</strong> — queried against VirusTotal and AbuseIPDB concurrently.</li>
+        <li><strong>Domain IOCs</strong> — queried against VirusTotal.</li>
+        <li>An IOC is marked <strong>true positive</strong> if the VT malicious count meets the threshold or the AbuseIPDB score meets the threshold. It is marked <strong>false positive</strong> if all sources return clean results.</li>
+        <li>RFC1918 private IPs (10/8, 172.16/12, 192.168/16) are saved as IOCs (useful for lateral movement analysis) but auto-marked false positive — they are never sent to external APIs.</li>
+        <li>Loopback, link-local, multicast, and other reserved IP ranges are discarded entirely at extraction time.</li>
+      </ul>
+      <p>The enrichment column in the IOC table shows results as <strong>VT: x/y</strong> (malicious/total engines) and <strong>AIPDB: z%</strong> (abuse score). A dash (<code>—</code>) is shown for IOC types not yet enriched or where no API key is configured.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Manual Override &amp; Re-Enrichment</h3>
+      <ul>
+        <li>Manually toggling an IOC's true/false status sets an <strong>overridden</strong> flag, shown as a grey pill next to the status badge. Subsequent background enrichment runs will not overwrite a manually overridden IOC.</li>
+        <li>A <strong>Re-enrich</strong> button is available on each <code>ip</code> and <code>domain</code> row. Clicking it triggers a synchronous re-enrichment (both VT and AbuseIPDB in parallel) and immediately refreshes the row. This clears the overridden flag so fresh data is applied.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Enrichment Thresholds (Environment Variables)</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>IOC_VT_MALICIOUS_THRESHOLD</code></td><td><code>1</code></td><td>Minimum VirusTotal malicious engine count to mark an IOC as true positive</td></tr>
+            <tr><td><code>IOC_ABUSEIPDB_SCORE_THRESHOLD</code></td><td><code>25</code></td><td>Minimum AbuseIPDB confidence score (0–100) to mark an IP IOC as true positive</td></tr>
+            <tr><td><code>IOC_ENRICH_VT_DELAY_SECONDS</code></td><td><code>15</code></td><td>Delay in seconds between VirusTotal calls during batch enrichment (free tier: 4 req/min)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <p><strong>IOC types extracted:</strong></p>
       <div class="v-wrap">
         <table class="v-table">
           <thead><tr><th>Type</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>ip</code></td><td>IPv4 addresses</td></tr>
-            <tr><td><code>domain</code></td><td>Domains validated against the public suffix list</td></tr>
+            <tr><td><code>ip</code></td><td>IPv4 addresses (loopback, multicast, and reserved ranges discarded; RFC1918 kept as false positive)</td></tr>
+            <tr><td><code>domain</code></td><td>Domains validated against the public suffix list; binary artifact extensions and purely numeric labels filtered</td></tr>
             <tr><td><code>url</code></td><td>HTTP / HTTPS / FTP URLs</td></tr>
             <tr><td><code>email</code></td><td>Email addresses</td></tr>
             <tr><td><code>bitcoin</code></td><td>Bitcoin wallet addresses</td></tr>
@@ -568,7 +646,8 @@ npm run dev</pre>
             <tr><td><code>POST /api/v1/files/fetch_url/</code></td><td>Fetch a sample from a URL</td></tr>
             <tr><td><code>POST /api/v1/files/vt-download/</code></td><td>Download from VirusTotal by SHA256</td></tr>
             <tr><td><code>POST /api/v1/files/mb-download/</code></td><td>Download from MalwareBazaar by SHA256</td></tr>
-            <tr><td><code>GET/PATCH /api/v1/iocs/</code></td><td>List and update IOCs</td></tr>
+            <tr><td><code>GET/PATCH /api/v1/iocs/</code></td><td>List and update IOCs — supports <code>?ioc_type=ip|domain|url|email|…</code> filter</td></tr>
+            <tr><td><code>POST /api/v1/iocs/{id}/enrich/</code></td><td>Re-enrich a single IOC against VT + AbuseIPDB; returns updated IOC</td></tr>
             <tr><td><code>GET/POST/PUT/DELETE /api/v1/yara/</code></td><td>YARA rule management</td></tr>
             <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup</td></tr>
             <tr><td><code>GET/POST /api/v1/admin/keys/</code></td><td>API key management (staff only)</td></tr>
