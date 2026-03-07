@@ -57,10 +57,13 @@
         <li><a href="#tools">Analysis Tools</a></li>
         <li><a href="#yara">YARA Rules</a></li>
         <li><a href="#ioc">IOC Management</a></li>
-        <li><a href="#ip">IP Intelligence</a></li>
+        <li><a href="#ip">IP &amp; Domain Intelligence</a></li>
         <li><a href="#tags">Tags &amp; Search</a></li>
         <li><a href="#report">Sample Report</a></li>
         <li><a href="#pdf-report">PDF Report Export</a></li>
+        <li><a href="#mitre-attack">MITRE ATT&amp;CK Mapping</a></li>
+        <li><a href="#stix-export">STIX 2.1 Export</a></li>
+        <li><a href="#decoder">Decoder</a></li>
 
         <li class="d-group">Reference</li>
         <li><a href="#stack">Tech Stack</a></li>
@@ -472,6 +475,34 @@ npm run dev</pre>
         </table>
       </div>
 
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Android (APK)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>APK Tool</strong></td>
+              <td><code>Manifest</code> <code>Components</code> <code>Intents</code> <code>Certificate</code> <code>Strings</code> <code>URLs</code> <code>Suspicious</code></td>
+              <td>Android APK analysis via <a href="https://github.com/androguard/androguard" target="_blank">androguard</a>. <em>Manifest</em> shows package name, version, SDK levels, and declared permissions (dangerous permissions highlighted). <em>Components</em> lists activities, services, receivers, and providers. <em>Intents</em> shows intent filters grouped by component. <em>Certificate</em> parses the signing certificate (v1/v2/v3 schemes) — subject, issuer, validity, SHA-1/SHA-256 fingerprints, and self-signed detection. <em>Strings</em> extracts meaningful strings from DEX bytecode (JVM class descriptors filtered). <em>URLs</em> finds hardcoded HTTP/HTTPS URLs and non-loopback IPs in DEX strings. <em>Suspicious</em> reports dangerous permissions, suspicious API class references (DexClassLoader, Runtime.exec, SMS access, etc.), and exported components with intent filters.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Scripts &amp; .NET</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>.NET Analysis</strong></td>
+              <td><code>Assembly Info</code> <code>Type Definitions</code> <code>Method Definitions</code> <code>Strings</code> <code>Imports</code> <code>Resources</code></td>
+              <td>.NET managed assembly analysis via <a href="https://github.com/malwarefrank/dnfile" target="_blank">dnfile</a>. Extracts assembly metadata, type and method definitions, embedded strings, imported namespaces, and embedded resource names. Useful for analysing C# / VB.NET malware, droppers, and stagers without executing the code.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- ── YARA ── -->
       <h2 id="yara"><i class="bi bi-code-square me-2" style="color:var(--accent);"></i>YARA Rules</h2>
       <p>Navigate to <strong>YARA</strong> in the navigation bar to manage rules.</p>
@@ -508,6 +539,13 @@ npm run dev</pre>
       </ul>
       <p>The enrichment column in the IOC table shows results as <strong>VT: x/y</strong> (malicious/total engines) and <strong>AIPDB: z%</strong> (abuse score). A dash (<code>—</code>) is shown for IOC types not yet enriched or where no API key is configured.</p>
 
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk Actions</h3>
+      <p>Each row in the IOC table has a checkbox. Selecting one or more rows reveals a bulk action bar with two options:</p>
+      <ul>
+        <li><strong>Export STIX</strong> — exports the selected IOCs as a STIX 2.1 bundle (see <a href="#stix-export">STIX 2.1 Export</a> below).</li>
+        <li><strong>Delete</strong> — permanently removes the selected IOCs. Requires a confirmation click to prevent accidental deletion (staff only).</li>
+      </ul>
+
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Manual Override &amp; Re-Enrichment</h3>
       <ul>
         <li>Manually toggling an IOC's true/false status sets an <strong>overridden</strong> flag, shown as a grey pill next to the status badge. Subsequent background enrichment runs will not overwrite a manually overridden IOC.</li>
@@ -532,7 +570,7 @@ npm run dev</pre>
           <thead><tr><th>Type</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>ip</code></td><td>IPv4 addresses (loopback, multicast, and reserved ranges discarded; RFC1918 kept as false positive)</td></tr>
-            <tr><td><code>domain</code></td><td>Domains validated against the public suffix list; binary artifact extensions and purely numeric labels filtered</td></tr>
+            <tr><td><code>domain</code></td><td>Domains validated against the public suffix list; binary artifact extensions, purely numeric labels, and registered-domain labels shorter than 3 characters filtered (eliminates APK/DEX code artifacts)</td></tr>
             <tr><td><code>url</code></td><td>HTTP / HTTPS / FTP URLs</td></tr>
             <tr><td><code>email</code></td><td>Email addresses</td></tr>
             <tr><td><code>bitcoin</code></td><td>Bitcoin wallet addresses</td></tr>
@@ -548,13 +586,24 @@ npm run dev</pre>
         </table>
       </div>
 
-      <!-- ── IP ── -->
-      <h2 id="ip"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>IP Intelligence</h2>
+      <!-- ── IP + Domain ── -->
+      <h2 id="ip"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>IP &amp; Domain Intelligence</h2>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">IP Check</h3>
       <p>Navigate to <strong>IP Check</strong> to query an IP address against multiple threat intelligence sources simultaneously.</p>
       <ul>
-        <li>Aggregates results from <strong>AbuseIPDB</strong>, <strong>Spur</strong>, and <strong>Shodan</strong> in a single request.</li>
+        <li>Displays a colour-coded <strong>verdict banner</strong> (Malicious / Suspicious / Clean / Unknown) derived from all sources combined.</li>
+        <li>Individual source cards: <strong>VirusTotal</strong> (detection count + link), <strong>AbuseIPDB</strong> (score bar + usage type + ISP), <strong>Spur</strong> (tunnel/tag badges), <strong>Shodan</strong> (open ports, hostnames, CVEs).</li>
+        <li>Source cards with missing API keys are sorted to the bottom of the page.</li>
         <li>Private, loopback, and reserved IP ranges are rejected before any external query is made.</li>
-        <li>Requires at least one API key to be configured for results to be returned.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Domain Check</h3>
+      <p>Navigate to <strong>Domain Check</strong> to query a domain against VirusTotal and WHOIS.</p>
+      <ul>
+        <li>Displays a verdict banner derived from VirusTotal detections.</li>
+        <li>Individual source cards: <strong>VirusTotal</strong> (detection count, category badges + link), <strong>WHOIS</strong> (registrar, creation/expiry dates, name servers, status badges), <strong>Passive DNS</strong> (unique IPs seen resolving to this domain).</li>
+        <li>Cards with missing API keys are sorted to the bottom.</li>
       </ul>
 
       <!-- ── Tags ── -->
@@ -604,6 +653,51 @@ npm run dev</pre>
       </div>
       <div class="callout">The PDF is generated entirely client-side using <a href="https://github.com/parallax/jsPDF" target="_blank">jsPDF</a> and <a href="https://github.com/simonbengtsson/jsPDF-AutoTable" target="_blank">jsPDF-AutoTable</a>. No analysis data leaves the browser and no additional API calls are made.</div>
 
+      <!-- ── MITRE ATT&CK ── -->
+      <h2 id="mitre-attack"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>MITRE ATT&amp;CK Mapping</h2>
+      <p>On the sample detail page, the <strong>Info</strong> tab includes a <strong>MITRE ATT&amp;CK</strong> card alongside the VirusTotal summary.</p>
+      <ul>
+        <li>Click <strong>Map Techniques</strong> to scan the sample's stored analysis results and linked IOC types for known MITRE ATT&amp;CK technique indicators.</li>
+        <li>Results are displayed as colour-coded tactic badges arranged in a single flex-wrap row. Each badge shows the technique ID and name; hovering or reading the badge expands to show the matched indicator evidence.</li>
+        <li>Click a badge to open the official MITRE ATT&amp;CK technique page in a new tab.</li>
+        <li>Mapping covers 27 techniques across 10 tactics including execution, persistence, defence evasion, discovery, lateral movement, and impact.</li>
+        <li>Detection uses two sources: (1) regex pattern matching against saved <em>AnalysisResult</em> text (excluding IOC extractor output to prevent section-header false positives), and (2) direct mapping from linked IOC types (e.g. <code>scheduled_task</code> → T1053, <code>win_persistence</code> → T1547).</li>
+        <li>Results are persisted on the sample record and can be re-mapped at any time via the <strong>Re-map</strong> button.</li>
+      </ul>
+
+      <!-- ── STIX Export ── -->
+      <h2 id="stix-export"><i class="bi bi-box-arrow-up-right me-2" style="color:var(--accent);"></i>STIX 2.1 Export</h2>
+      <p>Vault1337 supports exporting threat intelligence in <a href="https://oasis-open.github.io/cti-documentation/stix/intro" target="_blank">STIX 2.1</a> format via the <a href="https://github.com/oasis-open/cti-python-stix2" target="_blank">stix2</a> library.</p>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">Sample STIX Export</h3>
+      <p>On the sample detail page, the <strong>Info</strong> tab has an <strong>Export STIX</strong> button. Clicking it downloads a STIX 2.1 bundle for that sample containing:</p>
+      <ul>
+        <li>A <strong>Vault1337 Identity</strong> SDO as the bundle author.</li>
+        <li>A <strong>File</strong> SCO with MD5, SHA-1, and SHA-256 hashes.</li>
+        <li>An <strong>Indicator</strong> SDO with a hash-based STIX pattern.</li>
+        <li>STIX objects for every linked IOC — IPv4Address, DomainName, URL, EmailAddress, WindowsRegistryKey SCOs with associated Indicator SDOs; Vulnerability SDOs for CVE IOCs; Note SDOs for persistence and other types.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk IOC STIX Export</h3>
+      <p>On the <strong>IOC</strong> page, select one or more IOCs using the row checkboxes, then click <strong>Export STIX</strong> in the bulk action bar. The download contains STIX objects for all selected IOCs, without being tied to a specific sample.</p>
+
+      <!-- ── Decoder ── -->
+      <h2 id="decoder"><i class="bi bi-file-binary me-2" style="color:var(--accent);"></i>Decoder</h2>
+      <p>Navigate to <strong>Decoder</strong> in the navigation bar to decode and transform encoded strings without uploading a sample.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Mode</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Base64</code></td><td>Decodes standard Base64-encoded strings</td></tr>
+            <tr><td><code>Hex</code></td><td>Decodes hex-encoded byte strings to ASCII/UTF-8</td></tr>
+            <tr><td><code>URL Decode</code></td><td>Decodes percent-encoded URL strings</td></tr>
+            <tr><td><code>ROT13</code></td><td>Applies ROT13 character substitution</td></tr>
+            <tr><td><code>XOR</code></td><td>XOR-decodes the input with a specified single-byte key (hex or decimal)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Output is displayed inline — no data is sent to the server. Useful for quickly decoding obfuscated strings found during analysis.</p>
+
       <!-- ── Tech Stack ── -->
       <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
       <div class="v-wrap">
@@ -648,8 +742,14 @@ npm run dev</pre>
             <tr><td><code>POST /api/v1/files/mb-download/</code></td><td>Download from MalwareBazaar by SHA256</td></tr>
             <tr><td><code>GET/PATCH /api/v1/iocs/</code></td><td>List and update IOCs — supports <code>?ioc_type=ip|domain|url|email|…</code> filter</td></tr>
             <tr><td><code>POST /api/v1/iocs/{id}/enrich/</code></td><td>Re-enrich a single IOC against VT + AbuseIPDB; returns updated IOC</td></tr>
+            <tr><td><code>GET /api/v1/iocs/{id}/samples/</code></td><td>List all samples that share a given IOC (pivot on shared infrastructure)</td></tr>
+            <tr><td><code>POST /api/v1/iocs/export-stix/</code></td><td>Export selected IOCs as a STIX 2.1 bundle — body: <code>{"ids": [1,2,3]}</code></td></tr>
+            <tr><td><code>POST /api/v1/iocs/bulk-delete/</code></td><td>Delete selected IOCs — body: <code>{"ids": [1,2,3]}</code> (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/map-attack/</code></td><td>Run MITRE ATT&amp;CK technique mapping for a sample; persists and returns results</td></tr>
+            <tr><td><code>GET /api/v1/files/{id}/stix/</code></td><td>Download a STIX 2.1 bundle for a sample and all its IOCs</td></tr>
             <tr><td><code>GET/POST/PUT/DELETE /api/v1/yara/</code></td><td>YARA rule management</td></tr>
-            <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup</td></tr>
+            <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup (VT, AbuseIPDB, Spur, Shodan)</td></tr>
+            <tr><td><code>POST /api/v1/intel/domain/</code></td><td>Domain intelligence lookup (VT, WHOIS, passive DNS)</td></tr>
             <tr><td><code>GET/POST /api/v1/admin/keys/</code></td><td>API key management (staff only)</td></tr>
             <tr><td><code>POST /api/v1/tools/qr-decode/</code></td><td>Stateless QR code decode</td></tr>
           </tbody>
@@ -674,6 +774,9 @@ npm run dev</pre>
         <a class="ack-pill" href="https://github.com/miurahr/py7zr" target="_blank">py7zr</a>
         <a class="ack-pill" href="https://github.com/john-kurkowski/tldextract" target="_blank">tldextract</a>
         <a class="ack-pill" href="https://github.com/astanin/python-tabulate" target="_blank">tabulate</a>
+        <a class="ack-pill" href="https://github.com/androguard/androguard" target="_blank">androguard</a>
+        <a class="ack-pill" href="https://github.com/malwarefrank/dnfile" target="_blank">dnfile</a>
+        <a class="ack-pill" href="https://github.com/oasis-open/cti-python-stix2" target="_blank">stix2</a>
       </div>
 
       <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Backend &amp; Framework</p>
