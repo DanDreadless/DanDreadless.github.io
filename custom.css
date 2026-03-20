@@ -73,6 +73,8 @@ body {
 }
 .hero .logo {
   height: 100px;
+  max-width: 90%;
+  width: auto;
   margin-bottom: 1.8rem;
   filter: drop-shadow(0 0 24px rgba(189,54,58,.4));
 }
@@ -265,4 +267,11 @@ footer p { margin: 0; }
   .docs-wrap { grid-template-columns: 1fr; }
   .docs-sidebar { display: none; }
   .section { padding: 3rem 0; }
+}
+@media (max-width: 576px) {
+  .hero .logo {
+    height: auto;
+    width: 65vw;
+    max-width: 240px;
+  }
 }
