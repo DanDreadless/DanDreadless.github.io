@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Insight — open-source passive web threat scanner. Content-based detection of JavaScript threats, phishing, skimmers, and domain attacks. No reputation APIs required.">
+  <meta name="keywords" content="insight, web threat scanner, phishing detection, malicious javascript, open source, vault1337">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
+  <title>Insight — Web Threat Scanner</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="Images/white-logo-no-background.svg" alt="Vault1337">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="docs.html">Documentation</a></li>
+        <li class="nav-item"><a class="nav-link active" href="insight.html">Insight</a></li>
+        <li class="nav-item">
+          <a class="nav-link nav-gh" href="https://github.com/DanDreadless/Insight" target="_blank">
+            <i class="bi bi-github me-1"></i>GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page header ────────────────────────────────────────────────────────── -->
+<div class="hero" style="padding: 3.5rem 1rem 3rem;">
+  <div class="container">
+    <p class="s-sub mb-1" style="color:var(--muted);">A companion tool to Vault1337</p>
+    <h1 style="font-size:clamp(1.6rem,4vw,2.4rem); font-weight:700; margin-bottom:.5rem;">Insight — Web Threat Scanner</h1>
+    <p class="sub" style="max-width:600px; margin:0 auto 1.5rem;">
+      Open-source passive web threat scanner. Submit any URL — Insight fetches all public resources and analyses them entirely on content, with no reliance on reputation databases.
+    </p>
+    <div class="cta">
+      <a href="#getting-started" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Getting Started</a>
+      <a href="#detection" class="btn-v outline"><i class="bi bi-shield-check me-1"></i>Detection Engine</a>
+      <a href="https://github.com/DanDreadless/Insight" target="_blank" class="btn-v outline"><i class="bi bi-github me-1"></i>View on GitHub</a>
+    </div>
+    <div class="badge-row">
+      <img src="https://img.shields.io/badge/AGPL--3.0-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python">
+      <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white" alt="Django">
+      <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
+      <img src="https://img.shields.io/badge/Celery-Redis-37814A?logo=celery&logoColor=white" alt="Celery">
+    </div>
+  </div>
+</div>
+
+<!-- ── Docs body ──────────────────────────────────────────────────────────── -->
+<div class="container section">
+  <div class="docs-wrap">
+
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <ul class="d-nav">
+        <li class="d-group">Getting Started</li>
+        <li><a href="#getting-started">Overview</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+
+        <li class="d-group">Running Locally</li>
+        <li><a href="#redis">1. Start Redis</a></li>
+        <li><a href="#backend">2. Backend</a></li>
+        <li><a href="#celery">3. Celery Worker</a></li>
+        <li><a href="#frontend">4. Frontend</a></li>
+        <li><a href="#verify">5. Verify</a></li>
+        <li><a href="#docker">Docker (Alternative)</a></li>
+
+        <li class="d-group">Configuration</li>
+        <li><a href="#env-vars">Environment Variables</a></li>
+
+        <li class="d-group">Detection Engine</li>
+        <li><a href="#detection">How It Works</a></li>
+        <li><a href="#verdict">Verdict &amp; Scoring</a></li>
+        <li><a href="#js-analysis">JavaScript Analysis</a></li>
+        <li><a href="#html-analysis">HTML Analysis</a></li>
+        <li><a href="#domain-intel">Domain Intelligence</a></li>
+        <li><a href="#header-analysis">Header Analysis</a></li>
+        <li><a href="#ssl-analysis">SSL Analysis</a></li>
+        <li><a href="#tech-detection">Technology Detection</a></li>
+
+        <li class="d-group">Reference</li>
+        <li><a href="#api-ref">API Endpoints</a></li>
+        <li><a href="#stack">Tech Stack</a></li>
+        <li><a href="#ack">Acknowledgements</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="docs-content">
+
+      <!-- ── Overview ── -->
+      <h2 id="getting-started"><i class="bi bi-radar me-2" style="color:var(--accent);"></i>Overview</h2>
+      <p>
+        Insight is a passive web threat scanner. Submit any URL and it fetches all public resources — HTML, scripts,
+        HTTP headers, and TLS certificates — then analyses them entirely on content. There are no calls to reputation
+        databases or external threat intelligence APIs.
+      </p>
+      <p>
+        Because detection is content-based, Insight catches zero-day campaigns, freshly registered phishing domains,
+        and newly injected skimmers that reputation feeds haven't yet indexed. It is a companion tool to
+        <a href="https://vault1337.com" target="_blank">vault1337.com</a> and shares the same design system.
+      </p>
+      <p>
+        The result of each scan is a prioritised findings report covering JavaScript threats, phishing indicators,
+        domain intelligence, security misconfigurations, and the full detected technology stack — each finding
+        categorised by severity (CRITICAL / HIGH / MEDIUM / LOW / INFO) with supporting evidence extracted directly
+        from the page content.
+      </p>
+      <div class="callout">
+        <strong>Beta:</strong> Insight is currently in beta. All scan results are provided for informational purposes
+        only and must be independently verified by a trained security analyst before any action is taken. Findings
+        may contain false positives or miss threats not covered by the current detection rules.
+      </div>
+
+      <!-- ── Requirements ── -->
+      <h2 id="requirements"><i class="bi bi-list-check me-2" style="color:var(--accent);"></i>Requirements</h2>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Requirement</th><th>Version</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Python</td><td>3.11+</td><td>Global or virtual environment</td></tr>
+            <tr><td>Node.js</td><td>18+</td><td>For the frontend dev server</td></tr>
+            <tr><td>Redis</td><td>7+</td><td>Required for Celery task queue — Docker is the easiest option</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Redis ── -->
+      <h2 id="redis"><i class="bi bi-database me-2" style="color:var(--accent);"></i>1. Start Redis</h2>
+      <p>Redis must be running before the backend or Celery worker will start successfully.</p>
+
+      <div class="step">
+        <div class="step-n">A</div>
+        <div class="step-b">
+          <h5>Docker (any OS — recommended)</h5>
+          <pre>docker run -d -p 6379:6379 redis:7-alpine</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">B</div>
+        <div class="step-b">
+          <h5>Native (Linux / macOS)</h5>
+          <pre>redis-server</pre>
+        </div>
+      </div>
+
+      <!-- ── Backend ── -->
+      <h2 id="backend"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>2. Backend</h2>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Clone the repository</h5>
+          <pre>git clone https://github.com/DanDreadless/Insight.git
+cd Insight/backend</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Install Python dependencies</h5>
+          <pre>pip install -r requirements.txt</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Configure the environment</h5>
+          <p>Copy the sample env file and set at minimum a <code>SECRET_KEY</code> value.</p>
+          <pre>cp ../.env.sample ../.env
+# Edit ../.env — set SECRET_KEY to a long random string</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Run migrations and start the server</h5>
+          <pre>python manage.py migrate
+python manage.py runserver</pre>
+          <p>The Django API will be available at <strong>http://localhost:8000</strong>.</p>
+        </div>
+      </div>
+
+      <!-- ── Celery ── -->
+      <h2 id="celery"><i class="bi bi-cpu me-2" style="color:var(--accent);"></i>3. Celery Worker</h2>
+      <p>Scans are executed as asynchronous Celery tasks. The worker must be running in a separate terminal — scans will queue but never run without it.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Start the worker (from the <code>backend/</code> directory)</h5>
+          <pre>celery -A insight worker -l info</pre>
+        </div>
+      </div>
+
+      <!-- ── Frontend ── -->
+      <h2 id="frontend"><i class="bi bi-window me-2" style="color:var(--accent);"></i>4. Frontend</h2>
+      <p>The React frontend runs on its own dev server and proxies all <code>/api/</code> requests to Django on port 8000.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Install and start (from the <code>frontend/</code> directory)</h5>
+          <pre>npm install
+npm run dev</pre>
+          <p>The dev server starts at <strong>http://localhost:5173</strong>.</p>
+        </div>
+      </div>
+
+      <!-- ── Verify ── -->
+      <h2 id="verify"><i class="bi bi-check2-circle me-2" style="color:var(--accent);"></i>5. Verify</h2>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>URL</th><th>Expected</th></tr></thead>
+          <tbody>
+            <tr><td><code>http://localhost:5173</code></td><td>React frontend — URL input and scan interface</td></tr>
+            <tr><td><code>http://localhost:8000/api/health/</code></td><td><code>{"status":"ok"}</code></td></tr>
+            <tr><td><code>http://localhost:8000/api/schema/swagger-ui/</code></td><td>Interactive API documentation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Run the test suite</h3>
+      <pre># All tests
+python manage.py test scanner
+
+# Single module
+python manage.py test scanner.tests.test_validators</pre>
+
+      <!-- ── Docker ── -->
+      <h2 id="docker"><i class="bi bi-box-seam me-2" style="color:var(--accent);"></i>Docker (Alternative)</h2>
+      <p>If you prefer not to install Python and Node.js locally, the full stack can be started with Docker Compose.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Configure and start</h5>
+          <pre>cp .env.sample .env   # edit SECRET_KEY
+docker-compose up --build</pre>
+          <p>Frontend on <strong>:5173</strong>, backend on <strong>:8000</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Teardown</h5>
+          <pre># Stop and remove volumes
+docker-compose down -v
+
+# Full clean (removes images too)
+docker-compose down --rmi all --volumes --remove-orphans</pre>
+        </div>
+      </div>
+
+      <!-- ── Environment Variables ── -->
+      <h2 id="env-vars"><i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Environment Variables</h2>
+      <p>All configuration lives in <code>.env</code> at the repo root. Copy from <code>.env.sample</code> — the only required change for local development is setting <code>SECRET_KEY</code>.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>Default</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>SECRET_KEY</code></td><td><em>(insecure sample)</em></td><td>Must be changed — startup fails in production if unchanged</td></tr>
+            <tr><td><code>DEBUG</code></td><td><code>True</code></td><td>Set <code>False</code> in production</td></tr>
+            <tr><td><code>REDIS_URL</code></td><td><code>redis://localhost:6379/0</code></td><td>Use <code>rediss://</code> (TLS) in production</td></tr>
+            <tr><td><code>DATABASE_URL</code></td><td><code>sqlite:///db.sqlite3</code></td><td>Use PostgreSQL in production</td></tr>
+            <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Frontend origin</td></tr>
+            <tr><td><code>RATE_LIMIT_SCANS_PER_HOUR</code></td><td><code>5</code></td><td>Per IP address</td></tr>
+            <tr><td><code>MAX_SCAN_RESOURCES</code></td><td><code>50</code></td><td>External scripts analysed per scan</td></tr>
+            <tr><td><code>SCAN_TIMEOUT_SECONDS</code></td><td><code>60</code></td><td>Hard Celery task time limit</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Detection Engine ── -->
+      <h2 id="detection"><i class="bi bi-shield-exclamation me-2" style="color:var(--accent);"></i>How It Works</h2>
+      <p>
+        When a URL is submitted, Insight fetches the page and all linked external scripts using an SSRF-safe HTTP
+        fetcher. No external threat intelligence APIs are called — all analysis is performed against the raw content
+        returned by the target server.
+      </p>
+      <p>Five analysis modules run against every scan:</p>
+      <ul>
+        <li><strong>JavaScript analyser</strong> — 30 checks against all scripts collected from the page</li>
+        <li><strong>HTML analyser</strong> — 18 structural checks against the page markup</li>
+        <li><strong>Domain intelligence</strong> — 10 checks on the hostname and TLD</li>
+        <li><strong>Header analyser</strong> — 12 checks on HTTP response headers</li>
+        <li><strong>SSL analyser</strong> — 6 checks on the TLS certificate</li>
+      </ul>
+      <p>
+        Each check emits zero or more findings. A context-collapse engine fires additional synthetic findings when
+        combinations of signals indicate coordinated attack infrastructure.
+      </p>
+
+      <!-- ── Verdict ── -->
+      <h2 id="verdict"><i class="bi bi-flag me-2" style="color:var(--accent);"></i>Verdict &amp; Scoring</h2>
+
+      <h3>Verdict derivation</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Verdict</th><th>Condition</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:#f87171;">MALICIOUS</strong></td><td>Any CRITICAL finding</td></tr>
+            <tr><td><strong style="color:#fb923c;">SUSPICIOUS</strong></td><td>Any HIGH finding, or 2+ MEDIUM findings</td></tr>
+            <tr><td><strong style="color:#4ade80;">CLEAN</strong></td><td>Only LOW and INFO findings</td></tr>
+            <tr><td><strong style="color:var(--muted);">UNKNOWN</strong></td><td>No findings at all</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Context collapse rules</h3>
+      <p>Synthetic findings are generated when multiple signals combine to indicate a coordinated attack pattern:</p>
+      <ul>
+        <li>High-risk TLD + external form action + missing security headers &rarr; <strong>HIGH</strong> "phishing infrastructure"</li>
+        <li>DGA domain + hidden iframe + obfuscated JS &rarr; <strong>CRITICAL</strong> "drive-by malware delivery"</li>
+        <li>Brand impersonation + phishing form (± new certificate) &rarr; <strong>CRITICAL</strong> "active phishing campaign"</li>
+        <li>Keylogger / skimmer + DevTools evasion &rarr; <strong>CRITICAL</strong> "sophisticated targeted malware"</li>
+        <li>Fake CAPTCHA / ClickFix UI + clipboard write &rarr; <strong>CRITICAL</strong> "ClickFix malware delivery"</li>
+      </ul>
+
+      <!-- ── JS Analysis ── -->
+      <h2 id="js-analysis"><i class="bi bi-code-slash me-2" style="color:var(--accent);"></i>JavaScript Analysis</h2>
+      <p>
+        All scripts are run through jsbeautifier before analysis (files &le; 256 KB). Both the original and
+        beautified forms are checked. Base64-encoded strings are decoded and the plaintext payload is appended
+        to the evidence block where printable.
+      </p>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">CRITICAL</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Check</th><th>Pattern</th></tr></thead>
+          <tbody>
+            <tr><td>Encoded payload execution</td><td><code>eval(atob(...))</code>, <code>eval(unescape(...))</code>, <code>eval(decodeURIComponent(...))</code> chains</td></tr>
+            <tr><td>Session theft</td><td>Cookie / localStorage read + outbound <code>fetch</code> / XHR / <code>sendBeacon</code></td></tr>
+            <tr><td>Credential harvester</td><td>Form submit hijack + external <code>fetch</code> / <code>sendBeacon</code> + <code>preventDefault</code></td></tr>
+            <tr><td>Keylogger</td><td><code>keydown</code> / <code>keyup</code> listener reading <code>event.key</code> + outbound network call</td></tr>
+            <tr><td>Magecart skimmer</td><td>DOM query targeting card / CVV fields + exfiltration + encoding or polling</td></tr>
+            <tr><td>Crypto miner</td><td>Stratum protocol strings, CoinHive / CryptoLoot names, WebWorker + WASM pattern</td></tr>
+            <tr><td>Unix shell dropper</td><td><code>base64 -d | bash</code> pattern embedded in JS strings</td></tr>
+            <tr><td>PowerShell dropper</td><td><code>irm ... | iex</code> / <code>Invoke-RestMethod ... | iex</code> embedded in JS strings</td></tr>
+            <tr><td>HTML smuggling</td><td><code>new Blob([...])</code> + <code>URL.createObjectURL</code> + auto-download trigger</td></tr>
+            <tr><td>Web3 wallet drainer</td><td><code>window.ethereum</code> + <code>eth_sendTransaction</code> / <code>eth_signTypedData</code> / <code>personal_sign</code></td></tr>
+            <tr><td>Malicious service worker</td><td><code>navigator.serviceWorker.register()</code> from <code>blob:</code> or <code>data:</code> URI</td></tr>
+            <tr><td>Remote code execution</td><td><code>fetch()</code> + <code>.then()</code> / <code>await</code> + <code>eval()</code> / <code>new Function()</code> in same async chain — compromised WordPress pattern</td></tr>
+            <tr><td>Decrypt-then-execute</td><td><code>crypto.subtle.decrypt</code> / <code>importKey</code> + <code>eval()</code> / <code>new Function()</code> — encrypted payload executed at runtime</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">HIGH</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Check</th><th>Pattern</th></tr></thead>
+          <tbody>
+            <tr><td>Obfuscator.io fingerprint</td><td><code>_0x</code> array-rotation variable pattern</td></tr>
+            <tr><td>Character-code obfuscation</td><td><code>String.fromCharCode(...)</code> building strings character by character</td></tr>
+            <tr><td>High entropy string</td><td>Shannon entropy &gt; 5.5 bits/char on literals &gt; 64 chars</td></tr>
+            <tr><td>Dynamic hidden iframe</td><td><code>createElement('iframe')</code> + <code>display:none</code> / <code>width:0</code></td></tr>
+            <tr><td>Forced download</td><td><code>createElement('a')</code> + <code>.download</code> + <code>.click()</code></td></tr>
+            <tr><td>Beacon exfiltration</td><td><code>navigator.sendBeacon()</code> to external domain</td></tr>
+            <tr><td>Clipboard hijack</td><td><code>navigator.clipboard.writeText()</code> outside a recognisable click handler</td></tr>
+            <tr><td>Script injection</td><td><code>document.write()</code> injecting external <code>&lt;script src="https://..."&gt;</code></td></tr>
+            <tr><td>Shell string</td><td><code>bash -c</code> execution string embedded in JS</td></tr>
+            <tr><td>C2 infrastructure</td><td><code>curl</code> / <code>wget</code> to bare IP address</td></tr>
+            <tr><td>External service worker</td><td><code>serviceWorker.register()</code> loading from an external domain</td></tr>
+            <tr><td>Living off Trusted Sites (LoTS)</td><td>Exfiltration via Telegram Bot API, Discord webhook, Slack webhook, Google Apps Script, Webhook.site, Pipedream, RequestBin, Pastebin API</td></tr>
+            <tr><td>Dynamic module import</td><td><code>import('https://...')</code> loading an ES module from an unknown external URL</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">MEDIUM</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Check</th><th>Pattern</th></tr></thead>
+          <tbody>
+            <tr><td>URL evasion</td><td><code>['a','b','c'].join('')</code> array-split string construction</td></tr>
+            <tr><td>Moderate entropy</td><td>Shannon entropy 4.8–5.5 bits/char (possibly encoded)</td></tr>
+            <tr><td>Auto-redirect</td><td><code>window.location</code> inside <code>setTimeout</code> &lt; 3000ms</td></tr>
+            <tr><td>Right-click disable</td><td><code>contextmenu</code> event + <code>preventDefault()</code></td></tr>
+            <tr><td>DevTools detection</td><td><code>outerWidth</code> / <code>outerHeight</code> delta, <code>__REACT_DEVTOOLS_GLOBAL_HOOK__</code>, console timing tricks</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── HTML Analysis ── -->
+      <h2 id="html-analysis"><i class="bi bi-file-earmark-code me-2" style="color:var(--accent);"></i>HTML Analysis</h2>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Severity</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Phishing form: <code>action</code> domain &ne; page domain + brand keyword in page title</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Phishing form: <code>action</code> domain &ne; page domain (no brand signal in title)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Hidden iframe (<code>display:none</code>, <code>width=0</code>, <code>height=0</code>, off-screen position)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td><code>&lt;base href&gt;</code> pointing to external domain (URL hijacking)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Meta refresh redirect with delay &le; 2s to external domain</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Login form transmitting credentials over plain HTTP</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake browser update page: browser/update terminology + executable download link (SocGholish / ClearFake)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake CAPTCHA / ClickFix: human-verification text + Win+R / terminal execution instructions</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Clickjacking overlay: full-viewport fixed/absolute element with z-index &gt; 100 + click handler</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;base href&gt;</code> present — same origin, verify it is intentional</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Meta refresh redirect (any delay)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Right-click disabled via <code>oncontextmenu="return false"</code></td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Suspicious executable download link (<code>.exe</code>, <code>.msi</code>, <code>.ps1</code>, <code>.bat</code>, <code>.hta</code>, etc.)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Inline script dominates page content (script &gt; 3&times; non-script HTML)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;noscript&gt;</code> block contains external URL redirect</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Sensitive keywords in HTML comments (password, api_key, token, secret, etc.)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Resources loaded from IPFS gateways (takedown-resistant phishing / drainer hosting)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External script preloaded via <code>&lt;link rel="preload" as="script"&gt;</code> or <code>&lt;link rel="prefetch"&gt;</code> from unknown domain — WordPress malware injection staging pattern</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>External scripts loaded without Subresource Integrity (SRI)</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Password field missing <code>autocomplete</code> attribute</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>CSS <code>user-select: none</code> disabling text selection</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Domain Intelligence ── -->
+      <h2 id="domain-intel"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>Domain Intelligence</h2>
+      <p>Domain checks run against the hostname of the scanned URL. No WHOIS or DNS lookups are made — detection is based on the domain string itself.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Severity</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Subdomain token is a typosquat of a known brand (Levenshtein edit distance 1)</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Subdomain contains exact brand keyword (e.g. <code>paypal.attacker.com</code>)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>SLD (registered domain) is a typosquat of a known brand (edit distance 1)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>IDN / homograph attack — Cyrillic or mixed-script characters in domain</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>High-risk TLD (<code>.xyz</code>, <code>.top</code>, <code>.click</code>, <code>.loan</code>, <code>.zip</code>, <code>.cyou</code>, and 20+ more)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score &gt; 0.7 (consonant ratio + entropy + English subword absence)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Brand keyword present in SLD (e.g. <code>paypal-login.com</code>)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Digit substitution in SLD (e.g. <code>g00gle</code>, <code>faceb00k</code>)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Excessive subdomain depth (&gt; 4 labels)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Hosted on abuse-prone free platform with long random subdomain (Cloudflare R2, Pages.dev, Firebase)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Brands monitored include: PayPal, Google, Microsoft, Apple, Amazon, Facebook, Instagram, Netflix, Steam, Coinbase, Binance, MetaMask, Ledger, Trezor, Trust Wallet, OpenSea, Roblox, Discord, Twitch, Spotify, Chase, Barclays, and more.</p>
+
+      <!-- ── Header Analysis ── -->
+      <h2 id="header-analysis"><i class="bi bi-card-list me-2" style="color:var(--accent);"></i>Header Analysis</h2>
+      <p>12 checks on HTTP response headers. All checks are passive — no additional requests are made.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Category</th><th>Checks</th></tr></thead>
+          <tbody>
+            <tr><td>Missing security headers</td><td>Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, Referrer-Policy, Permissions-Policy</td></tr>
+            <tr><td>Information disclosure</td><td>Server version string, X-Powered-By version disclosure</td></tr>
+            <tr><td>Deprecated software</td><td>Apache 2.2, PHP 5.x, OpenSSL 1.0 detected in headers</td></tr>
+            <tr><td>Insecure cookies</td><td>Missing <code>Secure</code>, <code>HttpOnly</code>, or <code>SameSite</code> flags on cookies</td></tr>
+            <tr><td>CORS misconfiguration</td><td>Wildcard <code>Access-Control-Allow-Origin: *</code> combined with <code>Access-Control-Allow-Credentials: true</code></td></tr>
+            <tr><td>Transport</td><td>Page served over HTTP rather than HTTPS</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── SSL Analysis ── -->
+      <h2 id="ssl-analysis"><i class="bi bi-lock me-2" style="color:var(--accent);"></i>SSL Analysis</h2>
+      <p>6 checks on the TLS certificate. The certificate is retrieved directly — no third-party certificate transparency APIs are used.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Severity</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Certificate expires in fewer than 14 days</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Self-signed certificate</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Hostname / SAN mismatch</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Let's Encrypt certificate issued to a brand-impersonating domain</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Deprecated TLS version (1.0 or 1.1) negotiated</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Certificate issued within the last 7 days — new cert on suspicious domain is a phishing indicator</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Tech Detection ── -->
+      <h2 id="tech-detection"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Technology Detection</h2>
+      <p>
+        Identifies the technology stack from HTML, script sources, HTTP headers, and cookies.
+        Displayed as colour-coded badges with logos on the results page.
+      </p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Category</th><th>Technologies detected</th></tr></thead>
+          <tbody>
+            <tr><td>CMS</td><td>WordPress, Drupal, Joomla, Ghost, Shopify, Wix, Squarespace, Webflow, HubSpot CMS</td></tr>
+            <tr><td>JS Framework</td><td>React, Next.js, Vue, Nuxt, Angular, Svelte, SvelteKit, Ember, Backbone.js, Astro, Remix, Gatsby, Solid.js</td></tr>
+            <tr><td>Build Tool</td><td>Vite, webpack</td></tr>
+            <tr><td>JS Library</td><td>jQuery, Lodash, Axios, GSAP, Three.js, Alpine.js, htmx, Socket.io, Chart.js, D3.js, Swiper, Pusher</td></tr>
+            <tr><td>CSS Framework</td><td>Bootstrap, Tailwind CSS, Bulma, Font Awesome, UIkit</td></tr>
+            <tr><td>Backend</td><td>PHP, Python, Node.js, Express, ASP.NET, Laravel, Django, Ruby on Rails, Java, Flask, FastAPI, Symfony, Spring Boot</td></tr>
+            <tr><td>Web Server</td><td>nginx, Apache, Caddy, Gunicorn, LiteSpeed</td></tr>
+            <tr><td>CDN</td><td>Cloudflare, AWS CloudFront, Fastly, Akamai, jsDelivr</td></tr>
+            <tr><td>Hosting</td><td>Vercel, Netlify, GitHub Pages, Firebase, Render</td></tr>
+            <tr><td>Analytics</td><td>Google Analytics, Google Tag Manager, Facebook Pixel, Hotjar, Intercom, Mixpanel, Plausible, Matomo, TikTok Pixel, LinkedIn Insight</td></tr>
+            <tr><td>Security</td><td>Cloudflare Turnstile, reCAPTCHA, Cloudflare Bot Management</td></tr>
+            <tr><td>Payment</td><td>Stripe, PayPal, Square, Klarna</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── API Reference ── -->
+      <h2 id="api-ref"><i class="bi bi-braces me-2" style="color:var(--accent);"></i>API Endpoints</h2>
+      <p>All endpoints are under <code>/api/</code>. No authentication is required — rate limiting is enforced per IP address.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST</code></td><td><code>/api/scan/</code></td><td>Submit a URL for scanning. Returns <code>{"id": "...", "status": "PENDING"}</code>. 202 on success, 429 if rate limited.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/</code></td><td>Poll scan status and retrieve full results once complete.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/stream/</code></td><td>Server-Sent Events stream — events: <code>status_update</code>, <code>complete</code>, <code>error</code>. Auto-retry on disconnect (3 attempts, 2s delay).</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/source/</code></td><td>Re-fetch the raw source of a URL that belongs to a completed scan. Only permits URLs within the original scan scope.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/history/</code></td><td>Paginated list of completed scans. Supports <code>?q=</code> URL substring filter and <code>?page=</code>.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/health/</code></td><td>Health check — returns <code>{"status":"ok"}</code>.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/schema/swagger-ui/</code></td><td>Interactive API documentation (drf-spectacular).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">
+        <strong>SSRF protection:</strong> All outbound HTTP requests made during a scan go through an SSRF-safe fetcher
+        that rejects non-HTTP(S) schemes, resolves DNS and blocks RFC1918 / loopback / link-local addresses, caps
+        response bodies at 5 MB, and enforces hard timeouts. It is not possible to use the scan endpoint to probe
+        internal network resources.
+      </div>
+
+      <!-- ── Tech Stack ── -->
+      <h2 id="stack"><i class="bi bi-stack me-2" style="color:var(--accent);"></i>Tech Stack</h2>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+          <tbody>
+            <tr><td>Backend</td><td>Python 3.11 / Django 5.2 / Django REST Framework</td></tr>
+            <tr><td>Task queue</td><td>Celery + Redis</td></tr>
+            <tr><td>API docs</td><td>drf-spectacular — Swagger UI at <code>/api/schema/swagger-ui/</code></td></tr>
+            <tr><td>Frontend</td><td>React 19 / TypeScript / Vite / Tailwind CSS 4</td></tr>
+            <tr><td>Database</td><td>SQLite (development) / PostgreSQL (production)</td></tr>
+            <tr><td>Cache / broker</td><td>Redis</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Acknowledgements ── -->
+      <h2 id="ack"><i class="bi bi-heart me-2" style="color:var(--accent);"></i>Acknowledgements</h2>
+      <p>Insight is built on a number of excellent open-source libraries.</p>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:1.5rem;">Backend &amp; Analysis</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://www.python.org/" target="_blank">Python</a>
+        <a class="ack-pill" href="https://www.djangoproject.com/" target="_blank">Django</a>
+        <a class="ack-pill" href="https://www.django-rest-framework.org/" target="_blank">Django REST Framework</a>
+        <a class="ack-pill" href="https://docs.celeryq.dev/" target="_blank">Celery</a>
+        <a class="ack-pill" href="https://github.com/beaudar/jsbeautifier" target="_blank">jsbeautifier</a>
+        <a class="ack-pill" href="https://www.crummy.com/software/BeautifulSoup/" target="_blank">BeautifulSoup4</a>
+        <a class="ack-pill" href="https://github.com/john-kurkowski/tldextract" target="_blank">tldextract</a>
+        <a class="ack-pill" href="https://python-requests.org/" target="_blank">Requests</a>
+        <a class="ack-pill" href="https://drf-spectacular.readthedocs.io/" target="_blank">drf-spectacular</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Frontend</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://react.dev/" target="_blank">React</a>
+        <a class="ack-pill" href="https://vitejs.dev/" target="_blank">Vite</a>
+        <a class="ack-pill" href="https://www.typescriptlang.org/" target="_blank">TypeScript</a>
+        <a class="ack-pill" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
+        <a class="ack-pill" href="https://axios-http.com/" target="_blank">Axios</a>
+        <a class="ack-pill" href="https://reactrouter.com/" target="_blank">React Router</a>
+        <a class="ack-pill" href="https://simpleicons.org/" target="_blank">Simple Icons</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Infrastructure</p>
+      <div class="ack-wrap">
+        <a class="ack-pill" href="https://redis.io/" target="_blank">Redis</a>
+        <a class="ack-pill" href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>
+        <a class="ack-pill" href="https://gunicorn.org/" target="_blank">Gunicorn</a>
+        <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
+      </div>
+
+    </main>
+  </div><!-- /docs-wrap -->
+</div><!-- /container -->
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="f-links">
+      <a href="index.html">Home</a>
+      <a href="docs.html">Documentation</a>
+      <a href="insight.html">Insight</a>
+      <a href="https://github.com/DanDreadless/Insight" target="_blank">Insight GitHub</a>
+      <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Vault1337 GitHub</a>
+      <a href="https://github.com/DanDreadless/Insight/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
+      <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
+    </div>
+    <p>Vault1337 &mdash; Insight &mdash; &copy; <span id="yr"></span></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Highlight active sidebar link on scroll
+  const headings = document.querySelectorAll('.docs-content h2[id], .docs-content h3[id]');
+  const links = document.querySelectorAll('.d-nav a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.d-nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+  headings.forEach(h => observer.observe(h));
+</script>
+</body>
+</html>
