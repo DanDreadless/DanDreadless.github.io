@@ -413,6 +413,8 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           <thead><tr><th>Severity</th><th>Check</th></tr></thead>
           <tbody>
             <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Phishing form: <code>action</code> domain &ne; page domain + brand keyword in page title</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command (PowerShell, mshta, cmd, iex) embedded in HTML <code>data-*</code> attribute or event handler — ClickFix payload storage pattern</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command embedded in hidden HTML element (<code>display:none</code>, hidden input, <code>&lt;template&gt;</code>) — ClickFix payload storage pattern</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Phishing form: <code>action</code> domain &ne; page domain (no brand signal in title)</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Hidden iframe (<code>display:none</code>, <code>width=0</code>, <code>height=0</code>, off-screen position)</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td><code>&lt;base href&gt;</code> pointing to external domain (URL hijacking)</td></tr>
@@ -420,8 +422,6 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Login form transmitting credentials over plain HTTP</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake browser update page: browser/update terminology + executable download link (SocGholish / ClearFake)</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake CAPTCHA / ClickFix: human-verification text + Win+R / terminal execution instructions (expanded: "click to fix", "browser verification", "run the following command" variants)</td></tr>
-            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command (PowerShell, mshta, cmd, iex) embedded in HTML <code>data-*</code> attribute or event handler — ClickFix payload storage pattern</td></tr>
-            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command embedded in hidden HTML element (<code>display:none</code>, hidden input, <code>&lt;template&gt;</code>) — ClickFix payload storage pattern</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Clickjacking overlay: full-viewport fixed/absolute element with z-index &gt; 100 + click handler</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>External script loaded from unknown domain that is also <code>dns-prefetch</code>-staged in the same page — deliberate WordPress compromise pattern (e.g. WPCode injection)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;base href&gt;</code> present — same origin, verify it is intentional</td></tr>
