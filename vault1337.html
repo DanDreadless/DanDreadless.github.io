@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Vault1337 documentation — installation, configuration, analysis tools, and usage guide.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
+  <title>Vault1337 — Documentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="Images/white-logo-no-background.svg" alt="Vault1337">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="vault1337.html">Vault1337 Docs</a></li>
+        <li class="nav-item"><a class="nav-link" href="insight.html">Insight Docs</a></li>
+        <li class="nav-item">
+          <a class="nav-link nav-gh" href="https://github.com/DanDreadless/Vault1337" target="_blank">
+            <i class="bi bi-github me-1"></i>GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Docs body ──────────────────────────────────────────────────────────── -->
+<div class="container section">
+  <div class="docs-wrap">
+
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <ul class="d-nav">
+        <li class="d-group">Installation</li>
+        <li><a href="#install-docker">Docker (Quick Start)</a></li>
+        <li><a href="#compose">Docker Compose</a></li>
+        <li><a href="#local">Local Development</a></li>
+
+        <li class="d-group">Configuration</li>
+        <li><a href="#env-vars">Environment Variables</a></li>
+        <li><a href="#api-keys">API Keys</a></li>
+
+        <li class="d-group">Using Vault1337</li>
+        <li><a href="#uploading">Uploading Samples</a></li>
+        <li><a href="#vault-page">Vault Page</a></li>
+        <li><a href="#tools">Analysis Tools</a></li>
+        <li><a href="#yara">YARA Rules</a></li>
+        <li><a href="#ioc">IOC Management</a></li>
+        <li><a href="#ip">IP &amp; Domain Intelligence</a></li>
+        <li><a href="#tags">Tags &amp; Search</a></li>
+        <li><a href="#report">Sample Report</a></li>
+        <li><a href="#pdf-report">PDF Report Export</a></li>
+        <li><a href="#mitre-attack">MITRE ATT&amp;CK Mapping</a></li>
+        <li><a href="#stix-export">STIX 2.1 Export</a></li>
+        <li><a href="#decoder">Decoder</a></li>
+
+        <li class="d-group">Reference</li>
+        <li><a href="#stack">Tech Stack</a></li>
+        <li><a href="#api-ref">REST API</a></li>
+        <li><a href="#ack">Acknowledgements</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="docs-content">
+
+      <!-- ── Docker Quick Start ── -->
+      <h2 id="install-docker"><i class="bi bi-box-seam me-2" style="color:var(--accent);"></i>Docker (Quick Start)</h2>
+      <p>The fastest way to run Vault1337. Uses SQLite — data is not persisted after the container stops.</p>
+
+      <div class="callout"><strong>Requirements:</strong> Docker installed on your system. See the <a href="https://docs.docker.com/engine/install/" target="_blank">official Docker docs</a>.</div>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Pull the image</h5>
+          <pre>docker pull vault1337/vault1337:latest</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Run the container</h5>
+          <pre>docker run -p 8000:8000 \
+  -e SECRET_KEY=change-me-to-a-long-random-string \
+  -e DEBUG=True \
+  vault1337/vault1337:latest</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Log in</h5>
+          <p>Open <strong>http://localhost:8000</strong> and log in with the default credentials:</p>
+          <pre>Username: admin
+Password: changeme123</pre>
+          <div class="callout"><strong>Important:</strong> Change your password immediately at <code>http://localhost:8000/admin/</code></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Add API keys (optional)</h5>
+          <p>Navigate to <strong>Admin → API Keys</strong> to add keys for the intelligence integrations. See the <a href="#api-keys">API Keys</a> section below.</p>
+        </div>
+      </div>
+
+      <!-- ── Docker Compose ── -->
+      <h2 id="compose"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>Docker Compose</h2>
+      <p>Recommended for persistent deployments. Spins up Vault1337 with a PostgreSQL database and named volumes for samples and YARA rules.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Clone the repository</h5>
+          <pre>git clone https://github.com/DanDreadless/Vault1337.git
+cd Vault1337/Docker</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Configure the environment</h5>
+          <p>All settings live in <code>Docker/.env</code>. Open it and set at minimum:</p>
+          <div class="v-wrap mb-2">
+            <table class="v-table">
+              <thead><tr><th>Variable</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>SECRET_KEY</code></td><td>Long random string — generate with <code>openssl rand -hex 50</code></td></tr>
+                <tr><td><code>POSTGRES_PASSWORD</code></td><td>Password for the PostgreSQL database</td></tr>
+                <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Initial admin account password</td></tr>
+                <tr><td><code>ALLOWED_HOSTS</code></td><td>Comma-separated hostnames or IPs, e.g. <code>localhost,192.168.1.10</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Start the stack</h5>
+          <pre>docker compose up -d</pre>
+          <p>This builds the image (if not already built), starts PostgreSQL, waits for a health check, then starts Gunicorn. Migrations and superuser creation happen automatically on first run.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Open Vault1337</h5>
+          <p>Navigate to <strong>http://localhost:8000</strong> (or your configured <code>HOST_PORT</code>) and log in.</p>
+          <pre># View logs
+docker compose logs -f
+
+# Stop the stack (data preserved)
+docker compose down
+
+# Stop and wipe all data
+docker compose down -v</pre>
+        </div>
+      </div>
+
+      <!-- ── Local Dev ── -->
+      <h2 id="local"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Local Development</h2>
+      <p>Requires Python 3.12+, Node.js 22+, and (optionally) PostgreSQL.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Clone and set up a Python virtual environment</h5>
+          <pre>git clone https://github.com/DanDreadless/Vault1337.git
+cd Vault1337
+python3 -m venv env
+source env/bin/activate   # Windows: env\Scripts\activate
+pip install -r requirements.txt</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Install system dependencies</h5>
+          <pre># Ubuntu / Debian
+sudo apt install -y libimage-exiftool-perl libmpc-dev libgl1 libglib2.0-0</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Configure the environment</h5>
+          <p>Copy the Docker env template and edit it for local use:</p>
+          <pre>cp Docker/.env .env
+# Edit .env — set SECRET_KEY and DEBUG=True
+# Leave DATABASE_URL empty to use SQLite</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Run migrations and create a superuser</h5>
+          <pre>python manage.py migrate
+python manage.py createsuperuser</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-b">
+          <h5>Start the Django API</h5>
+          <pre>python manage.py runserver</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">6</div>
+        <div class="step-b">
+          <h5>Start the React frontend (second terminal)</h5>
+          <pre>cd frontend
+npm install
+npm run dev</pre>
+          <p>Open <strong>http://localhost:5173</strong>. The Vite dev server proxies <code>/api/</code> requests to Django on port 8000.</p>
+        </div>
+      </div>
+
+      <!-- ── Env Vars ── -->
+      <h2 id="env-vars"><i class="bi bi-gear me-2" style="color:var(--accent);"></i>Environment Variables</h2>
+      <p>All configuration is handled via environment variables loaded from a <code>.env</code> file (or passed directly to the container).</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>SECRET_KEY</code></td><td><em>required</em></td><td>Django secret key — use a long random string</td></tr>
+            <tr><td><code>DEBUG</code></td><td><code>False</code></td><td>Set <code>True</code> for local development only</td></tr>
+            <tr><td><code>ALLOWED_HOSTS</code></td><td><code>127.0.0.1</code></td><td>Comma-separated list of allowed hostnames/IPs</td></tr>
+            <tr><td><code>DATABASE_URL</code></td><td><em>SQLite</em></td><td>PostgreSQL connection string, e.g. <code>postgres://user:pass@host:5432/db</code></td></tr>
+            <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Comma-separated origins allowed for CORS requests</td></tr>
+            <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>200</code></td><td>Maximum file upload size in megabytes</td></tr>
+            <tr><td><code>POSTGRES_DB</code></td><td><code>vault1337</code></td><td>PostgreSQL database name (Compose only)</td></tr>
+            <tr><td><code>POSTGRES_USER</code></td><td><code>vault</code></td><td>PostgreSQL username (Compose only)</td></tr>
+            <tr><td><code>POSTGRES_PASSWORD</code></td><td><em>required</em></td><td>PostgreSQL password (Compose only)</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td><code>admin</code></td><td>Superuser created on first container startup</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td><code>admin@localhost</code></td><td>Superuser email</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><code>changeme123</code></td><td>Superuser initial password — change this</td></tr>
+            <tr><td><code>HOST_PORT</code></td><td><code>8000</code></td><td>Host port mapped to container port 8000</td></tr>
+            <tr><td><code>IOC_VT_MALICIOUS_THRESHOLD</code></td><td><code>1</code></td><td>VirusTotal malicious engine count required to auto-mark an IOC as true positive</td></tr>
+            <tr><td><code>IOC_ABUSEIPDB_SCORE_THRESHOLD</code></td><td><code>25</code></td><td>AbuseIPDB confidence score (0–100) required to auto-mark an IP IOC as true positive</td></tr>
+            <tr><td><code>IOC_ENRICH_VT_DELAY_SECONDS</code></td><td><code>15</code></td><td>Delay between VirusTotal calls during batch IOC enrichment (free tier rate limit)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── API Keys ── -->
+      <h2 id="api-keys"><i class="bi bi-key me-2" style="color:var(--accent);"></i>API Keys</h2>
+      <p>Third-party intelligence features require API keys. Add them via the web UI at <strong>Admin → API Keys</strong> (staff account required), or set them in your <code>.env</code> file before starting the container.</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Key</th><th>Service</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td><code>VT_KEY</code></td><td><a href="https://www.virustotal.com/" target="_blank">VirusTotal</a></td><td>Download samples by SHA256 hash, VT enrichment, domain/IP intelligence</td></tr>
+            <tr><td><code>MALWARE_BAZAAR_KEY</code></td><td><a href="https://bazaar.abuse.ch/api/" target="_blank">MalwareBazaar</a></td><td>Download samples by SHA256 hash</td></tr>
+            <tr><td><code>ABUSEIPDB_KEY</code></td><td><a href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a></td><td>IP reputation lookups and IOC enrichment</td></tr>
+            <tr><td><code>SPUR_KEY</code></td><td><a href="https://spur.us/context-api/" target="_blank">Spur</a></td><td>VPN / proxy / residential IP context</td></tr>
+            <tr><td><code>SHODAN_KEY</code></td><td><a href="https://account.shodan.io/" target="_blank">Shodan</a></td><td>Open ports and banner data for an IP</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Uploading ── -->
+      <h2 id="uploading"><i class="bi bi-cloud-upload me-2" style="color:var(--accent);"></i>Uploading Samples</h2>
+      <p>Navigate to <strong>Upload</strong> in the navigation bar. Four ingestion methods are available:</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Method</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Upload File</strong></td><td>Direct file upload (max 200 MB). Optionally extract a ZIP or 7z archive with a password.</td></tr>
+            <tr><td><strong>Fetch URL</strong></td><td>Download a sample from an external URL. Private/internal IP ranges are blocked (SSRF protection).</td></tr>
+            <tr><td><strong>VirusTotal</strong></td><td>Download a sample by SHA256 hash using your VT API key.</td></tr>
+            <tr><td><strong>MalwareBazaar</strong></td><td>Download a sample by SHA256 hash using your MB API key.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>All samples are stored by SHA256 hash. Original filenames are preserved in the database but never used as file paths on disk. Add comma-separated tags during upload for easier organisation.</p>
+
+      <!-- ── Vault Page ── -->
+      <h2 id="vault-page"><i class="bi bi-collection me-2" style="color:var(--accent);"></i>Vault Page</h2>
+      <p>The <strong>Vault</strong> page lists all stored samples with filtering, search, and bulk management controls.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">File Type Filter Chips</h3>
+      <p>A row of filter chips above the sample table lets you quickly narrow the list to a specific file category:</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Filter</th><th>Matches</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Windows</strong></td><td>PE executables and DLLs (MIME <code>application/x-dosexec</code> / <code>application/x-msdownload</code>)</td></tr>
+            <tr><td><strong>Linux</strong></td><td>ELF binaries</td></tr>
+            <tr><td><strong>macOS</strong></td><td>Mach-O binaries</td></tr>
+            <tr><td><strong>Documents</strong></td><td>PDF, Office, and other document types</td></tr>
+            <tr><td><strong>Archives</strong></td><td>ZIP, 7z, TAR, GZ, RAR, and other archive formats</td></tr>
+            <tr><td><strong>Email</strong></td><td><code>.eml</code> and <code>.msg</code> files</td></tr>
+            <tr><td><strong>Scripts</strong></td><td>Text/script MIME types and common script extensions, excluding URL-tagged items</td></tr>
+            <tr><td><strong>Images</strong></td><td>Image MIME types (PNG, JPEG, GIF, BMP, etc.)</td></tr>
+            <tr><td><strong>URLs</strong></td><td>Samples tagged with the auto-applied <code>url</code> tag (fetched via the Fetch URL ingestor)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk Delete</h3>
+      <p>Each row has a checkbox. Tick one or more rows (or use the header checkbox to select all on the current page) and a <strong>Delete N selected</strong> button appears in the page header. Clicking it prompts for confirmation then deletes all selected samples in parallel. The selection is cleared and the table reloads after deletion.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Pagination</h3>
+      <p>The bottom of the vault list shows <strong>« ‹ page X of Y › »</strong> controls — first, previous, next, and last page buttons alongside the current page indicator.</p>
+
+      <!-- ── Tools ── -->
+      <h2 id="tools"><i class="bi bi-tools me-2" style="color:var(--accent);"></i>Analysis Tools</h2>
+      <p>Open a sample from the vault and select the <strong>Tools</strong> tab. The tool selector automatically filters and groups available tools based on the detected file type (PE, ELF, Mach-O, document, archive, email, script). A <strong>Show all tools</strong> checkbox is available for edge cases such as polyglot files.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Universal — all file types</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Strings</strong></td>
+              <td><code>UTF-8</code> <code>ASCII</code> <code>Wide (UTF-16LE)</code> <code>Latin-1</code> <code>UTF-16</code> <code>UTF-32</code></td>
+              <td>Extracts printable strings across multiple encodings, including wide strings commonly used to hide Windows API calls.</td>
+            </tr>
+            <tr>
+              <td><strong>Extract IOCs</strong></td>
+              <td>—</td>
+              <td>Scans the sample for indicators of compromise and saves them to the IOC database linked to this sample. Detects: IP addresses, domains, URLs, emails, Bitcoin addresses, CVE IDs, registry keys, named pipes/mutexes, Windows persistence paths (Run/RunOnce/Services), scheduled task paths, Linux cron paths, systemd unit paths, and macOS LaunchAgent/LaunchDaemon plists.</td>
+            </tr>
+            <tr>
+              <td><strong>Hex Viewer</strong></td>
+              <td>—</td>
+              <td>Renders a hex dump of the sample with ASCII sidebar.</td>
+            </tr>
+            <tr>
+              <td><strong>Run YARA Rules</strong></td>
+              <td>—</td>
+              <td>Runs all saved YARA rules against the sample and reports matches with rule name, matched strings, and file offsets.</td>
+            </tr>
+            <tr>
+              <td><strong>ExifTool</strong></td>
+              <td>—</td>
+              <td>Reads all metadata tags from a file using <a href="https://exiftool.org/" target="_blank">ExifTool</a> by Phil Harvey.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Windows (PE)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>LIEF Parser</strong></td>
+              <td><code>DOS Header</code> <code>Rich Header</code> <code>PE Header</code> <code>Entrypoint</code> <code>Sections</code> <code>Imports</code> <code>Signature Check</code> <code>Check Entropy</code> <code>Import Hash (LIEF)</code> <code>Overlay Detection</code> <code>Rich Header Hash</code> <code>Exports</code></td>
+              <td>Comprehensive PE binary analysis via the <a href="https://github.com/lief-project/LIEF" target="_blank">LIEF project</a>. Covers all standard PE structures including the export directory and digital signature verification.</td>
+            </tr>
+            <tr>
+              <td><strong>PE File</strong></td>
+              <td><code>Import Hash</code> <code>Rich Header Hash</code> <code>Resources</code> <code>Version Info</code> <code>Overlay</code> <code>Suspicious Imports</code> <code>Section Entropy</code> <code>Packer Detection</code> <code>Compile Timestamp</code> <code>Anti-VM Detection</code></td>
+              <td>PE-focused analysis via <a href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>. Highlights suspicious Windows API imports (62 APIs across 8 categories). <em>Packer Detection</em> performs a raw byte signature scan across the full binary (35+ signatures), checks the overlay for packer markers, and detects minimal import profiles (LoadLibrary/GetProcAddress only) — outputs a structured VERDICT line naming the packer where possible (UPX, MPRESS, ASPack, VMProtect, Themida, Armadillo, AutoIt, PyInstaller, NSIS, Inno Setup, WinRAR SFX, .NET obfuscators, and more). Checks compile timestamp for anomalies (future dates, pre-1993, zeroed, known fakes) and scans raw bytes for 50+ anti-VM/sandbox artifact strings (VMware, VirtualBox, QEMU, Hyper-V, analysis tools).</td>
+            </tr>
+            <tr>
+              <td><strong>Disassembler</strong></td>
+              <td>—</td>
+              <td>Disassembles code at the entry point using <a href="https://www.capstone-engine.org/" target="_blank">Capstone</a>. Supports x86, x86-64, and ARM architectures with automatic detection.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Linux (ELF)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>LIEF Parser</strong></td>
+              <td><code>ELF Header</code> <code>ELF Sections</code> <code>ELF Symbols</code> <code>ELF Suspicious Symbols</code> <code>ELF Packer Detection</code> <code>ELF Segments</code> <code>ELF Binary Info</code></td>
+              <td>ELF binary analysis via LIEF. <em>ELF Suspicious Symbols</em> flags 67 dangerous dynamic symbols across Execution, Network, Privilege Escalation, Anti-Analysis/Injection, Dynamic Loading, Rootkit/File Hiding, and Surveillance categories. <em>ELF Segments</em> lists all program headers and flags W+X PT_LOAD segments. <em>ELF Binary Info</em> reports stripped status, linking type, and interpreter path.</td>
+            </tr>
+            <tr>
+              <td><strong>Disassembler</strong></td>
+              <td>—</td>
+              <td>Entry point disassembly via Capstone with architecture auto-detection.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">macOS (Mach-O)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Mach-O Tool</strong></td>
+              <td><code>Header</code> <code>Load Commands</code> <code>Imported Libraries</code> <code>Exported Functions</code> <code>Symbols</code> <code>Sections &amp; Entropy</code> <code>Code Signature</code> <code>Entitlements</code> <code>Encrypted Segments</code></td>
+              <td>Mach-O binary analysis via LIEF. Supports fat binaries (reports all architectures). <em>Imported Libraries</em> annotates dylibs by capability category (Keychain, Network, Camera, Location, etc.). <em>Entitlements</em> extracts the embedded XML plist from the code signature blob. <em>Encrypted Segments</em> detects <code>LC_ENCRYPTION_INFO</code> / <code>LC_ENCRYPTION_INFO_64</code> load commands (App Store DRM / FairPlay) and high-entropy sections.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Documents &amp; PDFs</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>PDF Parser</strong></td>
+              <td><code>Extract Metadata</code> <code>Extract Content</code> <code>Extract Images</code> <code>Extract URLs</code> <code>JavaScript</code> <code>Embedded Files</code> <code>Render Pages</code></td>
+              <td>PDF forensics via <a href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>. Surfaces embedded JavaScript, embedded files, URLs, and document metadata. <em>Render Pages</em> rasterises each page to a PNG image via <code>get_pixmap()</code> — pure pixel rendering with no JavaScript execution or active content triggered. Capped at 15 pages / 10 MB.</td>
+            </tr>
+            <tr>
+              <td><strong>OLETools</strong></td>
+              <td><code>OLEID</code> <code>OLEMETA</code> <code>OLEDUMP</code> <code>OLEVBA</code> <code>RTFOBJ</code> <code>OLEOBJ</code></td>
+              <td>Analyses Microsoft OLE2 compound files (Office documents, RTF) via <a href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>. Detects VBA macros, auto-execution triggers, embedded objects, and obfuscation.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Archives &amp; Email</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Zip Extractor</strong></td>
+              <td><code>With password</code> <code>Without password</code></td>
+              <td>Extracts <code>.zip</code> and <code>.7z</code> archives. All extracted files are added to the vault as individual samples and automatically enriched with VirusTotal data.</td>
+            </tr>
+            <tr>
+              <td><strong>Email Parser</strong></td>
+              <td><code>Email Headers</code> <code>Email Body</code> <code>Download Attachments</code> <code>URL Extractor</code></td>
+              <td>Parses <code>.eml</code> and <code>.msg</code> files. Attachments are downloaded directly into the vault for further analysis.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Images</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Image Viewer</strong></td>
+              <td>—</td>
+              <td>Renders the sample as an inline image using a data URI — useful for inspecting images that may contain steganography or hidden data. Format is detected via PIL. Capped at 10 MB.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Android (APK)</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>APK Tool</strong></td>
+              <td><code>Manifest</code> <code>Components</code> <code>Intents</code> <code>Certificate</code> <code>Strings</code> <code>URLs</code> <code>Suspicious</code></td>
+              <td>Android APK analysis via <a href="https://github.com/androguard/androguard" target="_blank">androguard</a>. <em>Manifest</em> shows package name, version, SDK levels, and declared permissions (dangerous permissions highlighted). <em>Components</em> lists activities, services, receivers, and providers. <em>Intents</em> shows intent filters grouped by component. <em>Certificate</em> parses the signing certificate (v1/v2/v3 schemes) — subject, issuer, validity, SHA-1/SHA-256 fingerprints, and self-signed detection. <em>Strings</em> extracts meaningful strings from DEX bytecode (JVM class descriptors filtered). <em>URLs</em> finds hardcoded HTTP/HTTPS URLs and non-loopback IPs in DEX strings. <em>Suspicious</em> reports dangerous permissions, suspicious API class references (DexClassLoader, Runtime.exec, SMS access, etc.), and exported components with intent filters.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Scripts &amp; .NET</h3>
+      <div class="v-wrap mb-4">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>Sub-options</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>.NET Analysis</strong></td>
+              <td><code>Assembly Info</code> <code>Type Definitions</code> <code>Method Definitions</code> <code>Strings</code> <code>Imports</code> <code>Resources</code></td>
+              <td>.NET managed assembly analysis via <a href="https://github.com/malwarefrank/dnfile" target="_blank">dnfile</a>. Extracts assembly metadata, type and method definitions, embedded strings, imported namespaces, and embedded resource names. Useful for analysing C# / VB.NET malware, droppers, and stagers without executing the code.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── YARA ── -->
+      <h2 id="yara"><i class="bi bi-code-square me-2" style="color:var(--accent);"></i>YARA Rules</h2>
+      <p>Navigate to <strong>YARA</strong> in the navigation bar to manage rules.</p>
+      <ul>
+        <li>Create new rules using the built-in editor — paste or write YARA syntax directly.</li>
+        <li>Edit existing rules at any time.</li>
+        <li>Run all rules against a specific sample from the sample detail page using the <strong>Run YARA Rules</strong> tool.</li>
+        <li>Results show the matching rule name, tags, matched string identifiers, file offsets, and match lengths.</li>
+        <li>Rules are stored as <code>.yar</code> files in <code>vault/yara-rules/</code> on the server.</li>
+      </ul>
+      <div class="callout">Rules with syntax errors will fail to save — the editor will report the parse error inline.</div>
+
+      <div class="callout"><strong>No rules are included by default</strong> — Vault1337 ships with an empty rules directory. You need to add your own <code>.yar</code> files via the web editor or by placing them in the <code>vault/yara-rules/</code> directory on the server.</div>
+
+      <!-- ── IOC ── -->
+      <h2 id="ioc"><i class="bi bi-crosshair me-2" style="color:var(--accent);"></i>IOC Management</h2>
+      <p>Navigate to <strong>IOCs</strong> to view all extracted indicators of compromise across all samples.</p>
+      <ul>
+        <li>Run the <strong>Extract IOCs</strong> tool on a sample to populate its IOCs.</li>
+        <li>Each IOC is linked back to the sample it came from.</li>
+        <li>Mark IOCs as true positive or false positive using the toggle on the IOC page.</li>
+        <li>Filter the list by classification (true / false / unreviewed) and by IOC type using the filter chips above the table.</li>
+        <li>Search by IOC value using the search box.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Auto-Enrichment</h3>
+      <p>When the <strong>Extract IOCs</strong> tool runs, newly extracted <code>ip</code> and <code>domain</code> IOCs are automatically enriched against threat intel APIs in a background thread — the tool response returns immediately while enrichment continues asynchronously.</p>
+      <ul>
+        <li><strong>IP IOCs</strong> — queried against VirusTotal and AbuseIPDB concurrently.</li>
+        <li><strong>Domain IOCs</strong> — queried against VirusTotal.</li>
+        <li>An IOC is marked <strong>true positive</strong> if the VT malicious count meets the threshold or the AbuseIPDB score meets the threshold. It is marked <strong>false positive</strong> if all sources return clean results.</li>
+        <li>RFC1918 private IPs (10/8, 172.16/12, 192.168/16) are saved as IOCs (useful for lateral movement analysis) but auto-marked false positive — they are never sent to external APIs.</li>
+        <li>Loopback, link-local, multicast, and other reserved IP ranges are discarded entirely at extraction time.</li>
+      </ul>
+      <p>The enrichment column in the IOC table shows results as <strong>VT: x/y</strong> (malicious/total engines) and <strong>AIPDB: z%</strong> (abuse score). A dash (<code>—</code>) is shown for IOC types not yet enriched or where no API key is configured.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk Actions</h3>
+      <p>Each row in the IOC table has a checkbox. Selecting one or more rows reveals a bulk action bar with two options:</p>
+      <ul>
+        <li><strong>Export STIX</strong> — exports the selected IOCs as a STIX 2.1 bundle (see <a href="#stix-export">STIX 2.1 Export</a> below).</li>
+        <li><strong>Delete</strong> — permanently removes the selected IOCs. Requires a confirmation click to prevent accidental deletion (staff only).</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Manual Override &amp; Re-Enrichment</h3>
+      <ul>
+        <li>Manually toggling an IOC's true/false status sets an <strong>overridden</strong> flag, shown as a grey pill next to the status badge. Subsequent background enrichment runs will not overwrite a manually overridden IOC.</li>
+        <li>A <strong>Re-enrich</strong> button is available on each <code>ip</code> and <code>domain</code> row. Clicking it triggers a synchronous re-enrichment (both VT and AbuseIPDB in parallel) and immediately refreshes the row. This clears the overridden flag so fresh data is applied.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Enrichment Thresholds (Environment Variables)</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>IOC_VT_MALICIOUS_THRESHOLD</code></td><td><code>1</code></td><td>Minimum VirusTotal malicious engine count to mark an IOC as true positive</td></tr>
+            <tr><td><code>IOC_ABUSEIPDB_SCORE_THRESHOLD</code></td><td><code>25</code></td><td>Minimum AbuseIPDB confidence score (0–100) to mark an IP IOC as true positive</td></tr>
+            <tr><td><code>IOC_ENRICH_VT_DELAY_SECONDS</code></td><td><code>15</code></td><td>Delay in seconds between VirusTotal calls during batch enrichment (free tier: 4 req/min)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p><strong>IOC types extracted:</strong></p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>ip</code></td><td>IPv4 addresses (loopback, multicast, and reserved ranges discarded; RFC1918 kept as false positive)</td></tr>
+            <tr><td><code>domain</code></td><td>Domains validated against the public suffix list; binary artifact extensions, purely numeric labels, and registered-domain labels shorter than 3 characters filtered (eliminates APK/DEX code artifacts)</td></tr>
+            <tr><td><code>url</code></td><td>HTTP / HTTPS / FTP URLs</td></tr>
+            <tr><td><code>email</code></td><td>Email addresses</td></tr>
+            <tr><td><code>bitcoin</code></td><td>Bitcoin wallet addresses</td></tr>
+            <tr><td><code>cve</code></td><td>CVE identifiers (e.g. CVE-2021-44228)</td></tr>
+            <tr><td><code>registry</code></td><td>Windows registry key paths (HKLM / HKCU etc.)</td></tr>
+            <tr><td><code>named_pipe</code></td><td>Named pipe and mutex paths</td></tr>
+            <tr><td><code>win_persistence</code></td><td>Windows Run / RunOnce / Services registry persistence paths</td></tr>
+            <tr><td><code>scheduled_task</code></td><td>Scheduled task file paths and schtasks command references</td></tr>
+            <tr><td><code>linux_cron</code></td><td>Linux cron paths (<code>/etc/cron*</code>, <code>/var/spool/cron</code>)</td></tr>
+            <tr><td><code>systemd_unit</code></td><td>Systemd service / timer / socket unit file paths</td></tr>
+            <tr><td><code>macos_launchagent</code></td><td>macOS LaunchAgent and LaunchDaemon plist paths</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── IP + Domain ── -->
+      <h2 id="ip"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>IP &amp; Domain Intelligence</h2>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">IP Check</h3>
+      <p>Navigate to <strong>IP Check</strong> to query an IP address against multiple threat intelligence sources simultaneously.</p>
+      <ul>
+        <li>Displays a colour-coded <strong>verdict banner</strong> (Malicious / Suspicious / Clean / Unknown) derived from all sources combined.</li>
+        <li>Individual source cards: <strong>VirusTotal</strong> (detection count + link), <strong>AbuseIPDB</strong> (score bar + usage type + ISP), <strong>Spur</strong> (tunnel/tag badges), <strong>Shodan</strong> (open ports, hostnames, CVEs).</li>
+        <li>Source cards with missing API keys are sorted to the bottom of the page.</li>
+        <li>Private, loopback, and reserved IP ranges are rejected before any external query is made.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Domain Check</h3>
+      <p>Navigate to <strong>Domain Check</strong> to query a domain against VirusTotal and WHOIS.</p>
+      <ul>
+        <li>Displays a verdict banner derived from VirusTotal detections.</li>
+        <li>Individual source cards: <strong>VirusTotal</strong> (detection count, category badges + link), <strong>WHOIS</strong> (registrar, creation/expiry dates, name servers, status badges), <strong>Passive DNS</strong> (unique IPs seen resolving to this domain).</li>
+        <li>Cards with missing API keys are sorted to the bottom.</li>
+      </ul>
+
+      <!-- ── Tags ── -->
+      <h2 id="tags"><i class="bi bi-tags me-2" style="color:var(--accent);"></i>Tags &amp; Search</h2>
+      <ul>
+        <li>Add comma-separated tags when uploading a sample.</li>
+        <li>Add or remove tags from any sample on the sample detail page.</li>
+        <li>All tags are stored in lowercase automatically.</li>
+        <li>Use the search bar on the <strong>Vault</strong> page to filter samples by filename, hash, or tag.</li>
+        <li>Results are paginated — use the page controls at the bottom of the vault list.</li>
+      </ul>
+
+      <!-- ── Sample Report ── -->
+      <h2 id="report"><i class="bi bi-file-earmark-bar-graph me-2" style="color:var(--accent);"></i>Sample Report</h2>
+      <p>Every sample has a structured JSON report available at <code>GET /api/v1/files/{id}/report/</code>. The report aggregates all stored analysis data in a single response — no new analysis is run.</p>
+      <p>The report includes:</p>
+      <ul>
+        <li><strong>File metadata</strong> — name, size, magic bytes, MIME type, upload date, uploader</li>
+        <li><strong>Hashes</strong> — MD5, SHA1, SHA256, SHA512</li>
+        <li><strong>Tags</strong> — all tags applied to the sample</li>
+        <li><strong>VirusTotal summary</strong> — detection counts (malicious / suspicious / undetected / harmless), threat label, threat category, scan date, and known names</li>
+        <li><strong>IOCs</strong> — all confirmed (true positive) IOCs grouped by type</li>
+      </ul>
+      <div class="callout">VirusTotal data is only included if a VT enrichment has previously been run on the sample (automatically on upload if a VT API key is configured, or manually via the VT Enrich action).</div>
+
+      <!-- ── PDF Report ── -->
+      <h2 id="pdf-report"><i class="bi bi-file-earmark-pdf me-2" style="color:var(--accent);"></i>PDF Report Export</h2>
+      <p>Every sample detail page has a <strong>PDF Report</strong> button on the Info tab. Clicking it generates a professional A4 PDF report entirely in-browser — no server round-trip is required beyond the initial page load.</p>
+      <p>The PDF is built from data already loaded on the page and downloads instantly with the filename:</p>
+      <pre>vault1337_report_&lt;sha256[:12]&gt;_&lt;YYYYMMDD&gt;.pdf</pre>
+      <p><strong>Report sections:</strong></p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Section</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Header</strong></td><td>Dark slate header band — report title, Vault1337 branding, generation timestamp, SHA256 sub-row, and "RESTRICTED — For authorised personnel only" classification label.</td></tr>
+            <tr><td><strong>Executive Summary</strong></td><td>Filename, detection ratio colour-coded by risk (red &gt;5 detections, amber 1–5, green 0), and VirusTotal threat label — or a "No VT data" message if not yet enriched.</td></tr>
+            <tr><td><strong>File Details</strong></td><td>Original filename, file size (human-readable + bytes), MIME type, magic bytes, upload date, uploaded by.</td></tr>
+            <tr><td><strong>Cryptographic Hashes</strong></td><td>MD5, SHA-1, SHA-256, and SHA-512 in monospace font.</td></tr>
+            <tr><td><strong>VirusTotal Intelligence</strong></td><td>Detection ratio, threat label, scan date, and a table of the top 10 engine detections (malicious and suspicious results only). Omitted if no VT data is present.</td></tr>
+            <tr><td><strong>Tags</strong></td><td>All tags applied to the sample, comma-separated.</td></tr>
+            <tr><td><strong>IOCs</strong></td><td>Confirmed true-positive IOCs only, grouped by type with a sub-header per type. Omitted if no confirmed IOCs exist.</td></tr>
+            <tr><td><strong>Analyst Notes</strong></td><td>Each saved comment rendered as a titled block (bold title + body text). Shows "No analyst notes recorded." if empty.</td></tr>
+            <tr><td><strong>Footer</strong></td><td>Appears on every page: "Vault1337 — Confidential | Generated: &lt;ISO datetime&gt; | Page N of M".</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout">The PDF is generated entirely client-side using <a href="https://github.com/parallax/jsPDF" target="_blank">jsPDF</a> and <a href="https://github.com/simonbengtsson/jsPDF-AutoTable" target="_blank">jsPDF-AutoTable</a>. No analysis data leaves the browser and no additional API calls are made.</div>
+
+      <!-- ── MITRE ATT&CK ── -->
+      <h2 id="mitre-attack"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>MITRE ATT&amp;CK Mapping</h2>
+      <p>On the sample detail page, the <strong>Info</strong> tab includes a <strong>MITRE ATT&amp;CK</strong> card alongside the VirusTotal summary.</p>
+      <ul>
+        <li>Click <strong>Map Techniques</strong> to scan the sample's stored analysis results and linked IOC types for known MITRE ATT&amp;CK technique indicators.</li>
+        <li>Results are displayed as colour-coded tactic badges arranged in a single flex-wrap row. Each badge shows the technique ID and name; hovering or reading the badge expands to show the matched indicator evidence.</li>
+        <li>Click a badge to open the official MITRE ATT&amp;CK technique page in a new tab.</li>
+        <li>Mapping covers 27 techniques across 10 tactics including execution, persistence, defence evasion, discovery, lateral movement, and impact.</li>
+        <li>Detection uses two sources: (1) regex pattern matching against saved <em>AnalysisResult</em> text (excluding IOC extractor output to prevent section-header false positives), and (2) direct mapping from linked IOC types (e.g. <code>scheduled_task</code> → T1053, <code>win_persistence</code> → T1547).</li>
+        <li>Results are persisted on the sample record and can be re-mapped at any time via the <strong>Re-map</strong> button.</li>
+      </ul>
+
+      <!-- ── STIX Export ── -->
+      <h2 id="stix-export"><i class="bi bi-box-arrow-up-right me-2" style="color:var(--accent);"></i>STIX 2.1 Export</h2>
+      <p>Vault1337 supports exporting threat intelligence in <a href="https://oasis-open.github.io/cti-documentation/stix/intro" target="_blank">STIX 2.1</a> format via the <a href="https://github.com/oasis-open/cti-python-stix2" target="_blank">stix2</a> library.</p>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">Sample STIX Export</h3>
+      <p>On the sample detail page, the <strong>Info</strong> tab has an <strong>Export STIX</strong> button. Clicking it downloads a STIX 2.1 bundle for that sample containing:</p>
+      <ul>
+        <li>A <strong>Vault1337 Identity</strong> SDO as the bundle author.</li>
+        <li>A <strong>File</strong> SCO with MD5, SHA-1, and SHA-256 hashes.</li>
+        <li>An <strong>Indicator</strong> SDO with a hash-based STIX pattern.</li>
+        <li>STIX objects for every linked IOC — IPv4Address, DomainName, URL, EmailAddress, WindowsRegistryKey SCOs with associated Indicator SDOs; Vulnerability SDOs for CVE IOCs; Note SDOs for persistence and other types.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk IOC STIX Export</h3>
+      <p>On the <strong>IOC</strong> page, select one or more IOCs using the row checkboxes, then click <strong>Export STIX</strong> in the bulk action bar. The download contains STIX objects for all selected IOCs, without being tied to a specific sample.</p>
+
+      <!-- ── Decoder ── -->
+      <h2 id="decoder"><i class="bi bi-file-binary me-2" style="color:var(--accent);"></i>Decoder</h2>
+      <p>Navigate to <strong>Decoder</strong> in the navigation bar to decode and transform encoded strings without uploading a sample.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Mode</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Base64</code></td><td>Decodes standard Base64-encoded strings</td></tr>
+            <tr><td><code>Hex</code></td><td>Decodes hex-encoded byte strings to ASCII/UTF-8</td></tr>
+            <tr><td><code>URL Decode</code></td><td>Decodes percent-encoded URL strings</td></tr>
+            <tr><td><code>ROT13</code></td><td>Applies ROT13 character substitution</td></tr>
+            <tr><td><code>XOR</code></td><td>XOR-decodes the input with a specified single-byte key (hex or decimal)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Output is displayed inline — no data is sent to the server. Useful for quickly decoding obfuscated strings found during analysis.</p>
+
+      <!-- ── Tech Stack ── -->
+      <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+          <tbody>
+            <tr><td>Backend</td><td>Python 3.12 / Django 5.2 / Django REST Framework</td></tr>
+            <tr><td>Authentication</td><td>JWT — djangorestframework-simplejwt with token blacklisting</td></tr>
+            <tr><td>API docs</td><td>drf-spectacular — Swagger UI at <code>/api/v1/docs/</code></td></tr>
+            <tr><td>Frontend</td><td>React 19 / TypeScript / Vite 6 / Tailwind CSS 4</td></tr>
+            <tr><td>Database</td><td>PostgreSQL (production) / SQLite (development)</td></tr>
+            <tr><td>Static files</td><td>WhiteNoise (serves React SPA + Django admin assets)</td></tr>
+            <tr><td>Production server</td><td>Gunicorn (4 workers) + NGINX</td></tr>
+            <tr><td>Container</td><td>Docker — <code>vault1337/vault1337:latest</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── API ── -->
+      <h2 id="api-ref"><i class="bi bi-braces me-2" style="color:var(--accent);"></i>REST API</h2>
+      <p>All endpoints are under <code>/api/v1/</code>. JWT Bearer token authentication is required on all endpoints except registration and token endpoints.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST /api/v1/auth/register/</code></td><td>Register a new user account</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/</code></td><td>Obtain JWT access + refresh token</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/refresh/</code></td><td>Refresh an access token</td></tr>
+            <tr><td><code>POST /api/v1/auth/logout/</code></td><td>Blacklist a refresh token</td></tr>
+            <tr><td><code>GET/PATCH /api/v1/auth/user/</code></td><td>Current user profile</td></tr>
+            <tr><td><code>GET/POST /api/v1/files/</code></td><td>List vault / upload a sample</td></tr>
+            <tr><td><code>GET/DELETE /api/v1/files/{id}/</code></td><td>Sample detail / delete</td></tr>
+            <tr><td><code>GET /api/v1/files/{id}/download/</code></td><td>Download sample file</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/run_tool/</code></td><td>Run an analysis tool</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/add_tag/</code></td><td>Add a tag to a sample</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/remove_tag/</code></td><td>Remove a tag from a sample</td></tr>
+            <tr><td><code>GET/POST /api/v1/files/{id}/comments/</code></td><td>List / add comments on a sample</td></tr>
+            <tr><td><code>GET /api/v1/files/{id}/report/</code></td><td>Structured JSON report (hashes, VT, IOCs, tags)</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/vt-enrich/</code></td><td>Fetch / refresh VirusTotal data for a sample</td></tr>
+            <tr><td><code>POST /api/v1/files/fetch_url/</code></td><td>Fetch a sample from a URL</td></tr>
+            <tr><td><code>POST /api/v1/files/vt-download/</code></td><td>Download from VirusTotal by SHA256</td></tr>
+            <tr><td><code>POST /api/v1/files/mb-download/</code></td><td>Download from MalwareBazaar by SHA256</td></tr>
+            <tr><td><code>GET/PATCH /api/v1/iocs/</code></td><td>List and update IOCs — supports <code>?ioc_type=ip|domain|url|email|…</code> filter</td></tr>
+            <tr><td><code>POST /api/v1/iocs/{id}/enrich/</code></td><td>Re-enrich a single IOC against VT + AbuseIPDB; returns updated IOC</td></tr>
+            <tr><td><code>GET /api/v1/iocs/{id}/samples/</code></td><td>List all samples that share a given IOC (pivot on shared infrastructure)</td></tr>
+            <tr><td><code>POST /api/v1/iocs/export-stix/</code></td><td>Export selected IOCs as a STIX 2.1 bundle — body: <code>{"ids": [1,2,3]}</code></td></tr>
+            <tr><td><code>POST /api/v1/iocs/bulk-delete/</code></td><td>Delete selected IOCs — body: <code>{"ids": [1,2,3]}</code> (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/files/{id}/map-attack/</code></td><td>Run MITRE ATT&amp;CK technique mapping for a sample; persists and returns results</td></tr>
+            <tr><td><code>GET /api/v1/files/{id}/stix/</code></td><td>Download a STIX 2.1 bundle for a sample and all its IOCs</td></tr>
+            <tr><td><code>GET/POST/PUT/DELETE /api/v1/yara/</code></td><td>YARA rule management</td></tr>
+            <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup (VT, AbuseIPDB, Spur, Shodan)</td></tr>
+            <tr><td><code>POST /api/v1/intel/domain/</code></td><td>Domain intelligence lookup (VT, WHOIS, passive DNS)</td></tr>
+            <tr><td><code>GET/POST /api/v1/admin/keys/</code></td><td>API key management (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/tools/qr-decode/</code></td><td>Stateless QR code decode</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Interactive API documentation (Swagger UI) is available at <code>/api/v1/docs/</code> on any running instance.</p>
+
+      <!-- ── Acknowledgements ── -->
+      <h2 id="ack"><i class="bi bi-heart me-2" style="color:var(--accent);"></i>Acknowledgements</h2>
+      <p>Vault1337 is built on outstanding open-source projects and public APIs.</p>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:1.5rem;">Analysis Libraries</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://github.com/lief-project/LIEF" target="_blank">LIEF</a>
+        <a class="ack-pill" href="https://github.com/erocarrera/pefile" target="_blank">pefile</a>
+        <a class="ack-pill" href="https://www.capstone-engine.org/" target="_blank">Capstone</a>
+        <a class="ack-pill" href="https://github.com/VirusTotal/yara-python" target="_blank">YARA-Python</a>
+        <a class="ack-pill" href="https://github.com/decalage2/oletools" target="_blank">Oletools</a>
+        <a class="ack-pill" href="https://pymupdf.readthedocs.io/" target="_blank">PyMuPDF</a>
+        <a class="ack-pill" href="https://exiftool.org/" target="_blank">ExifTool</a>
+        <a class="ack-pill" href="https://github.com/nicowillis/pyzipper" target="_blank">pyzipper</a>
+        <a class="ack-pill" href="https://github.com/miurahr/py7zr" target="_blank">py7zr</a>
+        <a class="ack-pill" href="https://github.com/john-kurkowski/tldextract" target="_blank">tldextract</a>
+        <a class="ack-pill" href="https://github.com/astanin/python-tabulate" target="_blank">tabulate</a>
+        <a class="ack-pill" href="https://github.com/androguard/androguard" target="_blank">androguard</a>
+        <a class="ack-pill" href="https://github.com/malwarefrank/dnfile" target="_blank">dnfile</a>
+        <a class="ack-pill" href="https://github.com/oasis-open/cti-python-stix2" target="_blank">stix2</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Backend &amp; Framework</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://www.python.org/" target="_blank">Python</a>
+        <a class="ack-pill" href="https://www.djangoproject.com/" target="_blank">Django</a>
+        <a class="ack-pill" href="https://www.django-rest-framework.org/" target="_blank">Django REST Framework</a>
+        <a class="ack-pill" href="https://python-requests.org/" target="_blank">Requests</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Intelligence APIs</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://www.virustotal.com/" target="_blank">VirusTotal</a>
+        <a class="ack-pill" href="https://bazaar.abuse.ch/api/" target="_blank">MalwareBazaar</a>
+        <a class="ack-pill" href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a>
+        <a class="ack-pill" href="https://spur.us/context-api/" target="_blank">Spur</a>
+        <a class="ack-pill" href="https://account.shodan.io/" target="_blank">Shodan</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Frontend</p>
+      <div class="ack-wrap mb-3">
+        <a class="ack-pill" href="https://react.dev/" target="_blank">React</a>
+        <a class="ack-pill" href="https://vitejs.dev/" target="_blank">Vite</a>
+        <a class="ack-pill" href="https://www.typescriptlang.org/" target="_blank">TypeScript</a>
+        <a class="ack-pill" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
+        <a class="ack-pill" href="https://axios-http.com/" target="_blank">Axios</a>
+        <a class="ack-pill" href="https://reactrouter.com/" target="_blank">React Router</a>
+        <a class="ack-pill" href="https://github.com/parallax/jsPDF" target="_blank">jsPDF</a>
+        <a class="ack-pill" href="https://github.com/simonbengtsson/jsPDF-AutoTable" target="_blank">jsPDF-AutoTable</a>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Infrastructure</p>
+      <div class="ack-wrap">
+        <a class="ack-pill" href="https://gunicorn.org/" target="_blank">Gunicorn</a>
+        <a class="ack-pill" href="https://whitenoise.readthedocs.io/" target="_blank">WhiteNoise</a>
+        <a class="ack-pill" href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>
+        <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
+        <a class="ack-pill" href="https://nginx.org/" target="_blank">NGINX</a>
+      </div>
+
+    </main>
+  </div><!-- /docs-wrap -->
+</div><!-- /container -->
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="f-links">
+      <a href="index.html">Home</a>
+      <a href="vault1337.html">Vault1337 Docs</a>
+      <a href="insight.html">Insight Docs</a>
+      <a href="https://github.com/DanDreadless/Vault1337" target="_blank">GitHub</a>
+      <a href="https://github.com/DanDreadless/Vault1337/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
+      <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
+    </div>
+    <p>Vault1337 &mdash; Malware Analysis Platform &mdash; &copy; <span id="yr"></span></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Highlight active sidebar link on scroll
+  const headings = document.querySelectorAll('.docs-content h2, .docs-content h3');
+  const links = document.querySelectorAll('.d-nav a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const match = document.querySelector(`.d-nav a[href="#${e.target.id}"]`);
+        if (match) match.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-60px 0px -70% 0px' });
+  headings.forEach(h => { if (h.id) obs.observe(h); });
+</script>
+</body>
+</html>

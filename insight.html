@@ -27,8 +27,8 @@
     <div class="collapse navbar-collapse" id="nav">
       <ul class="navbar-nav ms-auto align-items-center">
         <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="docs.html">Documentation</a></li>
-        <li class="nav-item"><a class="nav-link active" href="insight.html">Insight</a></li>
+        <li class="nav-item"><a class="nav-link" href="vault1337.html">Vault1337 Docs</a></li>
+        <li class="nav-item"><a class="nav-link active" href="insight.html">Insight Docs</a></li>
         <li class="nav-item">
           <a class="nav-link nav-gh" href="https://github.com/DanDreadless/Insight" target="_blank">
             <i class="bi bi-github me-1"></i>GitHub
@@ -335,6 +335,8 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
         <li>Brand impersonation + phishing form (± new certificate) &rarr; <strong>CRITICAL</strong> "active phishing campaign"</li>
         <li>Keylogger / skimmer + DevTools evasion &rarr; <strong>CRITICAL</strong> "sophisticated targeted malware"</li>
         <li>Fake CAPTCHA / ClickFix UI + clipboard write &rarr; <strong>CRITICAL</strong> "ClickFix malware delivery"</li>
+        <li>Injected unknown external script + ClickFix / clipboard payload &rarr; <strong>CRITICAL</strong> "compromised site delivering ClickFix malware"</li>
+        <li>Newly registered domain (&le; 30 days) + high-risk TLD &rarr; <strong>HIGH</strong> "newly registered high-risk domain" — purpose-built attack infrastructure signal</li>
       </ul>
 
       <!-- ── JS Analysis ── -->
@@ -363,6 +365,7 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td>Malicious service worker</td><td><code>navigator.serviceWorker.register()</code> from <code>blob:</code> or <code>data:</code> URI</td></tr>
             <tr><td>Remote code execution</td><td><code>fetch()</code> + <code>.then()</code> / <code>await</code> + <code>eval()</code> / <code>new Function()</code> in same async chain — compromised WordPress pattern</td></tr>
             <tr><td>Decrypt-then-execute</td><td><code>crypto.subtle.decrypt</code> / <code>importKey</code> + <code>eval()</code> / <code>new Function()</code> — encrypted payload executed at runtime</td></tr>
+            <tr><td>ClickFix clipboard payload</td><td><code>navigator.clipboard.writeText()</code> argument contains shell command indicators (PowerShell, mshta, cmd.exe, <code>| bash</code>, etc.) — content-based detection regardless of click handler</td></tr>
           </tbody>
         </table>
       </div>
@@ -416,8 +419,11 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Meta refresh redirect with delay &le; 2s to external domain</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Login form transmitting credentials over plain HTTP</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake browser update page: browser/update terminology + executable download link (SocGholish / ClearFake)</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake CAPTCHA / ClickFix: human-verification text + Win+R / terminal execution instructions</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake CAPTCHA / ClickFix: human-verification text + Win+R / terminal execution instructions (expanded: "click to fix", "browser verification", "run the following command" variants)</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command (PowerShell, mshta, cmd, iex) embedded in HTML <code>data-*</code> attribute or event handler — ClickFix payload storage pattern</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command embedded in hidden HTML element (<code>display:none</code>, hidden input, <code>&lt;template&gt;</code>) — ClickFix payload storage pattern</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Clickjacking overlay: full-viewport fixed/absolute element with z-index &gt; 100 + click handler</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>External script loaded from unknown domain that is also <code>dns-prefetch</code>-staged in the same page — deliberate WordPress compromise pattern (e.g. WPCode injection)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;base href&gt;</code> present — same origin, verify it is intentional</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Meta refresh redirect (any delay)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Right-click disabled via <code>oncontextmenu="return false"</code></td></tr>
@@ -427,6 +433,7 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Sensitive keywords in HTML comments (password, api_key, token, secret, etc.)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Resources loaded from IPFS gateways (takedown-resistant phishing / drainer hosting)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External script preloaded via <code>&lt;link rel="preload" as="script"&gt;</code> or <code>&lt;link rel="prefetch"&gt;</code> from unknown domain — WordPress malware injection staging pattern</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External <code>&lt;script src&gt;</code> from unknown domain without dns-prefetch staging</td></tr>
             <tr><td><span style="color:#60a5fa;">LOW</span></td><td>External scripts loaded without Subresource Integrity (SRI)</td></tr>
             <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Password field missing <code>autocomplete</code> attribute</td></tr>
             <tr><td><span style="color:#60a5fa;">LOW</span></td><td>CSS <code>user-select: none</code> disabling text selection</td></tr>
@@ -445,12 +452,14 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Subdomain contains exact brand keyword (e.g. <code>paypal.attacker.com</code>)</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>SLD (registered domain) is a typosquat of a known brand (edit distance 1)</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>IDN / homograph attack — Cyrillic or mixed-script characters in domain</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>High-risk TLD (<code>.xyz</code>, <code>.top</code>, <code>.click</code>, <code>.loan</code>, <code>.zip</code>, <code>.cyou</code>, and 20+ more)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score &gt; 0.7 (consonant ratio + entropy + English subword absence)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Brand keyword present in SLD (e.g. <code>paypal-login.com</code>)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Brand keyword in registered domain (e.g. <code>paypal-secure.com</code>) — attacker owns the SLD</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>High-risk TLD (<code>.xyz</code>, <code>.top</code>, <code>.click</code>, <code>.loan</code>, <code>.zip</code>, <code>.cyou</code>, and 20+ more) — strong context signal, not conclusive alone</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score &gt; 0.6 (consonant ratio + entropy + English subword absence)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Digit substitution in SLD (e.g. <code>g00gle</code>, <code>faceb00k</code>)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Excessive subdomain depth (&gt; 4 labels)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Hosted on abuse-prone free platform with long random subdomain (Cloudflare R2, Pages.dev, Firebase)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Newly registered domain (&le; 30 days old) — disproportionately present in threat feeds; requires WHOIS data</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Recently registered domain (31–90 days old) — context signal for analysts</td></tr>
           </tbody>
         </table>
       </div>
@@ -458,17 +467,29 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
 
       <!-- ── Header Analysis ── -->
       <h2 id="header-analysis"><i class="bi bi-card-list me-2" style="color:var(--accent);"></i>Header Analysis</h2>
-      <p>12 checks on HTTP response headers. All checks are passive — no additional requests are made.</p>
+      <p>15 checks on HTTP response headers. All checks are passive — no additional requests are made.</p>
+      <p style="color:var(--muted); font-size:.875rem;">
+        <strong style="color:var(--text);">Severity philosophy:</strong> Missing defensive headers are configuration debt, not threat indicators. Industry consensus (Cobalt, OWASP, Invicti, pentest report standards) rates them LOW/INFO. They only escalate in meaning when combined with active threat signals — handled by the context collapse engine.
+      </p>
       <div class="v-wrap mb-3">
         <table class="v-table">
-          <thead><tr><th>Category</th><th>Checks</th></tr></thead>
+          <thead><tr><th>Severity</th><th>Check</th></tr></thead>
           <tbody>
-            <tr><td>Missing security headers</td><td>Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security, Referrer-Policy, Permissions-Policy</td></tr>
-            <tr><td>Information disclosure</td><td>Server version string, X-Powered-By version disclosure</td></tr>
-            <tr><td>Deprecated software</td><td>Apache 2.2, PHP 5.x, OpenSSL 1.0 detected in headers</td></tr>
-            <tr><td>Insecure cookies</td><td>Missing <code>Secure</code>, <code>HttpOnly</code>, or <code>SameSite</code> flags on cookies</td></tr>
-            <tr><td>CORS misconfiguration</td><td>Wildcard <code>Access-Control-Allow-Origin: *</code> combined with <code>Access-Control-Allow-Credentials: true</code></td></tr>
-            <tr><td>Transport</td><td>Page served over HTTP rather than HTTPS</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Site served over unencrypted HTTP — credentials and sessions exposed in plaintext</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>End-of-life server software (Apache 2.2, PHP 5.x, IIS 6/7) — unpatched CVEs, likely compromised or abandoned infra</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>CORS misconfiguration: wildcard <code>Access-Control-Allow-Origin: *</code> + <code>Access-Control-Allow-Credentials: true</code></td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Missing <code>X-Content-Type-Options: nosniff</code></td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Missing HSTS on HTTPS site — SSL-stripping attack possible via active MitM</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>HSTS <code>max-age</code> below recommended 1 year</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Server header discloses software version — reconnaissance aid</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td><code>X-Powered-By</code> header exposes backend technology</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Insecure cookie flags — missing <code>HttpOnly</code>, <code>Secure</code>, or <code>SameSite</code></td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>CORS wildcard <code>Access-Control-Allow-Origin: *</code> (acceptable for public APIs, noted as LOW)</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>CSP allows <code>unsafe-inline</code> or <code>unsafe-eval</code> — weakens XSS protection</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Missing Content-Security-Policy — hardening gap, not a threat signal</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Missing X-Frame-Options — hardening gap, not a threat signal</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Missing Referrer-Policy — privacy gap</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Missing Permissions-Policy — rarely set by any site</td></tr>
           </tbody>
         </table>
       </div>
@@ -601,8 +622,8 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
   <div class="container">
     <div class="f-links">
       <a href="index.html">Home</a>
-      <a href="docs.html">Documentation</a>
-      <a href="insight.html">Insight</a>
+      <a href="vault1337.html">Vault1337 Docs</a>
+      <a href="insight.html">Insight Docs</a>
       <a href="https://github.com/DanDreadless/Insight" target="_blank">Insight GitHub</a>
       <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Vault1337 GitHub</a>
       <a href="https://github.com/DanDreadless/Insight/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
