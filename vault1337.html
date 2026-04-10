@@ -71,6 +71,7 @@
         <li class="d-group">Installation</li>
         <li><a href="#install-docker">Docker (Quick Start)</a></li>
         <li><a href="#compose">Docker Compose</a></li>
+        <li><a href="#docker-dev">Docker Development</a></li>
         <li><a href="#local">Local Development</a></li>
 
         <li class="d-group">Configuration</li>
@@ -85,11 +86,13 @@
         <li><a href="#ioc">IOC Management</a></li>
         <li><a href="#ip">IP &amp; Domain Intelligence</a></li>
         <li><a href="#tags">Tags &amp; Search</a></li>
+        <li><a href="#analyst-notes">Analyst Notes</a></li>
         <li><a href="#report">Sample Report</a></li>
         <li><a href="#pdf-report">PDF Report Export</a></li>
         <li><a href="#mitre-attack">MITRE ATT&amp;CK Mapping</a></li>
         <li><a href="#stix-export">STIX 2.1 Export</a></li>
         <li><a href="#decoder">Decoder</a></li>
+        <li><a href="#management">Management Page</a></li>
 
         <li class="d-group">Reference</li>
         <li><a href="#stack">Tech Stack</a></li>
@@ -133,7 +136,7 @@
           <p>Open <strong>http://localhost:8000</strong> and log in with the default credentials:</p>
           <pre>Username: admin
 Password: changeme123</pre>
-          <div class="callout"><strong>Important:</strong> Change your password immediately at <code>http://localhost:8000/admin/</code></div>
+          <div class="callout"><strong>Important:</strong> Change your password immediately via the <strong>Management</strong> page after first login.</div>
         </div>
       </div>
 
@@ -141,7 +144,7 @@ Password: changeme123</pre>
         <div class="step-n">4</div>
         <div class="step-b">
           <h5>Add API keys (optional)</h5>
-          <p>Navigate to <strong>Admin → API Keys</strong> to add keys for the intelligence integrations. See the <a href="#api-keys">API Keys</a> section below.</p>
+          <p>Navigate to <strong>Management → API Keys</strong> to add keys for the intelligence integrations. See the <a href="#api-keys">API Keys</a> section below.</p>
         </div>
       </div>
 
@@ -202,6 +205,52 @@ docker compose down -v</pre>
         </div>
       </div>
 
+      <!-- ── Docker Development ── -->
+      <h2 id="docker-dev"><i class="bi bi-code-slash me-2" style="color:var(--accent);"></i>Docker Development</h2>
+      <p>Use the localdev overlay to run the Django + React stack in Docker while keeping your local <code>db.sqlite3</code> and <code>sample_storage/</code> mounted directly from the host. Ideal for day-to-day development without a full PostgreSQL setup.</p>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Fix file permissions (WSL / Linux)</h5>
+          <p>The container runs as <code>vault</code> (UID 1001). If your host files are owned by a different UID, the container cannot write to them. Run once from the project root:</p>
+          <pre>chmod 666 db.sqlite3
+chmod -R 777 sample_storage/</pre>
+          <div class="callout"><strong>WSL note:</strong> Windows-side files mounted into WSL appear with host UID 1000, which differs from the container's UID 1001. The commands above fix this. You do not need to do this on a native Linux host where you created the files as the same user.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Start the dev stack</h5>
+          <p>Run all three compose files — base, build override, and localdev overlay:</p>
+          <pre>docker compose \
+  -f Docker/docker-compose.yml \
+  -f Docker/docker-compose.build.yml \
+  -f Docker/docker-compose.localdev.yml \
+  up --build</pre>
+          <p>This mounts <code>db.sqlite3</code> and <code>sample_storage/</code> from the project root, skips PostgreSQL, and applies SQLite WAL mode for concurrent reads. The React dev server is <strong>not</strong> included — run it separately (see <a href="#local">Local Development</a> step 6) for hot-reload.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Useful compose commands</h5>
+          <pre># Rebuild after backend dependency changes
+docker compose -f Docker/docker-compose.yml \
+  -f Docker/docker-compose.build.yml \
+  -f Docker/docker-compose.localdev.yml \
+  up --build
+
+# Stop without removing volumes
+docker compose -f Docker/docker-compose.yml \
+  -f Docker/docker-compose.localdev.yml \
+  down</pre>
+        </div>
+      </div>
+
       <!-- ── Local Dev ── -->
       <h2 id="local"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Local Development</h2>
       <p>Requires Python 3.12+, Node.js 22+, and (optionally) PostgreSQL.</p>
@@ -231,10 +280,11 @@ sudo apt install -y libimage-exiftool-perl libmpc-dev libgl1 libglib2.0-0</pre>
         <div class="step-n">3</div>
         <div class="step-b">
           <h5>Configure the environment</h5>
-          <p>Copy the Docker env template and edit it for local use:</p>
-          <pre>cp Docker/.env .env
-# Edit .env — set SECRET_KEY and DEBUG=True
-# Leave DATABASE_URL empty to use SQLite</pre>
+          <p>Create a <code>.env</code> file in the project root with at minimum:</p>
+          <pre>SECRET_KEY=change-me-to-a-long-random-string
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+# Leave DATABASE_URL unset to use SQLite</pre>
         </div>
       </div>
 
@@ -295,7 +345,7 @@ npm run dev</pre>
 
       <!-- ── API Keys ── -->
       <h2 id="api-keys"><i class="bi bi-key me-2" style="color:var(--accent);"></i>API Keys</h2>
-      <p>Third-party intelligence features require API keys. Add them via the web UI at <strong>Admin → API Keys</strong> (staff account required), or set them in your <code>.env</code> file before starting the container.</p>
+      <p>Third-party intelligence features require API keys. Add them via the web UI at <strong>Management → API Keys</strong> (staff account required), or set them in your <code>.env</code> file before starting the container.</p>
       <div class="v-wrap">
         <table class="v-table">
           <thead><tr><th>Key</th><th>Service</th><th>Used for</th></tr></thead>
@@ -305,6 +355,7 @@ npm run dev</pre>
             <tr><td><code>ABUSEIPDB_KEY</code></td><td><a href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a></td><td>IP reputation lookups and IOC enrichment</td></tr>
             <tr><td><code>SPUR_KEY</code></td><td><a href="https://spur.us/context-api/" target="_blank">Spur</a></td><td>VPN / proxy / residential IP context</td></tr>
             <tr><td><code>SHODAN_KEY</code></td><td><a href="https://account.shodan.io/" target="_blank">Shodan</a></td><td>Open ports and banner data for an IP</td></tr>
+            <tr><td><code>OTX_KEY</code></td><td><a href="https://otx.alienvault.com/" target="_blank">AlienVault OTX</a></td><td>Pulse-based threat intelligence for IOC enrichment</td></tr>
           </tbody>
         </table>
       </div>
@@ -642,6 +693,18 @@ npm run dev</pre>
         <li>Results are paginated — use the page controls at the bottom of the vault list.</li>
       </ul>
 
+      <!-- ── Analyst Notes ── -->
+      <h2 id="analyst-notes"><i class="bi bi-journal-text me-2" style="color:var(--accent);"></i>Analyst Notes</h2>
+      <p>Analyst notes let you attach structured commentary to any sample — useful for documenting findings, sharing context with team members, and capturing initial triage decisions.</p>
+      <ul>
+        <li>Open a sample and select the <strong>Notes</strong> tab on the sample detail page.</li>
+        <li>Each note has a <strong>title</strong>, a <strong>body</strong> (supports Markdown formatting), and a <strong>type</strong> label.</li>
+        <li>Note types include: <code>note</code> (general observation), <code>triage</code> (initial assessment), <code>ioc</code> (indicator context), and <code>malware</code> (malware family / campaign attribution).</li>
+        <li>Notes are preserved across sessions and visible to all users with access to the sample.</li>
+        <li>Notes appear in the PDF report export under the <strong>Analyst Notes</strong> section.</li>
+      </ul>
+      <div class="callout">Note bodies are rendered as Markdown in the UI — use headings, bullet lists, code blocks, and bold/italic formatting to structure your findings.</div>
+
       <!-- ── Sample Report ── -->
       <h2 id="report"><i class="bi bi-file-earmark-bar-graph me-2" style="color:var(--accent);"></i>Sample Report</h2>
       <p>Every sample has a structured JSON report available at <code>GET /api/v1/files/{id}/report/</code>. The report aggregates all stored analysis data in a single response — no new analysis is run.</p>
@@ -681,10 +744,10 @@ npm run dev</pre>
 
       <!-- ── MITRE ATT&CK ── -->
       <h2 id="mitre-attack"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>MITRE ATT&amp;CK Mapping</h2>
-      <p>On the sample detail page, the <strong>Info</strong> tab includes a <strong>MITRE ATT&amp;CK</strong> card alongside the VirusTotal summary.</p>
+      <p>Each sample has a dedicated <strong>ATT&amp;CK</strong> tab on the sample detail page showing matched MITRE ATT&amp;CK techniques. A summary card is also shown on the <strong>Info</strong> tab.</p>
       <ul>
         <li>Click <strong>Map Techniques</strong> to scan the sample's stored analysis results and linked IOC types for known MITRE ATT&amp;CK technique indicators.</li>
-        <li>Results are displayed as colour-coded tactic badges arranged in a single flex-wrap row. Each badge shows the technique ID and name; hovering or reading the badge expands to show the matched indicator evidence.</li>
+        <li>Results are displayed as colour-coded tactic badges arranged by tactic. Each badge shows the technique ID and name; expanding a badge shows the matched indicator evidence.</li>
         <li>Click a badge to open the official MITRE ATT&amp;CK technique page in a new tab.</li>
         <li>Mapping covers 27 techniques across 10 tactics including execution, persistence, defence evasion, discovery, lateral movement, and impact.</li>
         <li>Detection uses two sources: (1) regex pattern matching against saved <em>AnalysisResult</em> text (excluding IOC extractor output to prevent section-header false positives), and (2) direct mapping from linked IOC types (e.g. <code>scheduled_task</code> → T1053, <code>win_persistence</code> → T1547).</li>
@@ -724,6 +787,49 @@ npm run dev</pre>
       </div>
       <p>Output is displayed inline — no data is sent to the server. Useful for quickly decoding obfuscated strings found during analysis.</p>
 
+      <!-- ── Management Page ── -->
+      <h2 id="management"><i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Management Page</h2>
+      <p>Navigate to <strong>Management</strong> in the navigation bar (staff accounts only) to access platform administration tools organised across multiple tabs.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Dashboard</h3>
+      <p>Overview statistics for the platform: total samples, total IOCs, YARA rules, active users, and recent upload activity.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Users &amp; Roles</h3>
+      <ul>
+        <li>Create, edit, and deactivate user accounts without touching the Django admin.</li>
+        <li>Assign users to roles. Built-in roles: <strong>Admin</strong>, <strong>Analyst</strong>, <strong>Read Only</strong>.</li>
+        <li>Create custom roles and assign granular permissions to them.</li>
+        <li>Set or reset any user's password.</li>
+        <li>View and clear account lockouts — accounts are locked after repeated failed login attempts.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">API Keys</h3>
+      <p>Store third-party API keys securely in the database. Keys are written to the server's environment at runtime — they are never returned in API responses after being saved. See <a href="#api-keys">API Keys</a> for the full list of supported keys.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Audit Log</h3>
+      <ul>
+        <li>Every write action (upload, delete, tool run, role change, login, logout) is recorded in the audit log with a timestamp, username, and action detail.</li>
+        <li>Filter the log by action type or username.</li>
+        <li>Purge records older than the configured retention window (<code>AUDIT_LOG_RETENTION_DAYS</code>, default 365 days) with a single click.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Settings</h3>
+      <p>View current platform settings and update runtime-configurable values without restarting the server:</p>
+      <ul>
+        <li><strong>Storage paths</strong> — sample storage directory and backup directory.</li>
+        <li><strong>Database info</strong> — active database engine and name.</li>
+        <li><strong>Upload limit</strong> — maximum file upload size (configurable via <code>MAX_UPLOAD_SIZE_MB</code>).</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">SSO</h3>
+      <p>Configure Single Sign-On without editing environment variables. Supported providers: <strong>Okta</strong>, <strong>Azure AD / Entra ID</strong>, <strong>Google Workspace</strong>, <strong>GitHub</strong>, and any generic <strong>OIDC</strong> provider. SSO can be enabled alongside local username/password login.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Backup</h3>
+      <p>Run an on-demand <code>pg_dump</code> backup of the PostgreSQL database from the UI. Backup files are saved to the configured <code>BACKUP_DIR</code>. Backup status shows the last backup time and file path.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">CyberChef</h3>
+      <p>Check the locally bundled CyberChef version and update it to the latest GitHub release with a single click. No internet access is required at runtime — CyberChef is served entirely from the container.</p>
+
       <!-- ── Tech Stack ── -->
       <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
       <div class="v-wrap">
@@ -750,9 +856,10 @@ npm run dev</pre>
           <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>POST /api/v1/auth/register/</code></td><td>Register a new user account</td></tr>
-            <tr><td><code>POST /api/v1/auth/token/</code></td><td>Obtain JWT access + refresh token</td></tr>
-            <tr><td><code>POST /api/v1/auth/token/refresh/</code></td><td>Refresh an access token</td></tr>
-            <tr><td><code>POST /api/v1/auth/logout/</code></td><td>Blacklist a refresh token</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/</code></td><td>Obtain JWT access + refresh token pair</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/set-cookie/</code></td><td>Store a refresh token in an httpOnly cookie (called after login)</td></tr>
+            <tr><td><code>POST /api/v1/auth/token/refresh/</code></td><td>Issue a new access token using the httpOnly refresh cookie</td></tr>
+            <tr><td><code>POST /api/v1/auth/logout/</code></td><td>Blacklist the refresh token and clear the cookie</td></tr>
             <tr><td><code>GET/PATCH /api/v1/auth/user/</code></td><td>Current user profile</td></tr>
             <tr><td><code>GET/POST /api/v1/files/</code></td><td>List vault / upload a sample</td></tr>
             <tr><td><code>GET/DELETE /api/v1/files/{id}/</code></td><td>Sample detail / delete</td></tr>
@@ -777,6 +884,18 @@ npm run dev</pre>
             <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup (VT, AbuseIPDB, Spur, Shodan)</td></tr>
             <tr><td><code>POST /api/v1/intel/domain/</code></td><td>Domain intelligence lookup (VT, WHOIS, passive DNS)</td></tr>
             <tr><td><code>GET/POST /api/v1/admin/keys/</code></td><td>API key management (staff only)</td></tr>
+            <tr><td><code>GET/POST/PATCH/DELETE /api/v1/admin/users/</code></td><td>User account management (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/admin/users/{id}/set_password/</code></td><td>Set a user's password (staff only)</td></tr>
+            <tr><td><code>GET/POST/PATCH/DELETE /api/v1/admin/roles/</code></td><td>Role and permission management (staff only)</td></tr>
+            <tr><td><code>GET /api/v1/admin/permissions/</code></td><td>List all available permissions</td></tr>
+            <tr><td><code>GET /api/v1/admin/dashboard/</code></td><td>Platform statistics (staff only)</td></tr>
+            <tr><td><code>GET /api/v1/admin/audit/</code></td><td>Audit log — supports <code>?action=</code> and <code>?username=</code> filters (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/admin/audit/purge/</code></td><td>Purge audit log records older than retention window (staff only)</td></tr>
+            <tr><td><code>GET/POST /api/v1/admin/auth/lockouts/</code></td><td>View and clear account lockouts (staff only)</td></tr>
+            <tr><td><code>GET/POST /api/v1/admin/settings/</code></td><td>View and update runtime platform settings (staff only)</td></tr>
+            <tr><td><code>GET/POST /api/v1/admin/sso/</code></td><td>SSO configuration (staff only)</td></tr>
+            <tr><td><code>GET /api/v1/admin/backup/status/</code></td><td>Last backup status (staff only)</td></tr>
+            <tr><td><code>POST /api/v1/admin/backup/db/</code></td><td>Run a pg_dump database backup (staff only)</td></tr>
             <tr><td><code>POST /api/v1/tools/qr-decode/</code></td><td>Stateless QR code decode</td></tr>
           </tbody>
         </table>
@@ -820,6 +939,7 @@ npm run dev</pre>
         <a class="ack-pill" href="https://www.abuseipdb.com/api.html" target="_blank">AbuseIPDB</a>
         <a class="ack-pill" href="https://spur.us/context-api/" target="_blank">Spur</a>
         <a class="ack-pill" href="https://account.shodan.io/" target="_blank">Shodan</a>
+        <a class="ack-pill" href="https://otx.alienvault.com/" target="_blank">AlienVault OTX</a>
       </div>
 
       <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem;">Frontend</p>
@@ -830,6 +950,7 @@ npm run dev</pre>
         <a class="ack-pill" href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>
         <a class="ack-pill" href="https://axios-http.com/" target="_blank">Axios</a>
         <a class="ack-pill" href="https://reactrouter.com/" target="_blank">React Router</a>
+        <a class="ack-pill" href="https://github.com/remarkjs/react-markdown" target="_blank">react-markdown</a>
         <a class="ack-pill" href="https://github.com/parallax/jsPDF" target="_blank">jsPDF</a>
         <a class="ack-pill" href="https://github.com/simonbengtsson/jsPDF-AutoTable" target="_blank">jsPDF-AutoTable</a>
       </div>
