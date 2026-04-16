@@ -29,6 +29,7 @@
         <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="vault1337.html">Vault1337</a></li>
         <li class="nav-item"><a class="nav-link active" href="insight.html">Insight</a></li>
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a></li>
         <li class="nav-item">
           <a class="nav-link nav-gh" href="https://github.com/DanDreadless/Insight" target="_blank">
             <i class="bi bi-github me-1"></i>GitHub
@@ -48,7 +49,8 @@
       Open-source passive web threat scanner. Submit any URL — Insight fetches all public resources and analyses them entirely on content, with no reliance on reputation databases.
     </p>
     <div class="cta">
-      <a href="#getting-started" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Getting Started</a>
+      <a href="https://insight.vault1337.com" target="_blank" class="btn-v solid"><i class="bi bi-globe me-1"></i>Try It Live</a>
+      <a href="#getting-started" class="btn-v outline"><i class="bi bi-play-circle me-1"></i>Getting Started</a>
       <a href="#detection" class="btn-v outline"><i class="bi bi-shield-check me-1"></i>Detection Engine</a>
       <a href="https://github.com/DanDreadless/Insight" target="_blank" class="btn-v outline"><i class="bi bi-github me-1"></i>View on GitHub</a>
     </div>
@@ -94,6 +96,10 @@
         <li><a href="#ssl-analysis">SSL Analysis</a></li>
         <li><a href="#tech-detection">Technology Detection</a></li>
 
+        <li class="d-group">Carapace</li>
+        <li><a href="#carapace">Visual Renderer</a></li>
+        <li><a href="#carapace-findings">Renderer Findings</a></li>
+
         <li class="d-group">Reference</li>
         <li><a href="#api-ref">API Endpoints</a></li>
         <li><a href="#stack">Tech Stack</a></li>
@@ -123,9 +129,9 @@
         from the page content.
       </p>
       <div class="callout">
-        <strong>Beta:</strong> Insight is currently in beta. All scan results are provided for informational purposes
-        only and must be independently verified by a trained security analyst before any action is taken. Findings
-        may contain false positives or miss threats not covered by the current detection rules.
+        <strong>Disclaimer:</strong> All scan results are provided for informational purposes only and must be
+        independently verified by a trained security analyst before any action is taken. Findings may contain
+        false positives or miss threats not covered by the current detection rules.
       </div>
 
       <!-- ── Requirements ── -->
@@ -287,6 +293,9 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><code>RATE_LIMIT_SCANS_PER_HOUR</code></td><td><code>5</code></td><td>Per IP address</td></tr>
             <tr><td><code>MAX_SCAN_RESOURCES</code></td><td><code>50</code></td><td>External scripts analysed per scan</td></tr>
             <tr><td><code>SCAN_TIMEOUT_SECONDS</code></td><td><code>60</code></td><td>Hard Celery task time limit</td></tr>
+            <tr><td><code>CARAPACE_URL</code></td><td><em>(unset)</em></td><td>Base URL of the Carapace API, e.g. <code>http://carapace:8080</code>. Screenshots disabled if unset.</td></tr>
+            <tr><td><code>CARAPACE_API_KEY</code></td><td><em>(unset)</em></td><td>Optional API key sent in <code>X-Api-Key</code> header to Carapace</td></tr>
+            <tr><td><code>CARAPACE_SCREENSHOT_TIMEOUT</code></td><td><code>20</code></td><td>Per-request timeout in seconds for Carapace render calls</td></tr>
           </tbody>
         </table>
       </div>
@@ -537,6 +546,56 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
         </table>
       </div>
 
+      <!-- ── Carapace ── -->
+      <h2 id="carapace"><i class="bi bi-camera me-2" style="color:var(--accent);"></i>Visual Renderer (Carapace)</h2>
+      <p>
+        <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> is an optional companion
+        service that provides a Chromium-headless visual screenshot of each scanned URL.
+        It renders the page with <strong>JavaScript entirely disabled</strong> and
+        <strong>all network access blocked</strong> — giving analysts a pixel-perfect view of what a real
+        visitor sees while guaranteeing no drive-by code executes during analysis.
+      </p>
+      <p>
+        Carapace runs as a separate Docker service alongside the Insight backend. When
+        <code>CARAPACE_URL</code> is configured, every scan automatically calls the
+        <code>POST /render</code> endpoint and the screenshot is stored with the scan result.
+        If Carapace is unavailable the scan continues normally — it is entirely best-effort.
+      </p>
+      <p>In addition to the screenshot, Carapace returns a <strong>threat report</strong> with:</p>
+      <ul>
+        <li>A <strong>risk score</strong> (0–100) derived from renderer-level observations</li>
+        <li><strong>Threat flags</strong> — findings from the renderer converted directly into Insight findings under the <code>Renderer</code> category</li>
+        <li><strong>Technology detections</strong> — a DOM-parsed tech stack that is merged with Insight's own BeautifulSoup-based detections, catching things a static parser may miss</li>
+      </ul>
+      <div class="callout">
+        Carapace is open-source and available at
+        <a href="https://github.com/DanDreadless/Carapace" target="_blank">github.com/DanDreadless/Carapace</a>.
+        It is designed to be deployed as a sidecar alongside Insight — see the Carapace README for
+        setup instructions.
+      </div>
+
+      <h2 id="carapace-findings"><i class="bi bi-flag me-2" style="color:var(--accent);"></i>Renderer Findings</h2>
+      <p>
+        Threat flags from Carapace are converted to Insight findings in the <code>Renderer</code> category.
+        Sanitisation-behaviour codes that fire on almost every real page (e.g.
+        <code>BLOCKED_ELEMENT_SCRIPT</code>, <code>NETWORK_ATTEMPT_BLOCKED</code>) are suppressed — only
+        signals with independent threat value are surfaced.
+      </p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Severity</th><th>Flag</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Drive-by download blocked</td><td>Renderer intercepted an automatic file download — filename, MIME type, and SHA-256 recorded without executing the file</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>JS eval detected</td><td><code>eval()</code> or <code>new Function()</code> execution observed at render time — runtime obfuscation</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Exfiltration attempt blocked</td><td>Outbound XHR / fetch to an external domain intercepted by the network block</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Credential field on HTTP</td><td>Password input found on an unencrypted page — credentials would be sent in plaintext</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Redirect chain detected</td><td>Multiple HTTP redirects observed before final page load — common in traffic distribution systems</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Suspicious download link</td><td>Executable file linked from page content (<code>.exe</code>, <code>.msi</code>, <code>.ps1</code>, etc.)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DevTools evasion detected</td><td>Renderer-side debugger / devtools detection attempt observed</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <!-- ── API Reference ── -->
       <h2 id="api-ref"><i class="bi bi-braces me-2" style="color:var(--accent);"></i>API Endpoints</h2>
       <p>All endpoints are under <code>/api/</code>. No authentication is required — rate limiting is enforced per IP address.</p>
@@ -573,6 +632,7 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td>Frontend</td><td>React 19 / TypeScript / Vite / Tailwind CSS 4</td></tr>
             <tr><td>Database</td><td>SQLite (development) / PostgreSQL (production)</td></tr>
             <tr><td>Cache / broker</td><td>Redis</td></tr>
+            <tr><td>Visual renderer</td><td><a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> — Chromium-headless screenshot service (optional sidecar)</td></tr>
           </tbody>
         </table>
       </div>
@@ -613,6 +673,11 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
         <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
       </div>
 
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:1.5rem;">Visual Renderer</p>
+      <div class="ack-wrap">
+        <a class="ack-pill" href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a>
+      </div>
+
     </main>
   </div><!-- /docs-wrap -->
 </div><!-- /container -->
@@ -624,7 +689,9 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       <a href="index.html">Home</a>
       <a href="vault1337.html">Vault1337 Docs</a>
       <a href="insight.html">Insight Docs</a>
+      <a href="https://insight.vault1337.com" target="_blank">Live Site</a>
       <a href="https://github.com/DanDreadless/Insight" target="_blank">Insight GitHub</a>
+      <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace GitHub</a>
       <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Vault1337 GitHub</a>
       <a href="https://github.com/DanDreadless/Insight/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
       <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>

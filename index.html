@@ -29,6 +29,7 @@
         <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="vault1337.html">Vault1337</a></li>
         <li class="nav-item"><a class="nav-link" href="insight.html">Insight</a></li>
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a></li>
         <li class="nav-item">
           <a class="nav-link nav-gh" href="https://github.com/DanDreadless" target="_blank">
             <i class="bi bi-github me-1"></i>GitHub
@@ -47,6 +48,7 @@
     <div class="cta" style="justify-content:center; margin-bottom:1.5rem;">
       <a href="#vault1337" class="btn-v outline"><i class="bi bi-bug-fill me-1"></i>Vault1337</a>
       <a href="#insight" class="btn-v outline"><i class="bi bi-radar me-1"></i>Insight</a>
+      <a href="https://github.com/DanDreadless/Carapace" target="_blank" class="btn-v outline"><i class="bi bi-camera me-1"></i>Carapace</a>
     </div>
     <div class="badge-row">
       <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" alt="Python">
@@ -61,9 +63,9 @@
 <section class="section" id="tools">
   <div class="container">
     <p class="s-sub mb-1">The Toolkit</p>
-    <h2 class="s-head">Two Tools. One Security Workflow.</h2>
+    <h2 class="s-head">Three Tools. One Security Workflow.</h2>
     <p style="color:var(--muted); font-size:.95rem; max-width:680px; margin: .5rem auto 2.5rem; text-align:center;">
-      Vault1337 and Insight are companion tools built on the same stack and design system. Together they cover the full analyst workflow — from suspicious URL to dissected sample.
+      Vault1337, Insight, and Carapace are companion tools built on the same stack and design system. Together they cover the full analyst workflow — from suspicious URL to dissected sample.
     </p>
     <div class="row g-4">
 
@@ -134,9 +136,43 @@
             <a href="https://github.com/DanDreadless/Insight" target="_blank" class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem;">
               <i class="bi bi-github me-1"></i>GitHub
             </a>
-            <!-- <a href="https://insight.vault1337.com" target="_blank" class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem;">
+            <a href="https://insight.vault1337.com" target="_blank" class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem;">
               <i class="bi bi-globe me-1"></i>Live Site
-            </a> -->
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carapace -->
+      <div class="col-lg-6">
+        <div class="f-card" style="padding: 2rem; height:100%;">
+          <div style="display:flex; align-items:center; gap:.75rem; margin-bottom:1.2rem;">
+            <div class="f-icon" style="width:2.8rem; height:2.8rem; font-size:1.2rem; flex-shrink:0;">
+              <i class="bi bi-camera"></i>
+            </div>
+            <div>
+              <h3 style="font-size:1.15rem; font-weight:700; margin:0;">Carapace</h3>
+              <p style="color:var(--muted); font-size:.8rem; margin:0;">Visual Renderer for Insight</p>
+            </div>
+          </div>
+          <p style="color:var(--muted); font-size:.875rem; margin-bottom:1.2rem;">
+            Optional sidecar service that renders each scanned URL using Chromium headless with JavaScript
+            disabled and all network access blocked. Gives analysts a pixel-perfect screenshot of what a real
+            visitor would see, plus a renderer-level threat report — all without executing any malicious code.
+          </p>
+          <ul style="color:var(--muted); font-size:.82rem; padding-left:1.2rem; margin-bottom:1.4rem;">
+            <li>Safe Chromium render — JS disabled, network blocked, no code execution risk</li>
+            <li>Detects drive-by downloads, eval() chains, exfiltration attempts at render time</li>
+            <li>Risk score (0–100) and structured threat flags fed directly into Insight findings</li>
+            <li>Browser-grade technology detection merged with Insight's static analysis</li>
+          </ul>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+            <a href="https://github.com/DanDreadless/Carapace" target="_blank" class="btn-v solid" style="font-size:.84rem; padding:.4rem 1rem;">
+              <i class="bi bi-github me-1"></i>GitHub
+            </a>
+            <a href="insight.html#carapace" class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem;">
+              <i class="bi bi-book me-1"></i>Documentation
+            </a>
           </div>
         </div>
       </div>
@@ -366,13 +402,14 @@
         <p class="s-sub mb-1">About</p>
         <h2 class="s-head">About the Projects</h2>
         <p class="mt-3" style="color:var(--muted); font-size:.95rem;">
-          Both tools started as hands-on learning exercises and grew into full-stack applications used in practice.
-          Vault1337 runs on a Raspberry Pi 5 for personal malware research. Insight is deployed publicly for
-          quick URL triage before visiting suspicious links.
+          These tools started as hands-on learning exercises and grew into full-stack applications used in practice.
+          Vault1337 runs on a Raspberry Pi 5 for personal malware research. Insight is live at
+          <a href="https://insight.vault1337.com" target="_blank">insight.vault1337.com</a> for quick URL triage
+          before visiting suspicious links. Carapace runs alongside Insight as an optional visual renderer.
         </p>
         <p style="color:var(--muted); font-size:.95rem;">
           All code is open-source under AGPL-3.0. The shared design system, stack (Django + DRF + React + Vite +
-          Tailwind), and security philosophy mean both tools feel like one product rather than two separate projects.
+          Tailwind), and security philosophy mean all three tools feel like one product.
         </p>
         <div class="mt-3" style="display:flex; gap:.6rem; flex-wrap:wrap;">
           <a href="https://github.com/DanDreadless" target="_blank" class="btn-v solid" style="font-size:.85rem; padding:.4rem 1rem;">
@@ -403,14 +440,18 @@
               <i class="bi bi-radar" style="color:var(--accent);"></i>
               Insight Documentation
             </a>
-            <a href="https://github.com/DanDreadless/Insight" target="_blank" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
+            <a href="https://github.com/DanDreadless/Insight" target="_blank" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
               <i class="bi bi-github" style="color:var(--accent);"></i>
               Insight on GitHub
             </a>
-            <!-- <a href="https://insight.vault1337.com" target="_blank" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
+            <a href="https://insight.vault1337.com" target="_blank" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
               <i class="bi bi-globe" style="color:var(--accent);"></i>
-              Insight Live Demo
-            </a> -->
+              Insight — Live Site
+            </a>
+            <a href="https://github.com/DanDreadless/Carapace" target="_blank" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
+              <i class="bi bi-github" style="color:var(--accent);"></i>
+              Carapace on GitHub
+            </a>
           </div>
         </div>
       </div>
@@ -425,8 +466,10 @@
       <a href="index.html">Home</a>
       <a href="vault1337.html">Vault1337 Docs</a>
       <a href="insight.html">Insight Docs</a>
+      <a href="https://insight.vault1337.com" target="_blank">Insight Live</a>
       <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Vault1337 GitHub</a>
       <a href="https://github.com/DanDreadless/Insight" target="_blank">Insight GitHub</a>
+      <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace GitHub</a>
       <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
     </div>
     <p>DanDreadless &mdash; Security Tools &mdash; &copy; <span id="yr"></span></p>
