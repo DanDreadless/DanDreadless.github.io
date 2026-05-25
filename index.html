@@ -54,7 +54,7 @@
       <img src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white" alt="Python">
       <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white" alt="Django">
       <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
-      <img src="https://img.shields.io/badge/AGPL--3.0-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
     </div>
   </div>
 </section>
@@ -124,8 +124,8 @@
             newly injected skimmers that reputation feeds haven't yet indexed.
           </p>
           <ul style="color:var(--muted); font-size:.82rem; padding-left:1.2rem; margin-bottom:1.4rem;">
-            <li>30 JavaScript threat checks — skimmers, keyloggers, ClickFix, wallet drainers, obfuscation</li>
-            <li>21+ HTML checks — phishing forms, hidden iframes, fake CAPTCHA, SocGholish/ClearFake</li>
+            <li>58 JavaScript threat checks — skimmers, keyloggers, ClickFix, wallet drainers, drainer configs, blockchain C2, JSFuck/JJEncode/XOR obfuscation</li>
+            <li>33+ HTML checks — phishing forms, OTP relay, hidden iframes, fake CAPTCHA, tampered GTM, drainer injection</li>
             <li>Domain intelligence — typosquats, homographs, DGA, newly registered domains</li>
             <li>Context collapse engine — correlates signals into CRITICAL synthetic findings</li>
           </ul>
@@ -157,14 +157,15 @@
           </div>
           <p style="color:var(--muted); font-size:.875rem; margin-bottom:1.2rem;">
             Optional sidecar service that renders each scanned URL using Chromium headless with JavaScript
-            disabled and all network access blocked. Gives analysts a pixel-perfect screenshot of what a real
-            visitor would see, plus a renderer-level threat report — all without executing any malicious code.
+            fully enabled but all network requests intercepted and blocked. This lets dynamic overlays — ClickFix,
+            SocGholish, ClearFake, drainers — execute and render visibly in the screenshot, revealing the actual
+            attack UI rather than a blank page. A verdict badge is composited onto every screenshot.
           </p>
           <ul style="color:var(--muted); font-size:.82rem; padding-left:1.2rem; margin-bottom:1.4rem;">
-            <li>Safe Chromium render — JS disabled, network blocked, no code execution risk</li>
-            <li>Detects drive-by downloads, eval() chains, exfiltration attempts at render time</li>
+            <li>Safe Chromium render — JS enabled, network intercepted and blocked, dynamic overlays captured</li>
+            <li>Detects drive-by downloads, eval() chains, clipboard hijacks, and exfiltration at render time</li>
             <li>Risk score (0–100) and structured threat flags fed directly into Insight findings</li>
-            <li>Browser-grade technology detection merged with Insight's static analysis</li>
+            <li>Browser-grade technology detection and mobile screenshot (375×844 iPhone viewport) support</li>
           </ul>
           <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
             <a href="https://github.com/DanDreadless/Carapace" target="_blank" class="btn-v solid" style="font-size:.84rem; padding:.4rem 1rem;">
@@ -258,7 +259,7 @@
             <div class="f-card">
               <div class="f-icon"><i class="bi bi-code-slash"></i></div>
               <h5>JavaScript Threat Engine</h5>
-              <p>30 checks — Magecart skimmers, keyloggers, ClickFix clipboard payloads, wallet drainers, obfuscation patterns, shell droppers, and more. Base64 decoded inline.</p>
+              <p>58 checks — Magecart skimmers, keyloggers, ClickFix payloads, wallet drainers, blockchain C2 loaders, JSFuck/JJEncode/XOR obfuscation, ChaCha20 payloads, NDSW injection, AppleScript infostealers, and more.</p>
             </div>
           </div>
 
@@ -266,7 +267,7 @@
             <div class="f-card">
               <div class="f-icon"><i class="bi bi-file-earmark-code"></i></div>
               <h5>HTML Structural Analysis</h5>
-              <p>21+ checks — phishing forms, hidden iframes, fake browser update pages (SocGholish), ClickFix CAPTCHA pages, clickjacking overlays, and WordPress injection patterns.</p>
+              <p>33+ checks — phishing forms, OTP relay (AiTM), tampered GTM snippets, copyright impersonation, wallet extension injection, ClickFix CAPTCHA pages, WebDAV infrastructure, and more.</p>
             </div>
           </div>
 
@@ -408,7 +409,7 @@
           before visiting suspicious links. Carapace runs alongside Insight as an optional visual renderer.
         </p>
         <p style="color:var(--muted); font-size:.95rem;">
-          All code is open-source under AGPL-3.0. The shared design system, stack (Django + DRF + React + Vite +
+          All code is open-source under the MIT License. The shared design system, stack (Django + DRF + React + Vite +
           Tailwind), and security philosophy mean all three tools feel like one product.
         </p>
         <div class="mt-3" style="display:flex; gap:.6rem; flex-wrap:wrap;">

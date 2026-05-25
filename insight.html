@@ -55,7 +55,7 @@
       <a href="https://github.com/DanDreadless/Insight" target="_blank" class="btn-v outline"><i class="bi bi-github me-1"></i>View on GitHub</a>
     </div>
     <div class="badge-row">
-      <img src="https://img.shields.io/badge/AGPL--3.0-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
       <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python">
       <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white" alt="Django">
       <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
@@ -309,10 +309,10 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       </p>
       <p>Five analysis modules run against every scan:</p>
       <ul>
-        <li><strong>JavaScript analyser</strong> — 30 checks against all scripts collected from the page</li>
-        <li><strong>HTML analyser</strong> — 18 structural checks against the page markup</li>
-        <li><strong>Domain intelligence</strong> — 10 checks on the hostname and TLD</li>
-        <li><strong>Header analyser</strong> — 12 checks on HTTP response headers</li>
+        <li><strong>JavaScript analyser</strong> — 58 checks against all scripts collected from the page</li>
+        <li><strong>HTML analyser</strong> — 33+ structural checks against the page markup</li>
+        <li><strong>Domain intelligence</strong> — 12 checks on the hostname and TLD</li>
+        <li><strong>Header analyser</strong> — 15 checks on HTTP response headers</li>
         <li><strong>SSL analyser</strong> — 6 checks on the TLS certificate</li>
       </ul>
       <p>
@@ -551,9 +551,10 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       <p>
         <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> is an optional companion
         service that provides a Chromium-headless visual screenshot of each scanned URL.
-        It renders the page with <strong>JavaScript entirely disabled</strong> and
-        <strong>all network access blocked</strong> — giving analysts a pixel-perfect view of what a real
-        visitor sees while guaranteeing no drive-by code executes during analysis.
+        It renders the page with <strong>JavaScript fully enabled</strong> but
+        <strong>all network requests intercepted and blocked</strong> — allowing dynamic overlays (ClickFix,
+        SocGholish, ClearFake, drainers) to execute and render visibly in the screenshot, revealing the
+        actual attack UI. A verdict badge is composited onto every screenshot.
       </p>
       <p>
         Carapace runs as a separate Docker service alongside the Insight backend. When
@@ -693,7 +694,7 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       <a href="https://github.com/DanDreadless/Insight" target="_blank">Insight GitHub</a>
       <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace GitHub</a>
       <a href="https://github.com/DanDreadless/Vault1337" target="_blank">Vault1337 GitHub</a>
-      <a href="https://github.com/DanDreadless/Insight/blob/main/LICENSE" target="_blank">AGPL-3.0</a>
+      <a href="https://github.com/DanDreadless/Insight/blob/main/LICENSE" target="_blank">MIT License</a>
       <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
     </div>
     <p>Vault1337 &mdash; Insight &mdash; &copy; <span id="yr"></span></p>
