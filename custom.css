@@ -144,7 +144,7 @@ body {
 .v-table td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
 .v-table tr:last-child td { border-bottom: none; }
 .v-table tr:hover td { background: rgba(255,255,255,.018); }
-.v-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; overflow-x: auto; }
+.v-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* ── Code ── */
 pre {
@@ -177,6 +177,7 @@ pre code { background: none; padding: 0; font-size: inherit; }
   display: flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: .78rem; margin-top: .18rem;
 }
+.step-b { min-width: 0; }
 .step-b h5 { font-weight: 600; font-size: .92rem; margin-bottom: .25rem; }
 .step-b p  { color: var(--muted); font-size: .86rem; margin-bottom: .6rem; }
 
