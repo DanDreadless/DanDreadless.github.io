@@ -153,6 +153,7 @@ pre {
   border-radius: 6px;
   padding: 1rem 1.2rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   font-size: .83rem;
   line-height: 1.6;
   color: #c9d1d9;
@@ -212,6 +213,7 @@ pre code { background: none; padding: 0; font-size: inherit; }
   overflow-y: auto;
   padding-right: .5rem;
 }
+.docs-content { min-width: 0; }
 .d-nav { list-style: none; padding: 0; margin: 0; }
 .d-nav .d-group {
   font-size: .68rem; text-transform: uppercase;
@@ -257,12 +259,50 @@ footer {
   color: var(--muted);
   font-size: .8rem;
 }
-.f-links { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: .6rem; }
+.f-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; row-gap: .4rem; margin-bottom: .6rem; }
 .f-links a { color: var(--muted); text-decoration: none; transition: color .15s; }
 .f-links a:hover { color: var(--accent); }
 footer p { margin: 0; }
 
+/* ── Workflow connected cards ── */
+.wf-card-start {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px 0 0 8px;
+  padding: 1.75rem;
+  height: 100%;
+}
+.wf-card-mid {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1.75rem;
+  height: 100%;
+  position: relative;
+}
+.wf-card-end {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0 8px 8px 0;
+  padding: 1.75rem;
+  height: 100%;
+}
+.wf-connector {
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 2px; height: 60%;
+  background: var(--accent); opacity: .3; border-radius: 2px;
+}
+
 /* ── Responsive ── */
+@media (max-width: 991px) {
+  .wf-card-start, .wf-card-mid, .wf-card-end {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .wf-connector { display: none; }
+  .nav-gh { margin-left: 0; }
+}
 @media (max-width: 768px) {
   .docs-wrap { grid-template-columns: 1fr; }
   .docs-sidebar { display: none; }
@@ -274,4 +314,6 @@ footer p { margin: 0; }
     width: 65vw;
     max-width: 240px;
   }
+  .f-links { gap: 1rem; }
+  .hero { padding: 4rem 1rem 3.5rem; }
 }
