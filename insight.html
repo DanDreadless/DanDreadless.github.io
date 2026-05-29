@@ -295,7 +295,7 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><code>SCAN_TIMEOUT_SECONDS</code></td><td><code>60</code></td><td>Hard Celery task time limit</td></tr>
             <tr><td><code>CARAPACE_URL</code></td><td><em>(unset)</em></td><td>Base URL of the Carapace API, e.g. <code>http://carapace:8080</code>. Screenshots disabled if unset.</td></tr>
             <tr><td><code>CARAPACE_API_KEY</code></td><td><em>(unset)</em></td><td>Optional API key sent in <code>X-Api-Key</code> header to Carapace</td></tr>
-            <tr><td><code>CARAPACE_SCREENSHOT_TIMEOUT</code></td><td><code>20</code></td><td>Per-request timeout in seconds for Carapace render calls</td></tr>
+            <tr><td><code>CARAPACE_SCREENSHOT_TIMEOUT</code></td><td><code>30</code></td><td>Per-request timeout in seconds for Carapace render calls</td></tr>
           </tbody>
         </table>
       </div>
@@ -309,9 +309,9 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       </p>
       <p>Five analysis modules run against every scan:</p>
       <ul>
-        <li><strong>JavaScript analyser</strong> — 58 checks against all scripts collected from the page</li>
+        <li><strong>JavaScript analyser</strong> — 59 checks against all scripts collected from the page</li>
         <li><strong>HTML analyser</strong> — 33+ structural checks against the page markup</li>
-        <li><strong>Domain intelligence</strong> — 12 checks on the hostname and TLD</li>
+        <li><strong>Domain intelligence</strong> — 14 checks on the hostname and TLD</li>
         <li><strong>Header analyser</strong> — 15 checks on HTTP response headers</li>
         <li><strong>SSL analyser</strong> — 6 checks on the TLS certificate</li>
       </ul>
@@ -463,11 +463,14 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>IDN / homograph attack — Cyrillic or mixed-script characters in domain</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Brand keyword in registered domain (e.g. <code>paypal-secure.com</code>) — attacker owns the SLD</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>High-risk TLD (<code>.xyz</code>, <code>.top</code>, <code>.click</code>, <code>.loan</code>, <code>.zip</code>, <code>.cyou</code>, and 20+ more) — strong context signal, not conclusive alone</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score &gt; 0.6 (consonant ratio + entropy + English subword absence)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>DGA probability score &gt; 0.8 — strong algorithmic generation signal, characteristics consistent with C2 infrastructure</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score 0.6–0.8 (consonant ratio + entropy + English subword absence)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Digit substitution in SLD (e.g. <code>g00gle</code>, <code>faceb00k</code>)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Excessive subdomain depth (&gt; 4 labels)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Hosted on abuse-prone free platform with long random subdomain (Cloudflare R2, Pages.dev, Firebase)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Newly registered domain (&le; 30 days old) — disproportionately present in threat feeds; requires WHOIS data</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Subdomain encodes a domain via dot-to-hyphen substitution (e.g. <code>support-paypal-com.zapier.app</code>) — phishing-as-a-service technique using free subdomain hosting; HIGH if hosted on an abuse-prone platform</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Delivery/postal brand keyword embedded in SLD (USPS, FedEx, DHL) without being the official site — fake parcel notification phishing</td></tr>
             <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Recently registered domain (31–90 days old) — context signal for analysts</td></tr>
           </tbody>
         </table>
@@ -539,8 +542,8 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td>Web Server</td><td>nginx, Apache, Caddy, Gunicorn, LiteSpeed</td></tr>
             <tr><td>CDN</td><td>Cloudflare, AWS CloudFront, Fastly, Akamai, jsDelivr</td></tr>
             <tr><td>Hosting</td><td>Vercel, Netlify, GitHub Pages, Firebase, Render</td></tr>
-            <tr><td>Analytics</td><td>Google Analytics, Google Tag Manager, Facebook Pixel, Hotjar, Intercom, Mixpanel, Plausible, Matomo, TikTok Pixel, LinkedIn Insight</td></tr>
-            <tr><td>Security</td><td>Cloudflare Turnstile, reCAPTCHA, Cloudflare Bot Management</td></tr>
+            <tr><td>Analytics</td><td>Google Analytics, Google Tag Manager, Facebook Pixel, Hotjar, Intercom, Mixpanel, Plausible, Matomo, TikTok Pixel, LinkedIn Insight, Cloudflare Web Analytics</td></tr>
+            <tr><td>Security</td><td>Cloudflare Turnstile, reCAPTCHA, hCaptcha, Cloudflare Bot Management</td></tr>
             <tr><td>Payment</td><td>Stripe, PayPal, Square, Klarna</td></tr>
           </tbody>
         </table>
