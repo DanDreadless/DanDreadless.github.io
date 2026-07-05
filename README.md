@@ -11,10 +11,9 @@ Source for [vault1337.com](https://vault1337.com) — the project homepage for t
 | **Vault1337** | Self-hosted malware analysis platform | [Docs](https://vault1337.com/vault1337.html) · [Docker Hub](https://hub.docker.com/r/vault1337/vault1337) |
 | **Insight** | Passive web threat scanner — content-based, no reputation APIs | [Docs](https://vault1337.com/insight.html) · [Live](https://insight.vault1337.com) |
 
-> **Note:** the **Vault1337** and **Insight** source repositories are temporarily **private** while a conflict of
-> interest is resolved. Their documentation, the live Insight scanner, and the Vault1337 Docker Hub image remain
-> available; source access is on request until further notice. **Minos** (GPLv3) and **Carapace** stay fully
-> open-source on GitHub.
+> **Note:** the **Vault1337** and **Insight** source repositories have been made **private** until further notice.
+> Their documentation, the live Insight scanner, and the Vault1337 Docker Hub image remain available — any interest
+> in source access should be made directly. **Minos** (GPLv3) and **Carapace** stay fully open-source on GitHub.
 
 ## Pages
 
