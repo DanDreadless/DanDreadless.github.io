@@ -192,6 +192,22 @@ pre code { background: none; padding: 0; font-size: inherit; }
 }
 .callout strong { color: #e06065; }
 
+/* ── Private repo badge ── */
+.repo-private {
+  display: inline-flex; align-items: center;
+  vertical-align: middle;
+  background: rgba(189,54,58,.14);
+  border: 1px solid var(--accent);
+  color: #e06065;
+  border-radius: 20px;
+  padding: .05rem .55rem;
+  font-size: .62rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 /* ── Ack pills ── */
 .ack-wrap { display: flex; flex-wrap: wrap; gap: .45rem; }
 .ack-pill {

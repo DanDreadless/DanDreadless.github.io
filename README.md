@@ -1,18 +1,25 @@
 # vault1337.com — GitHub Pages Site
 
-Source for [vault1337.com](https://vault1337.com) — the project homepage for three open-source security tools built by [@DanDreadless](https://github.com/DanDreadless).
+Source for [vault1337.com](https://vault1337.com) — the project homepage for the open-source security tools built by [@DanDreadless](https://github.com/DanDreadless).
 
 ## Tools
 
-| Tool | Description | Repo |
-|------|-------------|------|
-| **Vault1337** | Self-hosted malware analysis platform | [GitHub](https://github.com/DanDreadless/Vault1337) |
-| **Insight** | Passive web threat scanner — content-based, no reputation APIs | [GitHub](https://github.com/DanDreadless/Insight) |
-| **Carapace** | Safe HTML/CSS/JS renderer (Rust) — Chromium headless with network intercept | [GitHub](https://github.com/DanDreadless/Carapace) |
+| Tool | Description | Links |
+|------|-------------|-------|
+| **Minos** | Modern DNS sinkhole / Pi-hole alternative — a single static Go binary with an embedded web UI, light enough for a Raspberry Pi | [GitHub](https://github.com/DanDreadless/minos) · [Docs](https://vault1337.com/minos.html) |
+| **Carapace** | Safe web renderer (Rust) — Chromium headless with JavaScript enabled and all network requests intercepted and blocked | [GitHub](https://github.com/DanDreadless/Carapace) |
+| **Vault1337** | Self-hosted malware analysis platform | [Docs](https://vault1337.com/vault1337.html) · [Docker Hub](https://hub.docker.com/r/vault1337/vault1337) |
+| **Insight** | Passive web threat scanner — content-based, no reputation APIs | [Docs](https://vault1337.com/insight.html) · [Live](https://insight.vault1337.com) |
+
+> **Note:** the **Vault1337** and **Insight** source repositories are temporarily **private** while a conflict of
+> interest is resolved. Their documentation, the live Insight scanner, and the Vault1337 Docker Hub image remain
+> available; source access is on request until further notice. **Minos** (GPLv3) and **Carapace** stay fully
+> open-source on GitHub.
 
 ## Pages
 
 - `index.html` — Landing page with tool overview
+- `minos.html` — Minos full documentation
 - `vault1337.html` — Vault1337 full documentation
 - `insight.html` — Insight full documentation (includes Carapace integration section)
 

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Minos documentation — a modern DNS sinkhole and Pi-hole alternative written in Go. Install, deploy on a Raspberry Pi, configure, and use.">
+  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, adguard alternative, dns, doh, dot, go, raspberry pi, adblock">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
+  <title>Minos - Documentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="Images/vault-logo.png" alt="DanDreadless">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="minos.html">Minos</a></li>
+        <li class="nav-item"><a class="nav-link" href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a></li>
+        <li class="nav-item"><a class="nav-link" href="vault1337.html">Vault1337</a></li>
+        <li class="nav-item"><a class="nav-link" href="insight.html">Insight</a></li>
+        <li class="nav-item">
+          <a class="nav-link nav-gh" href="https://github.com/DanDreadless/minos" target="_blank">
+            <i class="bi bi-github me-1"></i>GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page header ────────────────────────────────────────────────────────── -->
+<div class="hero" style="padding: 3.5rem 1rem 3rem;">
+  <div class="container">
+    <p class="s-sub mb-1" style="color:var(--muted);">Modern DNS sinkhole &middot; Pi-hole alternative</p>
+    <img src="Images/minos-banner.png" alt="Minos — DNS server" style="max-width:min(460px,80vw); width:100%; height:auto; margin-bottom:1rem; filter:drop-shadow(0 0 24px rgba(189,54,58,.35));">
+    <p class="sub" style="max-width:640px; margin:0 auto 1.5rem;">
+      <em>Every query gets judged.</em> A single static Go binary with an embedded web UI, light enough for a
+      Raspberry Pi. Every DNS query is judged against your blocklists and sentenced — allowed queries are
+      forwarded upstream over encrypted DoH or DoT. No telemetry, ever.
+    </p>
+    <div class="cta">
+      <a href="#quick-start" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Quick Start</a>
+      <a href="#features" class="btn-v outline"><i class="bi bi-list-check me-1"></i>What It Does</a>
+      <a href="https://github.com/DanDreadless/minos" target="_blank" class="btn-v outline"><i class="bi bi-github me-1"></i>View on GitHub</a>
+    </div>
+    <div class="badge-row">
+      <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white" alt="Go">
+      <img src="https://img.shields.io/badge/Docker-multi--arch-2496ED?logo=docker&logoColor=white" alt="Docker">
+      <img src="https://img.shields.io/badge/Raspberry%20Pi-ready-A22846?logo=raspberrypi&logoColor=white" alt="Raspberry Pi">
+    </div>
+  </div>
+</div>
+
+<!-- ── Docs body ──────────────────────────────────────────────────────────── -->
+<div class="container section">
+  <div class="docs-wrap">
+
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <ul class="d-nav">
+        <li class="d-group">Overview</li>
+        <li><a href="#overview">What is Minos</a></li>
+        <li><a href="#features">What It Does</a></li>
+
+        <li class="d-group">Getting Started</li>
+        <li><a href="#quick-start">Quick Start</a></li>
+        <li><a href="#install-script">Install Script</a></li>
+        <li><a href="#docker">Docker</a></li>
+        <li><a href="#build">Build From Source</a></li>
+        <li><a href="#first-run">First Run</a></li>
+        <li><a href="#cli">CLI Verbs</a></li>
+
+        <li class="d-group">Deployment</li>
+        <li><a href="#deploy">Raspberry Pi / Linux</a></li>
+        <li><a href="#encrypted-dns">Encrypted DNS</a></li>
+
+        <li class="d-group">Using Minos</li>
+        <li><a href="#family">Family Controls</a></li>
+        <li><a href="#network">Network Features</a></li>
+        <li><a href="#monitoring">Dashboard, Metrics &amp; API</a></li>
+        <li><a href="#migrate">Migrating In</a></li>
+
+        <li class="d-group">Reference</li>
+        <li><a href="#docs">Documentation</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#developing">Developing</a></li>
+        <li><a href="#license">License</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="docs-content">
+
+      <!-- ── Overview ── -->
+      <h2 id="overview"><i class="bi bi-shield-shaded me-2" style="color:var(--accent);"></i>What is Minos</h2>
+      <p>
+        Minos is a modern, user-friendly DNS sinkhole — a Pi-hole alternative — written in Go. It ships as a single
+        static binary with an embedded web UI, light enough to run on a Raspberry Pi Zero through a Pi 4. Named for
+        the judge of the underworld, every DNS query that arrives is judged against your blocklists and sentenced —
+        no exceptions, no appeals (well, except pardons).
+      </p>
+      <p>
+        Blocked queries are answered with <code>0.0.0.0</code>/<code>::</code> or <code>NXDOMAIN</code> (your choice);
+        allowed queries are forwarded upstream over encrypted DoH or DoT (plaintext optional). Everything is managed
+        live from the web dashboard — no restarts — and nothing is ever sent home. No telemetry, ever.
+      </p>
+      <div class="callout"><strong>Open-source:</strong> Minos is released under the GPLv3 licence. The full source, issue tracker, and releases live at <a href="https://github.com/DanDreadless/minos" target="_blank">github.com/DanDreadless/minos</a>.</div>
+
+      <!-- ── Features ── -->
+      <h2 id="features"><i class="bi bi-list-check me-2" style="color:var(--accent);"></i>What It Does</h2>
+
+      <h3>Filtering</h3>
+      <ul>
+        <li>Listens for DNS queries on <code>:53</code> (UDP + TCP) and judges each one against compiled blocklists (hosts, plain, and AdBlock formats).</li>
+        <li>Blocked queries get <code>0.0.0.0</code>/<code>::</code> or <code>NXDOMAIN</code> (your choice); allowed queries are forwarded upstream over DoH or DoT.</li>
+        <li>Every blocked query shows <em>which list and rule</em> condemned it, with a one-click pardon from the live log — never more than two clicks from seeing a block to allowing it.</li>
+        <li>Repeat queries are answered from a built-in response cache — concurrent identical queries collapse into one, and stale answers are served instantly while a fresh one is fetched behind them (RFC 8767).</li>
+        <li>A failing upstream is sidestepped automatically and re-probed until it recovers — one dead resolver never slows the whole network.</li>
+      </ul>
+
+      <h3>For the household</h3>
+      <ul>
+        <li>Device tracking (IP, MAC, hostname) with per-device groups: extra rules, full bypass, or no DNS at all — plus a one-click block for any device.</li>
+        <li>One-click blocked services (TikTok, YouTube, Discord…) — globally or per group, with optional schedules ("no social media after 21:00").</li>
+        <li>Safe Search enforcement (Google, Bing, DuckDuckGo, YouTube) — network-wide or per group, enforced by the provider so it can't be switched off.</li>
+      </ul>
+
+      <h3>For the network</h3>
+      <ul>
+        <li>Local DNS records for your LAN (<code>nas.home.lab</code>, wildcards, CNAMEs, PTR).</li>
+        <li>Conditional forwarding: route <code>lan</code> or your reverse zone to the router.</li>
+        <li>Private reverse zones answered locally (RFC 6303) — <code>192.168.x.x</code> lookups never leak to public resolvers.</li>
+        <li>Serves encrypted DNS to clients: DoT for Android Private DNS, DoH at <code>/dns-query</code> — bring a certificate, or let Minos fetch and renew one automatically.</li>
+      </ul>
+
+      <h3>Running it</h3>
+      <ul>
+        <li>Web dashboard with query charts, top blocked domains, busiest clients, cache hit rate, and a live query log streamed over WebSocket.</li>
+        <li>Full management from the UI: blocklists, allow/deny domains, upstreams, blocking mode, retention, API token — all applied live, no restarts.</li>
+        <li>Prometheus <code>/metrics</code> with a ready-made Grafana dashboard — scrape-only, never pushes.</li>
+        <li>A fully documented REST API with Home Assistant recipes — everything the UI does, your automations can do.</li>
+        <li>Webhook / <a href="https://ntfy.sh" target="_blank">ntfy</a> notifications: a new device on your network, an upstream failing or recovering, a new release.</li>
+        <li>Opt-in update check — off by default, and nothing is sent beyond the request itself.</li>
+        <li>Batched SQLite persistence that respects SD cards. <strong>No telemetry. Ever.</strong></li>
+      </ul>
+
+      <!-- ── Quick start ── -->
+      <h2 id="quick-start"><i class="bi bi-play-circle me-2" style="color:var(--accent);"></i>Quick Start</h2>
+      <p>
+        Minos runs on a Raspberry Pi or any Linux box — amd64, arm64, or 32-bit ARM (Pi Zero through Pi 4 on 32-bit
+        Pi OS). Pick the install method that suits you: the one-line install script, Docker, or a build from source.
+      </p>
+
+      <h3 id="install-script">Install script (recommended)</h3>
+      <p>One line installs the latest release and the systemd unit:</p>
+      <pre>curl -fsSL https://raw.githubusercontent.com/DanDreadless/minos/main/deploy/install.sh | sudo sh
+sudo systemctl enable --now minos</pre>
+
+      <h3 id="docker">Docker</h3>
+      <p>Multi-arch images are published on GHCR:</p>
+      <pre>docker run -d --name minos -p 53:53/udp -p 53:53/tcp -p 8080:8080 \
+  -v minos-data:/data ghcr.io/dandreadless/minos:latest</pre>
+      <div class="callout"><strong>Tip:</strong> <code>deploy/</code> in the repo also has a multi-arch Dockerfile and a Compose example — <code>restart: unless-stopped</code> gives the same boot behaviour as the systemd unit.</div>
+
+      <h3 id="build">Build from source</h3>
+      <p>Requires Go 1.22+ and Node 20+:</p>
+      <pre>make build          # builds web UI + single binary into bin/minos
+./bin/minos serve   # starts DNS on :53 and the web UI on :8080</pre>
+
+      <!-- ── First run ── -->
+      <h2 id="first-run"><i class="bi bi-gear me-2" style="color:var(--accent);"></i>First Run</h2>
+      <p>
+        First run writes a commented default config to <code>minos.yaml</code>. Point a device's DNS at the machine
+        running Minos and open <code>http://&lt;host&gt;:8080</code>.
+      </p>
+      <div class="callout"><strong>Local development without root:</strong> set <code>dns.listen: ":5353"</code> in the config and test with <code>dig @127.0.0.1 -p 5353 doubleclick.net</code>.</div>
+
+      <!-- ── CLI ── -->
+      <h2 id="cli"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>CLI Verbs</h2>
+      <p>The CLI talks to the running instance:</p>
+      <pre>minos status        # counters, rules, pause state
+minos pause 5m      # pause blocking for five minutes
+minos resume        # resume blocking
+minos import pihole /etc/pihole   # bring your Pi-hole settings with you</pre>
+
+      <!-- ── Deploy ── -->
+      <h2 id="deploy"><i class="bi bi-hdd-network me-2" style="color:var(--accent);"></i>Deploying on a Raspberry Pi (or any Linux box)</h2>
+      <p>
+        The install script puts the binary in <code>/usr/local/bin</code> and installs the hardened systemd unit.
+        Built from source instead?
+      </p>
+      <pre>sudo install -m 755 bin/minos /usr/local/bin/minos
+sudo cp deploy/minos.service /etc/systemd/system/</pre>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Free port 53</h5>
+          <p>Disable the <code>systemd-resolved</code> stub listener (or <code>dnsmasq</code>) so Minos can bind <code>:53</code>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Give the machine a fixed IP</h5>
+          <p>Clients will point at this address, so it must not change.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Firewall ports 53 / 8080 to your LAN only</h5>
+          <p>Never expose an open resolver or the admin UI to the public internet.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Point your router's DHCP DNS at the machine</h5>
+          <p>Set the DHCP DNS option to the Minos host and every device on the network follows automatically.</p>
+        </div>
+      </div>
+      <p>
+        The step-by-step walkthrough — including host-tuning notes for busy networks — is in
+        <a href="https://github.com/DanDreadless/minos/blob/main/docs/getting-started.md" target="_blank">docs/getting-started.md</a>.
+      </p>
+
+      <!-- ── Encrypted DNS ── -->
+      <h2 id="encrypted-dns"><i class="bi bi-shield-lock me-2" style="color:var(--accent);"></i>Encrypted DNS</h2>
+      <p>
+        Minos forwards upstream over DoH or DoT (plaintext optional) and can also serve encrypted DNS to your clients:
+        DoT for Android Private DNS, and DoH at <code>/dns-query</code>. Bring your own certificate, or let Minos fetch
+        and renew one automatically via ACME — Let's Encrypt through Cloudflare, deSEC, DuckDNS, or RFC 2136.
+      </p>
+
+      <!-- ── Family controls ── -->
+      <h2 id="family"><i class="bi bi-people me-2" style="color:var(--accent);"></i>Family Controls</h2>
+      <ul>
+        <li><strong>Device tracking &amp; groups</strong> — every device (IP, MAC, hostname) can be placed in a group with extra rules, full bypass, or no DNS at all, plus a one-click block for any device.</li>
+        <li><strong>Blocked services</strong> — one click blocks TikTok, YouTube, Discord and more, globally or per group, with optional schedules such as "no social media after 21:00".</li>
+        <li><strong>Safe Search enforcement</strong> — Google, Bing, DuckDuckGo and YouTube, network-wide or per group, enforced by the provider so it can't be switched off on the device.</li>
+      </ul>
+
+      <!-- ── Network features ── -->
+      <h2 id="network"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>Network Features</h2>
+      <ul>
+        <li><strong>Local DNS records</strong> for your LAN — <code>nas.home.lab</code>, wildcards, CNAMEs, and PTR records.</li>
+        <li><strong>Conditional forwarding</strong> — route <code>lan</code> or your reverse zone to the router.</li>
+        <li><strong>Private reverse zones</strong> answered locally (RFC 6303) — <code>192.168.x.x</code> lookups never leak to public resolvers.</li>
+      </ul>
+
+      <!-- ── Monitoring ── -->
+      <h2 id="monitoring"><i class="bi bi-graph-up me-2" style="color:var(--accent);"></i>Dashboard, Metrics &amp; API</h2>
+      <ul>
+        <li><strong>Dashboard</strong> — query charts, top blocked domains, busiest clients, cache hit rate, and a live query log streamed over WebSocket.</li>
+        <li><strong>Live management</strong> — blocklists, allow/deny domains, upstreams, blocking mode, retention, and API token are all applied live, with no restarts.</li>
+        <li><strong>Prometheus</strong> — a scrape-only <code>/metrics</code> endpoint with a ready-made <a href="https://github.com/DanDreadless/minos/blob/main/deploy/grafana-dashboard.json" target="_blank">Grafana dashboard</a>.</li>
+        <li><strong>REST API</strong> — a fully <a href="https://github.com/DanDreadless/minos/blob/main/docs/api.md" target="_blank">documented API</a> with <a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a>; everything the UI does, your automations can do.</li>
+        <li><strong>Notifications</strong> — webhook / <a href="https://ntfy.sh" target="_blank">ntfy</a> alerts for a new device, an upstream failing or recovering, or a new release.</li>
+      </ul>
+
+      <!-- ── Migrating in ── -->
+      <h2 id="migrate"><i class="bi bi-box-arrow-in-down me-2" style="color:var(--accent);"></i>Migrating In</h2>
+      <p>Already running Pi-hole or AdGuard Home? Bring your settings across in one command:</p>
+      <pre>minos import pihole /etc/pihole</pre>
+      <p>
+        …or upload <code>gravity.db</code> / <code>AdGuardHome.yaml</code> in the UI. You can export and restore the
+        whole Minos config as YAML at any time.
+      </p>
+
+      <!-- ── Documentation ── -->
+      <h2 id="docs"><i class="bi bi-book me-2" style="color:var(--accent);"></i>Documentation</h2>
+      <ul>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/getting-started.md" target="_blank">Getting started</a> — install, host prep, systemd, encrypted DNS, monitoring, and the full config reference.</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/api.md" target="_blank">REST API reference</a> — every endpoint, with examples.</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a> — blocking switch, sensors, bedtime automations, events on your phone.</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">Roadmap</a> — what shipped, what's under consideration.</li>
+      </ul>
+
+      <!-- ── Roadmap ── -->
+      <h2 id="roadmap"><i class="bi bi-signpost-split me-2" style="color:var(--accent);"></i>Roadmap</h2>
+      <p>
+        Everything from the July 2026 competitive review has shipped — the resolver core (cache, dedup, serve-stale,
+        failover health, private reverse zones), family controls, the Pi-hole/AdGuard importer with a UI uploader,
+        client-facing DoT/DoH with automatic ACME certificates, metrics, notifications, an opt-in update check, and the
+        release pipeline. The only item still under consideration is DNSSEC validation; details are in
+        <a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">docs/roadmap.md</a>.
+      </p>
+
+      <!-- ── Developing ── -->
+      <h2 id="developing"><i class="bi bi-code-slash me-2" style="color:var(--accent);"></i>Developing</h2>
+      <p>Go 1.22+, Node 20+.</p>
+      <pre>make test    # runs the Go suite with the race detector
+make lint    # runs golangci-lint and the frontend type check
+make bench   # runs the filter engine benchmarks</pre>
+      <p>See <code>CLAUDE.md</code> in the repo for architecture, conventions, and performance budgets.</p>
+
+      <!-- ── License ── -->
+      <h2 id="license"><i class="bi bi-file-earmark-text me-2" style="color:var(--accent);"></i>License</h2>
+      <p>Minos is released under the <strong>GPLv3</strong> licence. See the <a href="https://github.com/DanDreadless/minos" target="_blank">repository</a> for the full text.</p>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="f-links">
+      <a href="index.html">Home</a>
+      <a href="minos.html">Minos Docs</a>
+      <a href="https://github.com/DanDreadless/minos" target="_blank">Minos GitHub</a>
+      <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace GitHub</a>
+      <a href="vault1337.html">Vault1337 Docs</a>
+      <a href="insight.html">Insight Docs</a>
+      <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
+    </div>
+    <p>DanDreadless &mdash; Security Tools &mdash; &copy; <span id="yr"></span></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  // Highlight active sidebar link on scroll
+  const links = [...document.querySelectorAll('.d-nav a')];
+  const map = links.map(a => ({ a, sec: document.querySelector(a.getAttribute('href')) })).filter(x => x.sec);
+  const spy = () => {
+    const y = window.scrollY + 90;
+    let cur = map[0];
+    for (const m of map) if (m.sec.offsetTop <= y) cur = m;
+    links.forEach(a => a.classList.remove('active'));
+    if (cur) cur.a.classList.add('active');
+  };
+  window.addEventListener('scroll', spy, { passive: true });
+  spy();
+</script>
+</body>
+</html>
