@@ -134,7 +134,7 @@
 
       <h3>For the household</h3>
       <ul>
-        <li>Device tracking (IP, MAC, hostname) with per-device groups: extra rules, full bypass, or no DNS at all — plus a one-click block for any device.</li>
+        <li>Device identity — IP, MAC, vendor (from the MAC), and hostname (reverse DNS via the gateway, with an mDNS <code>.local</code> fallback) — with per-device groups: extra rules, full bypass, or no DNS at all, plus a one-click block for any device.</li>
         <li>One-click blocked services (TikTok, YouTube, Discord…) — globally or per group, with optional schedules ("no social media after 21:00").</li>
         <li>Safe Search enforcement (Google, Bing, DuckDuckGo, YouTube) — network-wide or per group, enforced by the provider so it can't be switched off.</li>
       </ul>
@@ -149,12 +149,12 @@
 
       <h3>Running it</h3>
       <ul>
-        <li>Web dashboard with query charts, top blocked domains, busiest clients, cache hit rate, and a live query log streamed over WebSocket.</li>
+        <li>Web dashboard with query charts, top blocked domains, and busiest clients — all clickable to drill straight into the matching, full-history log — cache hit rate, and a live query log streamed over WebSocket.</li>
         <li>Full management from the UI: blocklists, allow/deny domains, upstreams, blocking mode, retention, API token — all applied live, no restarts.</li>
         <li>Prometheus <code>/metrics</code> with a ready-made Grafana dashboard — scrape-only, never pushes.</li>
         <li>A fully documented REST API with Home Assistant recipes — everything the UI does, your automations can do.</li>
         <li>Webhook / <a href="https://ntfy.sh" target="_blank">ntfy</a> notifications: a new device on your network, an upstream failing or recovering, a new release.</li>
-        <li>Opt-in update check — off by default, and nothing is sent beyond the request itself.</li>
+        <li>Opt-in update check — when enabled, an in-app banner shows the exact upgrade command for how you installed (quick-install, Docker, or source); off by default, and nothing is sent beyond the request itself.</li>
         <li>Batched SQLite persistence that respects SD cards. <strong>No telemetry. Ever.</strong></li>
       </ul>
 
@@ -250,7 +250,7 @@ sudo cp deploy/minos.service /etc/systemd/system/</pre>
       <!-- ── Family controls ── -->
       <h2 id="family"><i class="bi bi-people me-2" style="color:var(--accent);"></i>Family Controls</h2>
       <ul>
-        <li><strong>Device tracking &amp; groups</strong> — every device (IP, MAC, hostname) can be placed in a group with extra rules, full bypass, or no DNS at all, plus a one-click block for any device.</li>
+        <li><strong>Device identity &amp; groups</strong> — every device (IP, MAC, vendor, and hostname where it resolves) can be placed in a group with extra rules, full bypass, or no DNS at all, plus a one-click block for any device.</li>
         <li><strong>Blocked services</strong> — one click blocks TikTok, YouTube, Discord and more, globally or per group, with optional schedules such as "no social media after 21:00".</li>
         <li><strong>Safe Search enforcement</strong> — Google, Bing, DuckDuckGo and YouTube, network-wide or per group, enforced by the provider so it can't be switched off on the device.</li>
       </ul>
@@ -266,7 +266,7 @@ sudo cp deploy/minos.service /etc/systemd/system/</pre>
       <!-- ── Monitoring ── -->
       <h2 id="monitoring"><i class="bi bi-graph-up me-2" style="color:var(--accent);"></i>Dashboard, Metrics &amp; API</h2>
       <ul>
-        <li><strong>Dashboard</strong> — query charts, top blocked domains, busiest clients, cache hit rate, and a live query log streamed over WebSocket.</li>
+        <li><strong>Dashboard</strong> — query charts, top blocked domains, and busiest clients (all clickable to drill into the full-history log), cache hit rate, and a live query log streamed over WebSocket.</li>
         <li><strong>Live management</strong> — blocklists, allow/deny domains, upstreams, blocking mode, retention, and API token are all applied live, with no restarts.</li>
         <li><strong>Prometheus</strong> — a scrape-only <code>/metrics</code> endpoint with a ready-made <a href="https://github.com/DanDreadless/minos/blob/main/deploy/grafana-dashboard.json" target="_blank">Grafana dashboard</a>.</li>
         <li><strong>REST API</strong> — a fully <a href="https://github.com/DanDreadless/minos/blob/main/docs/api.md" target="_blank">documented API</a> with <a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a>; everything the UI does, your automations can do.</li>
@@ -296,8 +296,12 @@ sudo cp deploy/minos.service /etc/systemd/system/</pre>
       <p>
         Everything from the July 2026 competitive review has shipped — the resolver core (cache, dedup, serve-stale,
         failover health, private reverse zones), family controls, the Pi-hole/AdGuard importer with a UI uploader,
-        client-facing DoT/DoH with automatic ACME certificates, metrics, notifications, an opt-in update check, and the
-        release pipeline. The only item still under consideration is DNSSEC validation; details are in
+        client-facing DoT/DoH with automatic ACME certificates, metrics, notifications, and the release pipeline.
+        Two follow-up rounds from real-world use have shipped since: a bootstrap-free default upstream and a curated
+        resolver picker, clickable dashboard drill-downs and a full-width UI, rollback-safe config loading, device
+        <strong>vendor</strong> labels and <strong>mDNS</strong> hostname resolution, a full-history query log, and
+        in-app upgrade guidance. Still planned are further device-identity layers (DHCP-lease ingestion, NetBIOS); the
+        one item under consideration is DNSSEC validation. Details are in
         <a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">docs/roadmap.md</a>.
       </p>
 
