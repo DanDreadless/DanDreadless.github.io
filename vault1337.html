@@ -45,8 +45,8 @@
   <div class="container">
     <p class="s-sub mb-1" style="color:var(--muted);">Open-source malware static analysis platform</p>
     <img src="Images/logo-no-background.png" alt="Vault1337 | Malware Analysis Platform" style="max-width:min(480px,75vw); width:100%; height:auto; margin-bottom:.5rem;">
-    <p class="sub" style="max-width:600px; margin:0 auto 1.5rem;">
-      Self-hosted malware analysis workbench. Upload samples, extract IOCs, map behaviour to MITRE ATT&amp;CK, export STIX 2.1 threat intelligence, and generate PDF analyst reports — all in one place.
+    <p class="sub" style="max-width:640px; margin:0 auto 1.5rem;">
+      Self-hosted malware analysis workbench for a single analyst. Upload samples, extract IOCs, map behaviour to MITRE ATT&amp;CK, search and diff your collection, group samples into cases, export STIX 2.1 and portable case archives, and generate PDF analyst reports — all from one container, with everything stored in one data directory you control.
     </p>
     <div class="cta">
       <a href="#install-docker" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Getting Started</a>
@@ -56,9 +56,10 @@
     <div class="callout" style="max-width:640px; margin:1.5rem auto 0; text-align:left;"><strong><i class="bi bi-lock-fill me-1"></i>Source temporarily private.</strong> The Vault1337 GitHub repository has been made private until further notice. This documentation and the published <a href="https://hub.docker.com/r/vault1337/vault1337" target="_blank">Docker Hub image</a> remain available — any interest in source access should be made directly.</div>
     <div class="badge-row">
       <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
-      <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python">
+      <img src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white" alt="Python">
       <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white" alt="Django">
       <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
+      <img src="https://img.shields.io/badge/SQLite-WAL-003B57?logo=sqlite&logoColor=white" alt="SQLite">
       <img src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker">
     </div>
   </div>
@@ -71,9 +72,13 @@
     <!-- Sidebar -->
     <aside class="docs-sidebar">
       <ul class="d-nav">
+        <li class="d-group">Overview</li>
+        <li><a href="#overview">What Vault1337 Is</a></li>
+        <li><a href="#data-dir">The Data Directory</a></li>
+
         <li class="d-group">Installation</li>
         <li><a href="#install-docker">Docker (Quick Start)</a></li>
-        <li><a href="#compose">Docker Compose</a></li>
+        <li><a href="#compose">Docker Compose (Persistent)</a></li>
         <li><a href="#docker-dev">Docker Development</a></li>
         <li><a href="#local">Local Development</a></li>
 
@@ -81,21 +86,35 @@
         <li><a href="#env-vars">Environment Variables</a></li>
         <li><a href="#api-keys">API Keys</a></li>
 
-        <li class="d-group">Using Vault1337</li>
+        <li class="d-group">Getting Samples In</li>
         <li><a href="#uploading">Uploading Samples</a></li>
+        <li><a href="#inbox">Inbox Drop Folder</a></li>
+        <li><a href="#ingest">Ingest Pipeline</a></li>
+
+        <li class="d-group">Working With Samples</li>
         <li><a href="#vault-page">Vault Page</a></li>
         <li><a href="#tools">Analysis Tools</a></li>
-        <li><a href="#yara">YARA Rules</a></li>
+        <li><a href="#search">Full-Text Search</a></li>
+        <li><a href="#cases">Cases &amp; Portable Archives</a></li>
+        <li><a href="#diff">Sample Diffing</a></li>
+        <li><a href="#cluster">SimHash Clustering</a></li>
+        <li><a href="#config-extract">Config Extraction</a></li>
+        <li><a href="#yara">YARA Rules &amp; Retrohunt</a></li>
         <li><a href="#ioc">IOC Management</a></li>
         <li><a href="#ip">IP &amp; Domain Intelligence</a></li>
-        <li><a href="#tags">Tags &amp; Search</a></li>
+        <li><a href="#tags">Tags</a></li>
         <li><a href="#analyst-notes">Analyst Notes</a></li>
+
+        <li class="d-group">Reporting &amp; Export</li>
         <li><a href="#report">Sample Report</a></li>
         <li><a href="#pdf-report">PDF Report Export</a></li>
         <li><a href="#mitre-attack">MITRE ATT&amp;CK Mapping</a></li>
         <li><a href="#stix-export">STIX 2.1 Export</a></li>
-        <li><a href="#decoder">Decoder</a></li>
+        <li><a href="#decoder">CyberChef</a></li>
+
+        <li class="d-group">Administration</li>
         <li><a href="#management">Management Page</a></li>
+        <li><a href="#integrity">Integrity &amp; Backups</a></li>
 
         <li class="d-group">Reference</li>
         <li><a href="#stack">Tech Stack</a></li>
@@ -107,9 +126,42 @@
     <!-- Main content -->
     <main class="docs-content">
 
+      <!-- ── Overview ── -->
+      <h2 id="overview"><i class="bi bi-shield-lock me-2" style="color:var(--accent);"></i>What Vault1337 Is</h2>
+      <p>Vault1337 is a self-hosted static malware analysis platform and repository. You upload samples, store them safely, and analyse them with a large suite of format-aware static tools — all without ever executing the malware. It is built around a single guiding principle:</p>
+      <div class="callout"><strong>One analyst, one box.</strong> Vault1337 runs as a single instance for a single analyst. There is no external database, no message queue, no cloud dependency, and no team-management machinery. One account (created with <code>createsuperuser</code>) logs in; everything the application owns lives in one data directory you control.</div>
+      <p>What that gets you in practice:</p>
+      <ul>
+        <li><strong>Nothing to run alongside it.</strong> SQLite (in WAL mode) is the database. Upgrading is <code>docker compose pull &amp;&amp; up -d</code> — no migrations to coordinate across services, nothing to back up separately.</li>
+        <li><strong>Your collection is portable and durable.</strong> Point the data directory at durable storage and it survives every upgrade. Move it to another machine by copying one folder.</li>
+        <li><strong>It works offline.</strong> Every external intelligence lookup is optional and degrades visibly when a key is missing or the host is airgapped — nothing hangs or fails hard.</li>
+        <li><strong>Samples are stored safely.</strong> Every stored sample is obfuscated at rest so host antivirus cannot recognise and quarantine your collection, and stored read-only so the application cannot corrupt it.</li>
+      </ul>
+
+      <!-- ── Data Directory ── -->
+      <h2 id="data-dir"><i class="bi bi-folder2-open me-2" style="color:var(--accent);"></i>The Data Directory</h2>
+      <p>Everything Vault1337 writes lives under a single data directory, chosen by the <code>VAULT_DATA_DIR</code> environment variable. In Docker this is <code>/data</code>; on a native install it defaults to <code>~/.vault1337</code>. This is the <strong>one thing you must put on durable storage</strong> — back it up, mount it, and your entire vault moves and upgrades with it.</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Path</th><th>Contents</th></tr></thead>
+          <tbody>
+            <tr><td><code>db.sqlite3</code></td><td>The database — samples' metadata, IOCs, tags, comments, cases, analysis results</td></tr>
+            <tr><td><code>config.json</code></td><td>All application settings and API keys (written by the Management page). Mode <code>0600</code>, auto-generated with a fresh <code>SECRET_KEY</code> on first start</td></tr>
+            <tr><td><code>samples/</code></td><td>Stored samples, named by plaintext SHA256, obfuscated at rest and read-only</td></tr>
+            <tr><td><code>inbox/</code></td><td>Drop-folder — files placed here are ingested automatically (see <a href="#inbox">Inbox Drop Folder</a>)</td></tr>
+            <tr><td><code>yara-rules/</code></td><td>Your YARA <code>.yar</code> rule files</td></tr>
+            <tr><td><code>cyberchef/</code></td><td>The self-hosted CyberChef build, updatable from the Management page</td></tr>
+            <tr><td><code>cache/</code></td><td>Runtime caches (e.g. the tldextract public-suffix list)</td></tr>
+            <tr><td><code>backups/</code></td><td>Self-contained SQLite database backups</td></tr>
+            <tr><td><code>logs/</code></td><td>Application logs</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><strong>Storage durability warning.</strong> On start, Vault1337 detects whether the data directory sits on durable storage (a bind mount or a named volume) or on a container's <em>ephemeral overlay filesystem</em>. If it is ephemeral — meaning your whole collection would be destroyed on the next <code>docker compose up</code> — it logs a loud warning and surfaces it on the Management dashboard. Always mount <code>/data</code> to durable storage.</div>
+
       <!-- ── Docker Quick Start ── -->
       <h2 id="install-docker"><i class="bi bi-box-seam me-2" style="color:var(--accent);"></i>Docker (Quick Start)</h2>
-      <p>The fastest way to run Vault1337. Uses SQLite — data is not persisted after the container stops.</p>
+      <p>The fastest way to try Vault1337, with <strong>no persistent storage</strong> — the collection is lost when the container stops. Do not store anything you want to keep this way; use <a href="#compose">Docker Compose</a> for a real deployment.</p>
 
       <div class="callout"><strong>Requirements:</strong> Docker installed on your system. See the <a href="https://docs.docker.com/engine/install/" target="_blank">official Docker docs</a>.</div>
 
@@ -152,8 +204,8 @@ Password: changeme123</pre>
       </div>
 
       <!-- ── Docker Compose ── -->
-      <h2 id="compose"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>Docker Compose</h2>
-      <p>Recommended for persistent deployments. Spins up Vault1337 with a PostgreSQL database and named volumes for samples and YARA rules.</p>
+      <h2 id="compose"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>Docker Compose (Persistent)</h2>
+      <p>The recommended way to run Vault1337. A single service with everything under <code>/data</code>. The base compose file puts <code>/data</code> on a Docker <strong>named volume</strong> that survives <code>docker compose down</code> and image upgrades.</p>
 
       <div class="step">
         <div class="step-n">1</div>
@@ -167,28 +219,28 @@ cd Vault1337/Docker</pre>
       <div class="step">
         <div class="step-n">2</div>
         <div class="step-b">
-          <h5>Configure the environment</h5>
-          <p>All settings live in <code>Docker/.env</code>. Open it and set at minimum:</p>
+          <h5>Create the environment file</h5>
+          <p>Create <code>Docker/.env</code> and set at minimum:</p>
           <div class="v-wrap mb-2">
             <table class="v-table">
               <thead><tr><th>Variable</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td><code>SECRET_KEY</code></td><td>Long random string — generate with <code>openssl rand -hex 50</code></td></tr>
-                <tr><td><code>POSTGRES_PASSWORD</code></td><td>Password for the PostgreSQL database</td></tr>
-                <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Initial admin account password</td></tr>
+                <tr><td><code>SECRET_KEY</code></td><td>Long random string — <code>openssl rand -hex 50</code>. If unset, one is generated into <code>config.json</code> on first start</td></tr>
                 <tr><td><code>ALLOWED_HOSTS</code></td><td>Comma-separated hostnames or IPs, e.g. <code>localhost,192.168.1.10</code></td></tr>
+                <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Initial admin password (default <code>changeme123</code> — change it)</td></tr>
               </tbody>
             </table>
           </div>
+          <div class="callout"><code>VAULT_DATA_DIR=/data</code> is set by the compose file and is the only environment variable the running application needs. API keys and app settings are <strong>not</strong> environment variables — set them from the Management page, which writes <code>/data/config.json</code>.</div>
         </div>
       </div>
 
       <div class="step">
         <div class="step-n">3</div>
         <div class="step-b">
-          <h5>Start the stack</h5>
+          <h5>Start</h5>
           <pre>docker compose up -d</pre>
-          <p>This builds the image (if not already built), starts PostgreSQL, waits for a health check, then starts Gunicorn. Migrations and superuser creation happen automatically on first run.</p>
+          <p>On first start the entrypoint applies any staged restore, runs migrations, creates the superuser from the <code>DJANGO_SUPERUSER_*</code> env vars, and starts Gunicorn.</p>
         </div>
       </div>
 
@@ -196,67 +248,71 @@ cd Vault1337/Docker</pre>
         <div class="step-n">4</div>
         <div class="step-b">
           <h5>Open Vault1337</h5>
-          <p>Navigate to <strong>http://localhost:8000</strong> (or your configured <code>HOST_PORT</code>) and log in.</p>
+          <p>Navigate to <strong>http://localhost:8000</strong> (or your configured <code>HOST_PORT</code>) and log in with <code>admin</code> / <code>changeme123</code>. Change the password immediately via the Management page.</p>
           <pre># View logs
 docker compose logs -f
 
-# Stop the stack (data preserved)
+# Stop the stack (your /data volume is preserved)
 docker compose down
 
-# Stop and wipe all data
+# Stop and DELETE the data volume — destroys your entire collection
 docker compose down -v</pre>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-b">
+          <h5>Put <code>/data</code> on a specific host path (optional)</h5>
+          <p>To store your vault on an external disk, NFS mount, or a known backup location instead of a named volume, set <code>VAULT_DATA_PATH</code> in <code>.env</code> and add the bind-mount override:</p>
+          <pre># .env
+VAULT_DATA_PATH=/srv/vault1337
+
+docker compose -f docker-compose.yml -f docker-compose.bindmounts.yml up -d</pre>
+          <p>The host directory must be writable by UID 1001 (the container's <code>vault</code> user).</p>
         </div>
       </div>
 
       <!-- ── Docker Development ── -->
       <h2 id="docker-dev"><i class="bi bi-code-slash me-2" style="color:var(--accent);"></i>Docker Development</h2>
-      <p>Use the localdev overlay to run the Django + React stack in Docker while keeping your local <code>db.sqlite3</code> and <code>sample_storage/</code> mounted directly from the host. Ideal for day-to-day development without a full PostgreSQL setup.</p>
+      <p>Builds the image from source and bind-mounts a host directory as <code>/data</code> so the database, samples, and <code>config.json</code> are visible from the host while you develop.</p>
 
       <div class="step">
         <div class="step-n">1</div>
         <div class="step-b">
-          <h5>Fix file permissions (WSL / Linux)</h5>
-          <p>The container runs as <code>vault</code> (UID 1001). If your host files are owned by a different UID, the container cannot write to them. Run once from the project root:</p>
-          <pre>chmod 666 db.sqlite3
-chmod -R 777 sample_storage/</pre>
-          <div class="callout"><strong>WSL note:</strong> Windows-side files mounted into WSL appear with host UID 1000, which differs from the container's UID 1001. The commands above fix this. You do not need to do this on a native Linux host where you created the files as the same user.</div>
+          <h5>Start the dev stack</h5>
+          <p>Run all three compose files — base, build override, and localdev overlay — from the <code>Docker/</code> directory:</p>
+          <pre>docker compose \
+  -f docker-compose.yml \
+  -f docker-compose.build.yml \
+  -f docker-compose.localdev.yml \
+  up --build</pre>
+          <p>The <code>build</code> override builds the image from the repository; the <code>localdev</code> overlay mounts <code>../.docker-data</code> (gitignored) as <code>/data</code>. It starts empty — the app creates its layout and generates a <code>SECRET_KEY</code> on first start.</p>
         </div>
       </div>
 
       <div class="step">
         <div class="step-n">2</div>
         <div class="step-b">
-          <h5>Start the dev stack</h5>
-          <p>Run all three compose files — base, build override, and localdev overlay:</p>
-          <pre>docker compose \
-  -f Docker/docker-compose.yml \
-  -f Docker/docker-compose.build.yml \
-  -f Docker/docker-compose.localdev.yml \
-  up --build</pre>
-          <p>This mounts <code>db.sqlite3</code> and <code>sample_storage/</code> from the project root, skips PostgreSQL, and applies SQLite WAL mode for concurrent reads. The React dev server is <strong>not</strong> included — run it separately (see <a href="#local">Local Development</a> step 6) for hot-reload.</p>
+          <h5>Bring existing data in (optional)</h5>
+          <p>To populate the dev data directory from an existing v1 checkout, run the migration command first, or simply drop files into the inbox and let the scanner ingest them:</p>
+          <pre>python manage.py migrate_v1_to_v2 --data-dir ../.docker-data
+# or drop samples into ../.docker-data/inbox/</pre>
+          <div class="callout"><strong>WSL / Linux note:</strong> the container runs as <code>vault</code> (UID 1001). If <code>../.docker-data</code> is owned by a different UID, make it writable so the container can write to it.</div>
         </div>
       </div>
 
       <div class="step">
         <div class="step-n">3</div>
         <div class="step-b">
-          <h5>Useful compose commands</h5>
-          <pre># Rebuild after backend dependency changes
-docker compose -f Docker/docker-compose.yml \
-  -f Docker/docker-compose.build.yml \
-  -f Docker/docker-compose.localdev.yml \
-  up --build
-
-# Stop without removing volumes
-docker compose -f Docker/docker-compose.yml \
-  -f Docker/docker-compose.localdev.yml \
-  down</pre>
+          <h5>React dev server (optional, for hot-reload)</h5>
+          <p>The Docker stack serves the pre-built frontend. For live frontend development with hot-reload, run the Vite dev server separately — see <a href="#local">Local Development</a> step 6.</p>
         </div>
       </div>
 
       <!-- ── Local Dev ── -->
       <h2 id="local"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Local Development</h2>
-      <p>Requires Python 3.12+, Node.js 22+, and (optionally) PostgreSQL.</p>
+      <p>Requires Python 3.12+ and Node.js 22+. No database server to install — Vault1337 uses SQLite.</p>
 
       <div class="step">
         <div class="step-n">1</div>
@@ -287,7 +343,8 @@ sudo apt install -y libimage-exiftool-perl libmpc-dev libgl1 libglib2.0-0</pre>
           <pre>SECRET_KEY=change-me-to-a-long-random-string
 DEBUG=True
 ALLOWED_HOSTS=127.0.0.1,localhost
-# Leave DATABASE_URL unset to use SQLite</pre>
+# Optional — the data directory defaults to ~/.vault1337
+# VAULT_DATA_DIR=/path/you/control</pre>
         </div>
       </div>
 
@@ -321,34 +378,34 @@ npm run dev</pre>
 
       <!-- ── Env Vars ── -->
       <h2 id="env-vars"><i class="bi bi-gear me-2" style="color:var(--accent);"></i>Environment Variables</h2>
-      <p>All configuration is handled via environment variables loaded from a <code>.env</code> file (or passed directly to the container).</p>
+      <p>By design, v2 needs almost no environment configuration — <code>VAULT_DATA_DIR</code> is the only variable the running application requires, and application settings and API keys live in <code>config.json</code>, edited from the Management page rather than the environment. The variables below are read at start-up.</p>
       <div class="v-wrap">
         <table class="v-table">
           <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>SECRET_KEY</code></td><td><em>required</em></td><td>Django secret key — use a long random string</td></tr>
-            <tr><td><code>DEBUG</code></td><td><code>False</code></td><td>Set <code>True</code> for local development only</td></tr>
-            <tr><td><code>ALLOWED_HOSTS</code></td><td><code>127.0.0.1</code></td><td>Comma-separated list of allowed hostnames/IPs</td></tr>
-            <tr><td><code>DATABASE_URL</code></td><td><em>SQLite</em></td><td>PostgreSQL connection string, e.g. <code>postgres://user:pass@host:5432/db</code></td></tr>
-            <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Comma-separated origins allowed for CORS requests</td></tr>
-            <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>200</code></td><td>Maximum file upload size in megabytes</td></tr>
-            <tr><td><code>POSTGRES_DB</code></td><td><code>vault1337</code></td><td>PostgreSQL database name (Compose only)</td></tr>
-            <tr><td><code>POSTGRES_USER</code></td><td><code>vault</code></td><td>PostgreSQL username (Compose only)</td></tr>
-            <tr><td><code>POSTGRES_PASSWORD</code></td><td><em>required</em></td><td>PostgreSQL password (Compose only)</td></tr>
+            <tr><td><code>VAULT_DATA_DIR</code></td><td><code>/data</code> (Docker) · <code>~/.vault1337</code> (native)</td><td>The data directory — database, samples, config, YARA rules, backups. The one thing to put on durable storage</td></tr>
+            <tr><td><code>VAULT_DATA_PATH</code></td><td><code>../vault-data</code></td><td>Host path bound to <code>/data</code> when using the bind-mount compose override</td></tr>
+            <tr><td><code>SECRET_KEY</code></td><td><em>auto-generated</em></td><td>Django secret key. If unset, a random key is generated into <code>config.json</code> on first start</td></tr>
+            <tr><td><code>DEBUG</code></td><td><code>False</code></td><td>Set <code>True</code> for local development only — never in production</td></tr>
+            <tr><td><code>ALLOWED_HOSTS</code></td><td><code>127.0.0.1,localhost</code></td><td>Comma-separated list of allowed hostnames/IPs</td></tr>
             <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td><code>admin</code></td><td>Superuser created on first container startup</td></tr>
             <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td><code>admin@localhost</code></td><td>Superuser email</td></tr>
-            <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><code>changeme123</code></td><td>Superuser initial password — change this</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><code>changeme123</code></td><td>Superuser initial password — change this after first login</td></tr>
             <tr><td><code>HOST_PORT</code></td><td><code>8000</code></td><td>Host port mapped to container port 8000</td></tr>
+            <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Comma-separated origins allowed for CORS (frontend dev server)</td></tr>
+            <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>200</code></td><td>Maximum file upload size in megabytes (also settable in <code>config.json</code>)</td></tr>
+            <tr><td><code>TLD_EXTRACT_AUTO_UPDATE</code></td><td><code>False</code></td><td>Whether to refresh the public-suffix list from the network; off by default so airgapped installs never stall</td></tr>
             <tr><td><code>IOC_VT_MALICIOUS_THRESHOLD</code></td><td><code>1</code></td><td>VirusTotal malicious engine count required to auto-mark an IOC as true positive</td></tr>
             <tr><td><code>IOC_ABUSEIPDB_SCORE_THRESHOLD</code></td><td><code>25</code></td><td>AbuseIPDB confidence score (0–100) required to auto-mark an IP IOC as true positive</td></tr>
             <tr><td><code>IOC_ENRICH_VT_DELAY_SECONDS</code></td><td><code>15</code></td><td>Delay between VirusTotal calls during batch IOC enrichment (free tier rate limit)</td></tr>
           </tbody>
         </table>
       </div>
+      <div class="callout">Legacy v1 variables such as <code>DATABASE_URL</code> and the <code>POSTGRES_*</code> settings are gone — Vault1337 v2 has no external database.</div>
 
       <!-- ── API Keys ── -->
       <h2 id="api-keys"><i class="bi bi-key me-2" style="color:var(--accent);"></i>API Keys</h2>
-      <p>Third-party intelligence features require API keys. Add them via the web UI at <strong>Management → API Keys</strong> (staff account required), or set them in your <code>.env</code> file before starting the container.</p>
+      <p>Third-party intelligence features require API keys. Add them via the web UI at <strong>Management → API Keys</strong> (staff account required); they are stored in the data directory's <code>config.json</code>, not in the environment. All integrations are optional — every external lookup degrades gracefully with a clear message when a key is missing or the host is offline, so Vault1337 is fully usable airgapped.</p>
       <div class="v-wrap">
         <table class="v-table">
           <thead><tr><th>Key</th><th>Service</th><th>Used for</th></tr></thead>
@@ -365,19 +422,44 @@ npm run dev</pre>
 
       <!-- ── Uploading ── -->
       <h2 id="uploading"><i class="bi bi-cloud-upload me-2" style="color:var(--accent);"></i>Uploading Samples</h2>
-      <p>Navigate to <strong>Upload</strong> in the navigation bar. Four ingestion methods are available:</p>
+      <p>The <strong>Home</strong> page is the ingestion hub. Five ways to bring a sample in:</p>
       <div class="v-wrap mb-3">
         <table class="v-table">
           <thead><tr><th>Method</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><strong>Upload File</strong></td><td>Direct file upload (max 200 MB). Optionally extract a ZIP or 7z archive with a password.</td></tr>
+            <tr><td><strong>Upload File</strong></td><td>Direct file upload (max 200 MB). Optionally extract a ZIP or 7z archive — with a password if needed — and each member is ingested as its own sample.</td></tr>
             <tr><td><strong>Fetch URL</strong></td><td>Download a sample from an external URL. Private/internal IP ranges are blocked (SSRF protection).</td></tr>
             <tr><td><strong>VirusTotal</strong></td><td>Download a sample by SHA256 hash using your VT API key.</td></tr>
             <tr><td><strong>MalwareBazaar</strong></td><td>Download a sample by SHA256 hash using your MB API key.</td></tr>
+            <tr><td><strong>Inbox drop folder</strong></td><td>Drop files into <code>&lt;data-dir&gt;/inbox/</code> and a background scanner ingests them automatically — see <a href="#inbox">Inbox Drop Folder</a>.</td></tr>
           </tbody>
         </table>
       </div>
-      <p>All samples are stored by SHA256 hash. Original filenames are preserved in the database but never used as file paths on disk. Add comma-separated tags during upload for easier organisation.</p>
+      <p>All samples are stored by their plaintext SHA256 hash — original filenames are kept in the database but never used as paths on disk. Add comma-separated tags at upload time for easier organisation.</p>
+      <div class="callout"><strong>Safe at rest.</strong> Once ingested, every stored sample is written <strong>obfuscated</strong> (a fixed-key XOR, so host antivirus cannot fingerprint it) and made read-only. This is obfuscation, not encryption — its job is to stop Defender/ClamAV silently quarantining your collection, not to keep secrets. Vault1337 transparently decodes samples when a tool needs the real bytes.</div>
+
+      <!-- ── Inbox ── -->
+      <h2 id="inbox"><i class="bi bi-inbox me-2" style="color:var(--accent);"></i>Inbox Drop Folder</h2>
+      <p>The data directory contains an <code>inbox/</code> folder. Any file placed there is picked up by a background <strong>inbox scanner</strong> and run through the full ingest pipeline — hashed, deduplicated, enriched, obfuscated, and catalogued — then removed from the inbox. This is the fastest way to bulk-import a directory of samples: copy them in and walk away.</p>
+      <ul>
+        <li>Duplicates (a sample whose SHA256 already exists) are detected and skipped, and the inbox copy is removed so it is not re-examined forever.</li>
+        <li>A second <strong>reconcile scanner</strong> periodically re-examines the vault and finishes analysing anything that was left under-processed (for example, if the app crashed mid-enrichment).</li>
+        <li>Both scanners run inside the application process — no cron, no separate worker. On a multi-worker Gunicorn deployment a lock-file election ensures only one worker scans.</li>
+        <li>You can also trigger a scan on demand from <strong>Management → Vault1337</strong>.</li>
+      </ul>
+
+      <!-- ── Ingest Pipeline ── -->
+      <h2 id="ingest"><i class="bi bi-diagram-2 me-2" style="color:var(--accent);"></i>Ingest Pipeline</h2>
+      <p>Every entry path — web upload, URL fetch, VirusTotal/MalwareBazaar download, archive extraction, and both scanners — runs the <strong>same</strong> ingest pipeline, so two samples with identical content always end up in an identical state regardless of how they arrived. In order:</p>
+      <ol>
+        <li><strong>Hash</strong> — MD5, SHA-1, SHA-256, SHA-512, magic bytes, size, MIME.</li>
+        <li><strong>Deduplicate</strong> — if the SHA-256 already exists, the sample is not stored twice.</li>
+        <li><strong>SimHash</strong> — a fuzzy content fingerprint for near-duplicate clustering.</li>
+        <li><strong>Store</strong> — written to <code>samples/&lt;sha256&gt;</code> as plaintext for the enrichment step.</li>
+        <li><strong>Enrich</strong> — IOC extraction, YARA scan (auto-tagging matches), MITRE ATT&amp;CK mapping, and a VirusTotal lookup on interactive uploads. Each step is guarded individually: a malformed sample that defeats a parser is still stored and catalogued.</li>
+        <li><strong>Obfuscate &amp; lock</strong> — the stored file is XOR-obfuscated and set read-only.</li>
+        <li><strong>Index</strong> — added to the full-text search index.</li>
+      </ol>
 
       <!-- ── Vault Page ── -->
       <h2 id="vault-page"><i class="bi bi-collection me-2" style="color:var(--accent);"></i>Vault Page</h2>
@@ -402,8 +484,12 @@ npm run dev</pre>
         </table>
       </div>
 
-      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk Delete</h3>
-      <p>Each row has a checkbox. Tick one or more rows (or use the header checkbox to select all on the current page) and a <strong>Delete N selected</strong> button appears in the page header. Clicking it prompts for confirmation then deletes all selected samples in parallel. The selection is cleared and the table reloads after deletion.</p>
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk Actions</h3>
+      <p>Each row has a checkbox. Tick one or more rows (or use the header checkbox to select all on the current page) and two actions appear in the page header:</p>
+      <ul>
+        <li><strong>Add N to case</strong> — opens a dialog to add the selected samples to an existing <a href="#cases">case</a> or create a new one on the spot.</li>
+        <li><strong>Delete N selected</strong> — prompts for confirmation, then deletes all selected samples in parallel.</li>
+      </ul>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Pagination</h3>
       <p>The bottom of the vault list shows <strong>« ‹ page X of Y › »</strong> controls — first, previous, next, and last page buttons alongside the current page indicator.</p>
@@ -583,19 +669,85 @@ npm run dev</pre>
         </table>
       </div>
 
-      <!-- ── YARA ── -->
-      <h2 id="yara"><i class="bi bi-code-square me-2" style="color:var(--accent);"></i>YARA Rules</h2>
-      <p>Navigate to <strong>YARA</strong> in the navigation bar to manage rules.</p>
+      <!-- ── Full-Text Search ── -->
+      <h2 id="search"><i class="bi bi-search me-2" style="color:var(--accent);"></i>Full-Text Search</h2>
+      <p>Once a collection passes a few hundred samples, the question is rarely "what is this file called" but "which sample had that C2 domain / that mutex / that string I remember from a tool's output." The <strong>Search</strong> page answers exactly that.</p>
       <ul>
-        <li>Create new rules using the built-in editor — paste or write YARA syntax directly.</li>
-        <li>Edit existing rules at any time.</li>
-        <li>Run all rules against a specific sample from the sample detail page using the <strong>Run YARA Rules</strong> tool.</li>
-        <li>Results show the matching rule name, tags, matched string identifiers, file offsets, and match lengths.</li>
-        <li>Rules are stored as <code>.yar</code> files in <code>vault/yara-rules/</code> on the server.</li>
+        <li>Searches the <em>content</em> of the whole catalogue via a SQLite FTS5 index: sample names, tags, IOC values, saved tool output, and analyst comments.</li>
+        <li>Results come back most-relevant-first, each with a highlighted snippet showing the matched text in context.</li>
+        <li>Supports prefix search with a trailing <code>*</code> (e.g. <code>cobalt*</code>) and quoted phrases; punctuation-heavy queries (URLs, <code>host:port</code>) are handled safely.</li>
+        <li>The index stays in sync automatically — every ingest, tool run, tag change, and comment updates it. To rebuild it from scratch (e.g. after importing an old vault), run <code>python manage.py rebuild_search_index</code>.</li>
       </ul>
-      <div class="callout">Rules with syntax errors will fail to save — the editor will report the parse error inline.</div>
 
-      <div class="callout"><strong>No rules are included by default</strong> — Vault1337 ships with an empty rules directory. You need to add your own <code>.yar</code> files via the web editor or by placing them in the <code>vault/yara-rules/</code> directory on the server.</div>
+      <!-- ── Cases ── -->
+      <h2 id="cases"><i class="bi bi-folder-symlink me-2" style="color:var(--accent);"></i>Cases &amp; Portable Archives</h2>
+      <p>A <strong>case</strong> is a named grouping of samples — an investigation, a campaign, a family. It is the natural unit of analyst work: "these fourteen samples are the same intrusion." Manage cases from the <strong>Cases</strong> page.</p>
+      <ul>
+        <li>Create a case, give it a description, and add samples to it — from the case page, or by selecting samples on the Vault page and choosing <strong>Add to case</strong>.</li>
+        <li>A sample can belong to any number of cases. Removing a sample from a case never deletes the sample itself; deleting a case never deletes its samples.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Export &amp; Import (<code>.vault</code> archives)</h3>
+      <p>Any case can be exported to a portable <code>.vault</code> archive and imported into another Vault1337 instance — the way to hand an investigation to a colleague or move it between machines.</p>
+      <ul>
+        <li>The archive is an ordinary ZIP containing a manifest, per-sample metadata (tags, IOC verdicts, comments, analysis results), and the sample bytes.</li>
+        <li>Samples travel <strong>obfuscated</strong>, so the archive is non-executable and does not trip antivirus in transit — and importable by any instance, because the obfuscation key is fixed.</li>
+        <li>On import, every sample is <strong>verified against its SHA-256</strong> before it is stored; a corrupt or tampered archive is rejected, not trusted. Nothing in the import path executes a sample.</li>
+        <li>Samples already present in the target vault are attached to the case without being overwritten, preserving your existing analysis.</li>
+      </ul>
+      <div class="callout">Export a case from its detail page with <strong>Export .vault</strong>; import one with <strong>Import .vault archive</strong> on the Cases page. Import restores the analyst context as-is rather than re-analysing, so IOC true/false verdicts and comments survive the round-trip.</div>
+
+      <!-- ── Sample Diffing ── -->
+      <h2 id="diff"><i class="bi bi-distribute-vertical me-2" style="color:var(--accent);"></i>Sample Diffing</h2>
+      <p>The <strong>Compare</strong> page (also reachable as "diff →" from clustering results) structurally compares two samples — the standard "is this a variant of that" workflow. It answers questions a raw byte diff cannot: two recompiles of the same source differ everywhere at the byte level but share their imports, sections, and strings.</p>
+      <p>For each facet it shows what is unique to sample A, unique to sample B, and how many items they share:</p>
+      <div class="v-wrap mb-2">
+        <table class="v-table">
+          <thead><tr><th>Facet</th><th>Compared on</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Imported functions</strong></td><td>Imports parsed via LIEF (PE / ELF / Mach-O)</td></tr>
+            <tr><td><strong>Sections</strong></td><td>Section names</td></tr>
+            <tr><td><strong>Strings</strong></td><td>ASCII and wide strings extracted from the real bytes</td></tr>
+            <tr><td><strong>IOCs</strong></td><td>Extracted indicator values</td></tr>
+            <tr><td><strong>ATT&amp;CK techniques</strong></td><td>Mapped technique IDs</td></tr>
+            <tr><td><strong>Tags</strong></td><td>Applied tags</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>A <strong>SimHash byte-similarity score</strong> is shown alongside. A PE-vs-script comparison still returns the facets it can (strings, IOCs, tags) rather than failing on the one it cannot.</p>
+
+      <!-- ── SimHash Clustering ── -->
+      <h2 id="cluster"><i class="bi bi-bezier2 me-2" style="color:var(--accent);"></i>SimHash Clustering</h2>
+      <p>Every sample gets a SimHash fuzzy fingerprint at ingest. The <strong>Cluster</strong> view (reached via <strong>Find similar</strong> on a sample page) finds near-duplicate samples by Hamming distance — lower distance means more similar content.</p>
+      <ul>
+        <li>Choose a maximum distance threshold (near-identical, similar, related, loose).</li>
+        <li>Results are colour-coded by similarity and sorted closest-first; the queried sample is never included.</li>
+        <li>Each result links straight to a structural <a href="#diff">diff</a> against the anchor sample.</li>
+      </ul>
+
+      <!-- ── Config Extraction ── -->
+      <h2 id="config-extract"><i class="bi bi-braces-asterisk me-2" style="color:var(--accent);"></i>Configuration Extraction</h2>
+      <p>The highest-value question about a commodity sample is often "what is its config" — the C2 addresses, the campaign/botnet ID, the mutex, the encryption key. The <strong>Config</strong> tab on a sample page runs every registered configuration extractor against the sample's decoded bytes and shows the structured result.</p>
+      <ul>
+        <li>Extraction is <strong>pluggable by family</strong>: a registry of small parsers, each of which inspects a sample and returns structured config or nothing. Adding a parser for a new family is a matter of dropping one file into the extractor package.</li>
+        <li>Ships with two built-in heuristics: a <em>generic network</em> extractor (C2 <code>host:port</code> endpoints, URLs, and labelled fields like <code>mutex=</code> / <code>botnet=</code> from cleartext strings) and a <em>Base64-JSON</em> extractor (config stored as a base64-encoded JSON object, common in commodity RATs).</li>
+        <li>Every extractor is pure static parsing — it reads bytes, never executes them. Each result is labelled with a confidence level.</li>
+        <li>Results are saved to the sample's record and added to the search index.</li>
+      </ul>
+
+      <!-- ── YARA ── -->
+      <h2 id="yara"><i class="bi bi-code-square me-2" style="color:var(--accent);"></i>YARA Rules &amp; Retrohunt</h2>
+      <p>Navigate to <strong>YARA</strong> in the navigation bar to manage rules with the built-in editor.</p>
+      <ul>
+        <li>Create and edit rules — paste or write YARA syntax directly; rules with syntax errors fail to save with the parse error reported inline.</li>
+        <li>Run all rules against a single sample from its detail page using the <strong>Run YARA Rules</strong> tool. Results show the matching rule name, tags, matched string identifiers, file offsets, and match lengths.</li>
+        <li>Rules are stored as <code>.yar</code> files under <code>&lt;data-dir&gt;/yara-rules/</code>.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Retrohunt</h3>
+      <p>The <strong>Retrohunt</strong> button in the rule editor runs the rule you are editing across <strong>every sample in the vault</strong>, not just one — the "I just wrote a rule, what does it already catch" workflow. Each stored sample is decoded before scanning, and the results list every match with its sample and rule name. Because rules and samples are both local, the hunt is fast and needs no external service.</p>
+
+      <div class="callout"><strong>No rules are included by default</strong> — Vault1337 ships with a starter set seeded into <code>&lt;data-dir&gt;/yara-rules/</code> on first use, but building a useful rule set is up to you. Add your own <code>.yar</code> files via the web editor or by placing them in that directory.</div>
 
       <!-- ── IOC ── -->
       <h2 id="ioc"><i class="bi bi-crosshair me-2" style="color:var(--accent);"></i>IOC Management</h2>
@@ -687,13 +839,12 @@ npm run dev</pre>
       </ul>
 
       <!-- ── Tags ── -->
-      <h2 id="tags"><i class="bi bi-tags me-2" style="color:var(--accent);"></i>Tags &amp; Search</h2>
+      <h2 id="tags"><i class="bi bi-tags me-2" style="color:var(--accent);"></i>Tags</h2>
       <ul>
-        <li>Add comma-separated tags when uploading a sample.</li>
-        <li>Add or remove tags from any sample on the sample detail page.</li>
-        <li>All tags are stored in lowercase automatically.</li>
-        <li>Use the search bar on the <strong>Vault</strong> page to filter samples by filename, hash, or tag.</li>
-        <li>Results are paginated — use the page controls at the bottom of the vault list.</li>
+        <li>Add comma-separated tags when uploading a sample, or add/remove tags from any sample on its detail page.</li>
+        <li>Ingest applies tags automatically — the file extension, the source it came from, and one <code>yara:&lt;rule&gt;</code> tag per matching YARA rule.</li>
+        <li>All tags are stored in lowercase.</li>
+        <li>Filter the <strong>Vault</strong> page by filename, hash, or tag with its search box and the file-type chips; for content search across tool output and IOCs, use <a href="#search">Full-Text Search</a>.</li>
       </ul>
 
       <!-- ── Analyst Notes ── -->
@@ -702,8 +853,8 @@ npm run dev</pre>
       <ul>
         <li>Open a sample and select the <strong>Notes</strong> tab on the sample detail page.</li>
         <li>Each note has a <strong>title</strong>, a <strong>body</strong> (supports Markdown formatting), and a <strong>type</strong> label.</li>
-        <li>Note types include: <code>note</code> (general observation), <code>triage</code> (initial assessment), <code>ioc</code> (indicator context), and <code>malware</code> (malware family / campaign attribution).</li>
-        <li>Notes are preserved across sessions and visible to all users with access to the sample.</li>
+        <li>Note types: <code>note</code> (general observation), <code>hypothesis</code> (a working theory), <code>ioc_context</code> (indicator context), and <code>verdict</code> (final assessment).</li>
+        <li>Notes are preserved across sessions and included in the full-text search index.</li>
         <li>Notes appear in the PDF report export under the <strong>Analyst Notes</strong> section.</li>
       </ul>
       <div class="callout">Note bodies are rendered as Markdown in the UI — use headings, bullet lists, code blocks, and bold/italic formatting to structure your findings.</div>
@@ -773,65 +924,63 @@ npm run dev</pre>
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Bulk IOC STIX Export</h3>
       <p>On the <strong>IOC</strong> page, select one or more IOCs using the row checkboxes, then click <strong>Export STIX</strong> in the bulk action bar. The download contains STIX objects for all selected IOCs, without being tied to a specific sample.</p>
 
-      <!-- ── Decoder ── -->
-      <h2 id="decoder"><i class="bi bi-file-binary me-2" style="color:var(--accent);"></i>Decoder</h2>
-      <p>Navigate to <strong>Decoder</strong> in the navigation bar to decode and transform encoded strings without uploading a sample.</p>
-      <div class="v-wrap mb-3">
-        <table class="v-table">
-          <thead><tr><th>Mode</th><th>Description</th></tr></thead>
-          <tbody>
-            <tr><td><code>Base64</code></td><td>Decodes standard Base64-encoded strings</td></tr>
-            <tr><td><code>Hex</code></td><td>Decodes hex-encoded byte strings to ASCII/UTF-8</td></tr>
-            <tr><td><code>URL Decode</code></td><td>Decodes percent-encoded URL strings</td></tr>
-            <tr><td><code>ROT13</code></td><td>Applies ROT13 character substitution</td></tr>
-            <tr><td><code>XOR</code></td><td>XOR-decodes the input with a specified single-byte key (hex or decimal)</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p>Output is displayed inline — no data is sent to the server. Useful for quickly decoding obfuscated strings found during analysis.</p>
+      <!-- ── CyberChef ── -->
+      <h2 id="decoder"><i class="bi bi-egg-fried me-2" style="color:var(--accent);"></i>CyberChef</h2>
+      <p>Navigate to <strong>CyberChef</strong> in the navigation bar for a full, self-hosted copy of <a href="https://github.com/gchq/CyberChef" target="_blank">CyberChef</a> — GCHQ's "Cyber Swiss Army Knife" — embedded directly in Vault1337 for decoding, deobfuscating, and transforming data during analysis (Base64, hex, XOR, gzip, magic detection, and hundreds of other operations).</p>
+      <ul>
+        <li>Served entirely from your own instance out of the data directory (<code>&lt;data-dir&gt;/cyberchef/</code>) — <strong>no internet access is required</strong> at runtime and nothing you paste leaves your box.</li>
+        <li>Check the bundled version and update it to the latest GitHub release with one click from <strong>Management → CyberChef</strong>.</li>
+      </ul>
+      <div class="callout">CyberChef is © Crown Copyright GCHQ, licensed under the Apache License 2.0, and is bundled unmodified.</div>
 
       <!-- ── Management Page ── -->
       <h2 id="management"><i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Management Page</h2>
-      <p>Navigate to <strong>Management</strong> in the navigation bar (staff accounts only) to access platform administration tools organised across multiple tabs.</p>
+      <p>Navigate to <strong>Management</strong> in the navigation bar (staff account only) to administer the instance across five tabs. There is no user or role management, no audit log, and no SSO — v2 is a single-analyst platform, so those enterprise features were removed.</p>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Dashboard</h3>
-      <p>Overview statistics for the platform: total samples, total IOCs, YARA rules, active users, and recent upload activity.</p>
-
-      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Users &amp; Roles</h3>
-      <ul>
-        <li>Create, edit, and deactivate user accounts without touching the Django admin.</li>
-        <li>Assign users to roles. Built-in roles: <strong>Admin</strong>, <strong>Analyst</strong>, <strong>Read Only</strong>.</li>
-        <li>Create custom roles and assign granular permissions to them.</li>
-        <li>Set or reset any user's password.</li>
-        <li>View and clear account lockouts — accounts are locked after repeated failed login attempts.</li>
-      </ul>
+      <p>At-a-glance health and counts: total samples, IOCs, YARA rules, recent activity, and the all-important <strong>storage durability</strong> status — a prominent warning here means your data directory is on ephemeral storage and your collection is at risk (see <a href="#data-dir">The Data Directory</a>).</p>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">API Keys</h3>
-      <p>Store third-party API keys securely in the database. Keys are written to the server's environment at runtime — they are never returned in API responses after being saved. See <a href="#api-keys">API Keys</a> for the full list of supported keys.</p>
+      <p>Add and update the six third-party API keys. They are stored in <code>&lt;data-dir&gt;/config.json</code> and never returned in full after being saved. See <a href="#api-keys">API Keys</a> for the list of supported services.</p>
 
-      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Audit Log</h3>
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Vault1337</h3>
       <ul>
-        <li>Every write action (upload, delete, tool run, role change, login, logout) is recorded in the audit log with a timestamp, username, and action detail.</li>
-        <li>Filter the log by action type or username.</li>
-        <li>Purge records older than the configured retention window (<code>AUDIT_LOG_RETENTION_DAYS</code>, default 365 days) with a single click.</li>
+        <li><strong>Version check</strong> — compares your running version against the latest GitHub release and tells you when an update is available.</li>
+        <li><strong>Update from source</strong> — pull the latest application code (Docker deployments).</li>
+        <li><strong>Migrations</strong> — run <code>makemigrations</code> and <code>migrate</code> from the UI; the dashboard surfaces both unapplied migration files and unmigrated model changes.</li>
+        <li><strong>Scan now</strong> — trigger the inbox and reconcile scanners on demand.</li>
+        <li><strong>Integrity</strong> — verify every stored sample against its hash (see <a href="#integrity">Integrity &amp; Backups</a>).</li>
       </ul>
-
-      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Settings</h3>
-      <p>View current platform settings and update runtime-configurable values without restarting the server:</p>
-      <ul>
-        <li><strong>Storage paths</strong> — sample storage directory and backup directory.</li>
-        <li><strong>Database info</strong> — active database engine and name.</li>
-        <li><strong>Upload limit</strong> — maximum file upload size (configurable via <code>MAX_UPLOAD_SIZE_MB</code>).</li>
-      </ul>
-
-      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">SSO</h3>
-      <p>Configure Single Sign-On without editing environment variables. Supported providers: <strong>Okta</strong>, <strong>Azure AD / Entra ID</strong>, <strong>Google Workspace</strong>, <strong>GitHub</strong>, and any generic <strong>OIDC</strong> provider. SSO can be enabled alongside local username/password login.</p>
-
-      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Backup</h3>
-      <p>Run an on-demand <code>pg_dump</code> backup of the PostgreSQL database from the UI. Backup files are saved to the configured <code>BACKUP_DIR</code>. Backup status shows the last backup time and file path.</p>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">CyberChef</h3>
-      <p>Check the locally bundled CyberChef version and update it to the latest GitHub release with a single click. No internet access is required at runtime — CyberChef is served entirely from the container.</p>
+      <p>Check the bundled CyberChef version and update it to the latest GitHub release with a single click. The update installs into the data directory, so it survives image upgrades. No internet access is required at runtime — CyberChef is served entirely from your instance.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Settings</h3>
+      <p>View and change runtime settings, written to <code>config.json</code> (no server restart needed unless noted):</p>
+      <ul>
+        <li><strong>Samples directory</strong> (restart required), and read-only display of the backup directory and database path.</li>
+        <li><strong>Upload limit</strong> — maximum file upload size.</li>
+        <li><strong>TLD auto-update</strong> — whether to refresh the public-suffix list from the network (off by default for airgapped installs).</li>
+      </ul>
+
+      <!-- ── Integrity & Backups ── -->
+      <h2 id="integrity"><i class="bi bi-shield-check me-2" style="color:var(--accent);"></i>Integrity &amp; Backups</h2>
+
+      <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">Integrity Verification</h3>
+      <p>Because samples are stored by their plaintext SHA-256, the store is self-describing: every file can be checked against its own name. Integrity verification re-hashes every stored sample and reports drift — corruption, truncation, antivirus tampering, and missing or orphaned files.</p>
+      <ul>
+        <li>Run it from <strong>Management → Vault1337</strong>, or on the command line with <code>python manage.py verify_integrity</code>.</li>
+        <li>Each sample is reported as <strong>OK</strong>, <strong>corrupt</strong> (matches neither its plaintext nor obfuscated hash), or <strong>missing</strong>.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Database Backups</h3>
+      <p>Create, download, and restore self-contained SQLite database backups from the Management page.</p>
+      <ul>
+        <li>A backup is a single self-contained SQLite file written to <code>&lt;data-dir&gt;/backups/</code> — download it and keep it anywhere.</li>
+        <li>Restores are <strong>staged</strong>: because the database cannot be swapped under a live connection, a requested restore is applied cleanly on the next start-up, before anything opens the database.</li>
+        <li>Samples are the source of truth — restoring an older database and then running a reconcile scan re-catalogues any sample files still present.</li>
+      </ul>
+      <div class="callout">The whole vault is one directory. For a full off-box backup, snapshot or copy <code>&lt;data-dir&gt;</code> — database, samples, config, rules and all.</div>
 
       <!-- ── Tech Stack ── -->
       <h2 id="stack"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Tech Stack</h2>
@@ -839,67 +988,101 @@ npm run dev</pre>
         <table class="v-table">
           <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
           <tbody>
-            <tr><td>Backend</td><td>Python 3.12 / Django 5.2 / Django REST Framework</td></tr>
-            <tr><td>Authentication</td><td>JWT — djangorestframework-simplejwt with token blacklisting</td></tr>
+            <tr><td>Backend</td><td>Python 3.13 / Django 5.2 / Django REST Framework</td></tr>
+            <tr><td>Authentication</td><td>JWT — djangorestframework-simplejwt with token blacklisting. Single analyst, created with <code>createsuperuser</code></td></tr>
             <tr><td>API docs</td><td>drf-spectacular — Swagger UI at <code>/api/v1/docs/</code></td></tr>
             <tr><td>Frontend</td><td>React 19 / TypeScript / Vite 6 / Tailwind CSS 4</td></tr>
-            <tr><td>Database</td><td>PostgreSQL (production) / SQLite (development)</td></tr>
-            <tr><td>Static files</td><td>WhiteNoise (serves React SPA + Django admin assets)</td></tr>
-            <tr><td>Production server</td><td>Gunicorn (4 workers) + NGINX</td></tr>
-            <tr><td>Container</td><td>Docker — <code>vault1337/vault1337:latest</code></td></tr>
+            <tr><td>Database</td><td>SQLite in WAL mode — no external database</td></tr>
+            <tr><td>Search</td><td>SQLite FTS5 full-text index</td></tr>
+            <tr><td>Storage</td><td>One data directory (<code>VAULT_DATA_DIR</code>) — database, samples, config, rules, backups</td></tr>
+            <tr><td>Static files</td><td>WhiteNoise (serves the React SPA + Django admin assets)</td></tr>
+            <tr><td>Server</td><td>Gunicorn — a single self-contained container</td></tr>
+            <tr><td>Container</td><td>Docker — <code>vault1337/vault1337</code></td></tr>
           </tbody>
         </table>
       </div>
 
       <!-- ── API ── -->
       <h2 id="api-ref"><i class="bi bi-braces me-2" style="color:var(--accent);"></i>REST API</h2>
-      <p>All endpoints are under <code>/api/v1/</code>. JWT Bearer token authentication is required on all endpoints except registration and token endpoints.</p>
+      <p>All endpoints are under <code>/api/v1/</code>. JWT Bearer authentication is required on everything except the health probe and the token endpoints. There is no registration endpoint — the single account is created with <code>createsuperuser</code>. Endpoints marked <em>staff</em> require a staff account.</p>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin:1.25rem 0 .5rem;">Auth &amp; health</p>
       <div class="v-wrap mb-3">
         <table class="v-table">
           <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>POST /api/v1/auth/register/</code></td><td>Register a new user account</td></tr>
-            <tr><td><code>POST /api/v1/auth/token/</code></td><td>Obtain JWT access + refresh token pair</td></tr>
-            <tr><td><code>POST /api/v1/auth/token/set-cookie/</code></td><td>Store a refresh token in an httpOnly cookie (called after login)</td></tr>
-            <tr><td><code>POST /api/v1/auth/token/refresh/</code></td><td>Issue a new access token using the httpOnly refresh cookie</td></tr>
-            <tr><td><code>POST /api/v1/auth/logout/</code></td><td>Blacklist the refresh token and clear the cookie</td></tr>
-            <tr><td><code>GET/PATCH /api/v1/auth/user/</code></td><td>Current user profile</td></tr>
-            <tr><td><code>GET/POST /api/v1/files/</code></td><td>List vault / upload a sample</td></tr>
-            <tr><td><code>GET/DELETE /api/v1/files/{id}/</code></td><td>Sample detail / delete</td></tr>
-            <tr><td><code>GET /api/v1/files/{id}/download/</code></td><td>Download sample file</td></tr>
-            <tr><td><code>POST /api/v1/files/{id}/run_tool/</code></td><td>Run an analysis tool</td></tr>
-            <tr><td><code>POST /api/v1/files/{id}/add_tag/</code></td><td>Add a tag to a sample</td></tr>
-            <tr><td><code>POST /api/v1/files/{id}/remove_tag/</code></td><td>Remove a tag from a sample</td></tr>
-            <tr><td><code>GET/POST /api/v1/files/{id}/comments/</code></td><td>List / add comments on a sample</td></tr>
-            <tr><td><code>GET /api/v1/files/{id}/report/</code></td><td>Structured JSON report (hashes, VT, IOCs, tags)</td></tr>
-            <tr><td><code>POST /api/v1/files/{id}/vt-enrich/</code></td><td>Fetch / refresh VirusTotal data for a sample</td></tr>
-            <tr><td><code>POST /api/v1/files/fetch_url/</code></td><td>Fetch a sample from a URL</td></tr>
-            <tr><td><code>POST /api/v1/files/vt-download/</code></td><td>Download from VirusTotal by SHA256</td></tr>
-            <tr><td><code>POST /api/v1/files/mb-download/</code></td><td>Download from MalwareBazaar by SHA256</td></tr>
-            <tr><td><code>GET/PATCH /api/v1/iocs/</code></td><td>List and update IOCs — supports <code>?ioc_type=ip|domain|url|email|…</code> filter</td></tr>
-            <tr><td><code>POST /api/v1/iocs/{id}/enrich/</code></td><td>Re-enrich a single IOC against VT + AbuseIPDB; returns updated IOC</td></tr>
-            <tr><td><code>GET /api/v1/iocs/{id}/samples/</code></td><td>List all samples that share a given IOC (pivot on shared infrastructure)</td></tr>
-            <tr><td><code>POST /api/v1/iocs/export-stix/</code></td><td>Export selected IOCs as a STIX 2.1 bundle — body: <code>{"ids": [1,2,3]}</code></td></tr>
-            <tr><td><code>POST /api/v1/iocs/bulk-delete/</code></td><td>Delete selected IOCs — body: <code>{"ids": [1,2,3]}</code> (staff only)</td></tr>
-            <tr><td><code>POST /api/v1/files/{id}/map-attack/</code></td><td>Run MITRE ATT&amp;CK technique mapping for a sample; persists and returns results</td></tr>
-            <tr><td><code>GET /api/v1/files/{id}/stix/</code></td><td>Download a STIX 2.1 bundle for a sample and all its IOCs</td></tr>
-            <tr><td><code>GET/POST/PUT/DELETE /api/v1/yara/</code></td><td>YARA rule management</td></tr>
-            <tr><td><code>POST /api/v1/intel/ip/</code></td><td>IP intelligence lookup (VT, AbuseIPDB, Spur, Shodan)</td></tr>
-            <tr><td><code>POST /api/v1/intel/domain/</code></td><td>Domain intelligence lookup (VT, WHOIS, passive DNS)</td></tr>
-            <tr><td><code>GET/POST /api/v1/admin/keys/</code></td><td>API key management (staff only)</td></tr>
-            <tr><td><code>GET/POST/PATCH/DELETE /api/v1/admin/users/</code></td><td>User account management (staff only)</td></tr>
-            <tr><td><code>POST /api/v1/admin/users/{id}/set_password/</code></td><td>Set a user's password (staff only)</td></tr>
-            <tr><td><code>GET/POST/PATCH/DELETE /api/v1/admin/roles/</code></td><td>Role and permission management (staff only)</td></tr>
-            <tr><td><code>GET /api/v1/admin/permissions/</code></td><td>List all available permissions</td></tr>
-            <tr><td><code>GET /api/v1/admin/dashboard/</code></td><td>Platform statistics (staff only)</td></tr>
-            <tr><td><code>GET /api/v1/admin/audit/</code></td><td>Audit log — supports <code>?action=</code> and <code>?username=</code> filters (staff only)</td></tr>
-            <tr><td><code>POST /api/v1/admin/audit/purge/</code></td><td>Purge audit log records older than retention window (staff only)</td></tr>
-            <tr><td><code>GET/POST /api/v1/admin/auth/lockouts/</code></td><td>View and clear account lockouts (staff only)</td></tr>
-            <tr><td><code>GET/POST /api/v1/admin/settings/</code></td><td>View and update runtime platform settings (staff only)</td></tr>
-            <tr><td><code>GET/POST /api/v1/admin/sso/</code></td><td>SSO configuration (staff only)</td></tr>
-            <tr><td><code>GET /api/v1/admin/backup/status/</code></td><td>Last backup status (staff only)</td></tr>
-            <tr><td><code>POST /api/v1/admin/backup/db/</code></td><td>Run a pg_dump database backup (staff only)</td></tr>
-            <tr><td><code>POST /api/v1/tools/qr-decode/</code></td><td>Stateless QR code decode</td></tr>
+            <tr><td><code>GET /health/</code></td><td>Liveness / readiness probe (unauthenticated)</td></tr>
+            <tr><td><code>POST /auth/token/</code></td><td>Obtain a JWT access + refresh token pair</td></tr>
+            <tr><td><code>POST /auth/token/refresh/</code></td><td>Issue a new access token from the httpOnly refresh cookie</td></tr>
+            <tr><td><code>POST /auth/token/set-cookie/</code></td><td>Store the refresh token in an httpOnly cookie (called after login)</td></tr>
+            <tr><td><code>POST /auth/logout/</code></td><td>Blacklist the refresh token and clear the cookie</td></tr>
+            <tr><td><code>GET /auth/user/</code></td><td>Current user (read-only — so the SPA knows who it is)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin:1.25rem 0 .5rem;">Samples</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET/POST /files/</code></td><td>List vault (supports <code>?search=</code>, <code>?file_type=</code>) / upload a sample</td></tr>
+            <tr><td><code>GET/DELETE /files/{sha256}/</code></td><td>Sample detail / delete</td></tr>
+            <tr><td><code>GET /files/{sha256}/download/</code></td><td>Download the sample (decoded)</td></tr>
+            <tr><td><code>POST /files/{sha256}/run_tool/</code></td><td>Run an analysis tool</td></tr>
+            <tr><td><code>GET /files/{sha256}/analysis_results/</code></td><td>Stored tool-run output</td></tr>
+            <tr><td><code>POST /files/{sha256}/add_tag/ · remove_tag/</code></td><td>Add / remove a tag</td></tr>
+            <tr><td><code>GET/POST /files/{sha256}/comments/</code></td><td>List / add analyst notes</td></tr>
+            <tr><td><code>GET /files/{sha256}/report/</code></td><td>Structured JSON report (hashes, VT, IOCs, tags)</td></tr>
+            <tr><td><code>POST /files/{sha256}/vt-enrich/ · mb-lookup/</code></td><td>Fetch / refresh VirusTotal or MalwareBazaar data</td></tr>
+            <tr><td><code>GET /files/{sha256}/vt_behaviour/</code></td><td>VirusTotal sandbox behaviour report</td></tr>
+            <tr><td><code>GET /files/{sha256}/similar/</code></td><td>Near-duplicate samples by SimHash (<code>?threshold=</code>)</td></tr>
+            <tr><td><code>POST /files/{sha256}/map-attack/</code></td><td>Run MITRE ATT&amp;CK mapping; persists and returns techniques</td></tr>
+            <tr><td><code>POST /files/{sha256}/extract-config/</code></td><td>Run configuration extractors; persists and returns results</td></tr>
+            <tr><td><code>GET /files/{sha256}/stix/</code></td><td>Download a STIX 2.1 bundle for the sample and its IOCs</td></tr>
+            <tr><td><code>POST /files/fetch_url/ · vt-download/ · mb-download/</code></td><td>Ingest from a URL, VirusTotal, or MalwareBazaar</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin:1.25rem 0 .5rem;">Search, diff, cases &amp; IOCs</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /search/?q=</code></td><td>Full-text search across the catalogue</td></tr>
+            <tr><td><code>GET /diff/?a=&amp;b=</code></td><td>Structural diff of two samples</td></tr>
+            <tr><td><code>GET/POST /cases/</code></td><td>List / create cases</td></tr>
+            <tr><td><code>GET/PATCH/DELETE /cases/{id}/</code></td><td>Case detail / update / delete</td></tr>
+            <tr><td><code>POST /cases/{id}/add_samples/ · remove_samples/</code></td><td>Add / remove samples (body: <code>{"sha256s":[…]}</code>)</td></tr>
+            <tr><td><code>GET /cases/{id}/export/</code></td><td>Download the case as a <code>.vault</code> archive</td></tr>
+            <tr><td><code>POST /cases/import_archive/</code></td><td>Import a <code>.vault</code> archive (multipart)</td></tr>
+            <tr><td><code>GET/PATCH /iocs/</code></td><td>List / update IOCs (<code>?ioc_type=</code>, <code>?filter=</code>)</td></tr>
+            <tr><td><code>POST /iocs/{id}/enrich/</code></td><td>Re-enrich one IOC against VT + AbuseIPDB</td></tr>
+            <tr><td><code>GET /iocs/{id}/samples/</code></td><td>Samples sharing this IOC (pivot on shared infrastructure)</td></tr>
+            <tr><td><code>POST /iocs/export-stix/ · bulk-delete/</code></td><td>Export / delete selected IOCs (body: <code>{"ids":[…]}</code>)</td></tr>
+            <tr><td><code>GET/POST/PUT/DELETE /yara/</code></td><td>YARA rule management</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin:1.25rem 0 .5rem;">Intelligence, tools &amp; administration</p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>POST /intel/ip/</code></td><td>IP intelligence (VT, AbuseIPDB, Spur, Shodan)</td></tr>
+            <tr><td><code>POST /intel/domain/</code></td><td>Domain intelligence (VT, WHOIS, passive DNS)</td></tr>
+            <tr><td><code>POST /tools/qr-decode/</code></td><td>Stateless QR code decode</td></tr>
+            <tr><td><code>GET/POST /admin/keys/</code></td><td>API key management <em>(staff)</em></td></tr>
+            <tr><td><code>GET/POST /admin/settings/</code></td><td>Runtime settings, written to <code>config.json</code> <em>(staff)</em></td></tr>
+            <tr><td><code>GET /admin/dashboard/</code></td><td>Counts, health, storage durability <em>(staff)</em></td></tr>
+            <tr><td><code>POST /admin/scan/</code></td><td>Trigger the inbox / reconcile scanners <em>(staff)</em></td></tr>
+            <tr><td><code>POST /admin/retrohunt/</code></td><td>Run a YARA rule across the whole vault <em>(staff)</em></td></tr>
+            <tr><td><code>POST /admin/integrity/</code></td><td>Verify every stored sample against its hash <em>(staff)</em></td></tr>
+            <tr><td><code>GET/POST /admin/backup/</code>, <code>/admin/backup/{name}/</code>, <code>…/restore/</code></td><td>List, create, download, and stage-restore database backups <em>(staff)</em></td></tr>
+            <tr><td><code>GET /admin/cyberchef/version/</code>, <code>POST …/update/</code></td><td>CyberChef version check and update <em>(staff)</em></td></tr>
+            <tr><td><code>/admin/app/version/ · update/ · migrations/ · migrate/ · makemigrations/</code></td><td>Application version, update, and migration management <em>(staff)</em></td></tr>
           </tbody>
         </table>
       </div>
@@ -962,9 +1145,9 @@ npm run dev</pre>
       <div class="ack-wrap">
         <a class="ack-pill" href="https://gunicorn.org/" target="_blank">Gunicorn</a>
         <a class="ack-pill" href="https://whitenoise.readthedocs.io/" target="_blank">WhiteNoise</a>
-        <a class="ack-pill" href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>
+        <a class="ack-pill" href="https://www.sqlite.org/" target="_blank">SQLite</a>
         <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
-        <a class="ack-pill" href="https://nginx.org/" target="_blank">NGINX</a>
+        <a class="ack-pill" href="https://github.com/gchq/CyberChef" target="_blank">CyberChef</a>
       </div>
 
     </main>

@@ -168,7 +168,8 @@
           <ul style="color:var(--muted); font-size:.82rem; padding-left:1.2rem; margin-bottom:1.4rem;">
             <li>20+ static analysis tools — Strings, Hex, YARA, LIEF, Capstone, OleTools, dnfile, and more</li>
             <li>IOC extraction, MITRE ATT&amp;CK mapping, STIX 2.1 export, PDF report generation</li>
-            <li>IP &amp; domain intelligence via VirusTotal, AbuseIPDB, Spur, and Shodan</li>
+            <li>Full-text search, sample diffing, cases with portable <code>.vault</code> export/import, config extraction</li>
+            <li>One analyst, one box — SQLite, a single data directory, samples obfuscated at rest, works offline</li>
             <li>Runs on a Raspberry Pi 5 — single Docker command deployment</li>
           </ul>
           <div class="callout" style="margin-bottom:1.2rem;"><strong>Source temporarily private.</strong> The repository has been made private until further notice. Documentation and the Docker Hub image remain available — any interest in source access should be made directly.</div>
@@ -352,9 +353,33 @@
 
       <div class="col-sm-6 col-lg-4">
         <div class="f-card">
+          <div class="f-icon"><i class="bi bi-search"></i></div>
+          <h5>Full-Text Search</h5>
+          <p>Find the sample behind a remembered C2 domain, mutex, or string. SQLite FTS5 indexes names, tags, IOCs, tool output, and comments — results with highlighted snippets.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-folder-symlink"></i></div>
+          <h5>Cases &amp; Portable Archives</h5>
+          <p>Group samples into investigations, then export a case as a portable <code>.vault</code> archive and import it elsewhere — samples travel obfuscated and are verified against their SHA256 on import.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-distribute-vertical"></i></div>
+          <h5>Diff, Cluster &amp; Extract Config</h5>
+          <p>Structurally diff two samples, cluster near-duplicates by SimHash, and pull C2 / mutex / campaign config with a pluggable per-family extractor registry.</p>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
           <div class="f-icon"><i class="bi bi-box-seam"></i></div>
-          <h5>Docker Ready</h5>
-          <p>Single-command Docker run or a full Compose stack with PostgreSQL and persistent volumes. Runs comfortably on a Raspberry Pi 5 in production.</p>
+          <h5>One Analyst, One Box</h5>
+          <p>Single container, SQLite, and one data directory that holds everything — upgrade with <code>docker compose pull</code>, back up by copying one folder. Samples obfuscated at rest; works fully offline. Runs comfortably on a Raspberry Pi 5.</p>
         </div>
       </div>
 
