@@ -187,11 +187,9 @@
       <div class="step">
         <div class="step-n">3</div>
         <div class="step-b">
-          <h5>Log in</h5>
-          <p>Open <strong>http://localhost:8000</strong> and log in with the default credentials:</p>
-          <pre>Username: admin
-Password: changeme123</pre>
-          <div class="callout"><strong>Important:</strong> Change your password immediately via the <strong>Management</strong> page after first login.</div>
+          <h5>Create your account</h5>
+          <p>Open <strong>http://localhost:8000</strong>. On first visit a one-time <strong>setup wizard</strong> prompts you to create your analyst account.</p>
+          <div class="callout"><strong>No default credentials.</strong> Vault1337 ships with no shipped admin password — you choose your own username and password on first run. (For scripted/headless deploys you can instead set <code>DJANGO_SUPERUSER_PASSWORD</code> to bootstrap the account and skip the wizard.)</div>
         </div>
       </div>
 
@@ -227,7 +225,7 @@ cd Vault1337/Docker</pre>
               <tbody>
                 <tr><td><code>SECRET_KEY</code></td><td>Long random string — <code>openssl rand -hex 50</code>. If unset, one is generated into <code>config.json</code> on first start</td></tr>
                 <tr><td><code>ALLOWED_HOSTS</code></td><td>Comma-separated hostnames or IPs, e.g. <code>localhost,192.168.1.10</code></td></tr>
-                <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Initial admin password (default <code>changeme123</code> — change it)</td></tr>
+                <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Optional — set it to bootstrap the account headlessly and skip the setup wizard. Unset by default (no shipped credential)</td></tr>
               </tbody>
             </table>
           </div>
@@ -240,7 +238,7 @@ cd Vault1337/Docker</pre>
         <div class="step-b">
           <h5>Start</h5>
           <pre>docker compose up -d</pre>
-          <p>On first start the entrypoint applies any staged restore, runs migrations, creates the superuser from the <code>DJANGO_SUPERUSER_*</code> env vars, and starts Gunicorn.</p>
+          <p>On first start the entrypoint applies any staged restore, runs migrations, and starts Gunicorn.</p>
         </div>
       </div>
 
@@ -248,7 +246,7 @@ cd Vault1337/Docker</pre>
         <div class="step-n">4</div>
         <div class="step-b">
           <h5>Open Vault1337</h5>
-          <p>Navigate to <strong>http://localhost:8000</strong> (or your configured <code>HOST_PORT</code>) and log in with <code>admin</code> / <code>changeme123</code>. Change the password immediately via the Management page.</p>
+          <p>Navigate to <strong>http://localhost:8000</strong> (or your configured <code>HOST_PORT</code>) and complete the one-time setup wizard to create your analyst account.</p>
           <pre># View logs
 docker compose logs -f
 
@@ -388,9 +386,9 @@ npm run dev</pre>
             <tr><td><code>SECRET_KEY</code></td><td><em>auto-generated</em></td><td>Django secret key. If unset, a random key is generated into <code>config.json</code> on first start</td></tr>
             <tr><td><code>DEBUG</code></td><td><code>False</code></td><td>Set <code>True</code> for local development only — never in production</td></tr>
             <tr><td><code>ALLOWED_HOSTS</code></td><td><code>127.0.0.1,localhost</code></td><td>Comma-separated list of allowed hostnames/IPs</td></tr>
-            <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td><code>admin</code></td><td>Superuser created on first container startup</td></tr>
-            <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td><code>admin@localhost</code></td><td>Superuser email</td></tr>
-            <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><code>changeme123</code></td><td>Superuser initial password — change this after first login</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td><em>unset</em></td><td>Optional headless bootstrap — when set, the entrypoint creates the account and the first-run wizard is skipped. Unset by default (no shipped credential)</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td><code>admin</code></td><td>Username for the bootstrapped account (only used when the password above is set)</td></tr>
+            <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td><em>empty</em></td><td>Email for the bootstrapped account (optional)</td></tr>
             <tr><td><code>HOST_PORT</code></td><td><code>8000</code></td><td>Host port mapped to container port 8000</td></tr>
             <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Comma-separated origins allowed for CORS (frontend dev server)</td></tr>
             <tr><td><code>MAX_UPLOAD_SIZE_MB</code></td><td><code>200</code></td><td>Maximum file upload size in megabytes (also settable in <code>config.json</code>)</td></tr>
