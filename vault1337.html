@@ -79,6 +79,7 @@
         <li class="d-group">Installation</li>
         <li><a href="#install-docker">Docker (Quick Start)</a></li>
         <li><a href="#compose">Docker Compose (Persistent)</a></li>
+        <li><a href="#verify">Verifying the Image</a></li>
         <li><a href="#docker-dev">Docker Development</a></li>
         <li><a href="#local">Local Development</a></li>
 
@@ -288,6 +289,16 @@ volumes:
 docker compose up -d</pre>
       <p>The container is replaced; <code>/data</code> is untouched. Migrations run automatically on start. Pin a specific version (for example <code>vault1337/vault1337:2.0.1</code>) rather than relying on <code>latest</code> if you want to control when that happens.</p>
       <p>Images are published for <strong>linux/amd64</strong> and <strong>linux/arm64</strong>, so they run on a NAS or a Raspberry Pi as well as a normal server.</p>
+
+      <h3 id="verify">Verifying the image signature</h3>
+      <p>Published images are signed with <a href="https://github.com/sigstore/cosign" target="_blank">cosign</a>. Verifying is optional but worth doing on a first install — it proves the layers you pulled are the ones that were published, and have not been altered in the registry or in transit.</p>
+      <p>Fetch the public key and verify:</p>
+      <pre>curl -O https://www.vault1337.com/cosign.pub
+
+cosign verify --key cosign.pub vault1337/vault1337:2.0.2</pre>
+      <p>A successful check prints <code>The signatures were verified against the specified public key</code> followed by the signed manifest digest. Confirm that digest matches what you pulled:</p>
+      <pre>docker buildx imagetools inspect vault1337/vault1337:2.0.2 --format '{{.Manifest.Digest}}'</pre>
+      <div class="callout"><strong>Applies to 2.0.1 and later.</strong> Earlier releases were signed by a hosted CI pipeline using keyless (OIDC) signing, a different trust model, and will not verify against this key. Releases are now built and signed on a workstation, so the signature attests that the maintainer's key signed the image — not which pipeline built it. Treat it as an integrity and continuity check, not a build provenance claim.</div>
 
       <h3>Useful commands</h3>
       <pre>docker compose logs -f          # live logs
