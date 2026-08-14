@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Minos documentation — a modern DNS sinkhole and Pi-hole alternative written in Go. Install, deploy on a Raspberry Pi, configure, and use.">
-  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, adguard alternative, dns, doh, dot, go, raspberry pi, adblock">
+  <meta name="description" content="Minos documentation — a modern DNS sinkhole and Pi-hole alternative written in Go, with in-process DNSSEC validation. Install, deploy on a Raspberry Pi, configure, and use.">
+  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, adguard alternative, dns, dnssec, dnssec validation, doh, dot, go, raspberry pi, adblock">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
   <title>Minos - Documentation</title>
@@ -87,6 +87,7 @@
         <li class="d-group">Deployment</li>
         <li><a href="#deploy">Raspberry Pi / Linux</a></li>
         <li><a href="#encrypted-dns">Encrypted DNS</a></li>
+        <li><a href="#dnssec">DNSSEC Validation</a></li>
 
         <li class="d-group">Using Minos</li>
         <li><a href="#family">Family Controls</a></li>
@@ -130,6 +131,7 @@
         <li>Every blocked query shows <em>which list and rule</em> condemned it, with a one-click pardon from the live log — never more than two clicks from seeing a block to allowing it.</li>
         <li>Repeat queries are answered from a built-in response cache — concurrent identical queries collapse into one, and stale answers are served instantly while a fresh one is fetched behind them (RFC 8767).</li>
         <li>A failing upstream is sidestepped automatically and re-probed until it recovers — one dead resolver never slows the whole network.</li>
+        <li>Optional <a href="#dnssec">in-process DNSSEC validation</a> against the DNS root of trust — so even your upstream resolver can't forge an answer for a signed domain.</li>
       </ul>
 
       <h3>For the household</h3>
@@ -247,6 +249,61 @@ sudo cp deploy/minos.service /etc/systemd/system/</pre>
         and renew one automatically via ACME — Let's Encrypt through Cloudflare, deSEC, DuckDNS, or RFC 2136.
       </p>
 
+      <!-- ── DNSSEC ── -->
+      <h2 id="dnssec"><i class="bi bi-patch-check me-2" style="color:var(--accent);"></i>DNSSEC Validation</h2>
+      <p>
+        Encrypted upstreams protect the path to your resolver. They don't protect you <em>from</em> it. Since
+        <strong>v0.19.0</strong>, Minos can check signed answers itself against the DNS root of trust, so a
+        compromised, misconfigured, or simply dishonest upstream can't hand you a forged address for a signed
+        domain. Neither Pi-hole nor AdGuard Home validates in-process.
+      </p>
+      <p>Set it in Settings, beside the upstreams, or in the config file:</p>
+      <pre>dns:
+  dnssec: permissive   # off | permissive | enforce</pre>
+
+      <ul>
+        <li><strong>off</strong> — the default. Validation is delegated to your upstream resolvers, exactly as before.</li>
+        <li><strong>permissive</strong> — validate every forwarded answer and count the outcomes, but never block. <em>Start here</em>: it shows you what your network actually sees, with zero risk.</li>
+        <li><strong>enforce</strong> — additionally refuse answers that <em>fail</em> validation (a forged record, a stripped signature, a broken chain) with SERVFAIL. The refusal appears in the query log attributed to <code>dnssec</code>, with the reason — the same "why was this condemned" treatment as a blocklist hit.</li>
+      </ul>
+
+      <div class="callout">
+        <strong>It can't break your resolution.</strong> Answers that can't be judged either way — an upstream that
+        returns no DNSSEC records, a transient chain-fetch failure — always pass, in both modes. A misconfigured
+        upstream costs you visibility, never connectivity. Unsigned domains (still most of the internet) are
+        unaffected.
+      </div>
+
+      <h3>What it costs</h3>
+      <p>
+        One signature check per cache-missed answer: roughly <strong>50&nbsp;µs</strong> on amd64, well under a
+        millisecond on a Raspberry Pi. Cache hits and blocked queries cost nothing extra — validation happens once,
+        before the answer is cached, and the verdict is cached with it. Zone keys are validated once and reused, so
+        the full chain walk happens on the first query into a zone, not every query.
+      </p>
+
+      <h3>Under the hood</h3>
+      <ul>
+        <li>Full chain of trust: RRSIG signatures verified up through DNSKEY and DS records to the root trust anchors, which ship embedded.</li>
+        <li>NSEC and NSEC3 denial-of-existence proofs (including opt-out), wildcard next-closer proofs, and a delegation walk that tells an honestly unsigned zone from a signature-stripping attack.</li>
+        <li>Hardened against resource-exhaustion attacks from day one — KeyTrap (CVE-2023-50387) bounds on signature work and the RFC 9276 cap on NSEC3 iterations.</li>
+        <li>Clients that ask for DNSSEC (the DO bit) get the full records and a trustworthy AD bit; everyone else gets clean, stripped answers.</li>
+      </ul>
+
+      <h3>Watching it</h3>
+      <p>
+        Prometheus exposes the outcomes, which is how you decide whether to move from permissive to enforce:
+      </p>
+      <pre>minos_dnssec_results_total{status="secure"}
+minos_dnssec_results_total{status="insecure"}        # unsigned zone, nothing to check
+minos_dnssec_results_total{status="bogus"}           # would be refused in enforce mode
+minos_dnssec_results_total{status="indeterminate"}   # couldn't be judged — always passes</pre>
+      <p>
+        Run permissive for a week. If <code>bogus</code> stays at zero and <code>indeterminate</code> is low,
+        enforce is a safe switch. A high <code>indeterminate</code> count usually means the upstream isn't
+        returning DNSSEC records at all.
+      </p>
+
       <!-- ── Family controls ── -->
       <h2 id="family"><i class="bi bi-people me-2" style="color:var(--accent);"></i>Family Controls</h2>
       <ul>
@@ -300,8 +357,9 @@ sudo cp deploy/minos.service /etc/systemd/system/</pre>
         Two follow-up rounds from real-world use have shipped since: a bootstrap-free default upstream and a curated
         resolver picker, clickable dashboard drill-downs and a full-width UI, rollback-safe config loading, device
         <strong>vendor</strong> labels and <strong>mDNS</strong> hostname resolution, a full-history query log, and
-        in-app upgrade guidance. Still planned are further device-identity layers (DHCP-lease ingestion, NetBIOS); the
-        one item under consideration is DNSSEC validation. Details are in
+        in-app upgrade guidance. <strong>In-process <a href="#dnssec">DNSSEC validation</a> shipped in v0.19.0</strong>
+        (August 2026). Still planned is further device identity (DHCP-lease ingestion); DNS-over-QUIC is the one item
+        under consideration. Details are in
         <a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">docs/roadmap.md</a>.
       </p>
 
