@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Carapace documentation — a safe HTML/CSS/JS renderer for security researchers, written in Rust. Renders hostile pages to PNG with all network requests blocked and produces a threat report.">
+  <meta name="description" content="Carapace documentation — a confined HTML/CSS/JS renderer for security researchers, written in Rust. Headless Chromium with JavaScript enabled behind an SSRF-enforcing policy proxy, a threat report with every render, and a /solve endpoint for Cloudflare and JavaScript cloaking gates.">
   <meta name="keywords" content="carapace, safe web renderer, malware, phishing, clickfix, magecart, rust, chromium headless, threat report, screenshot, security research">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
@@ -44,13 +44,13 @@
 <!-- ── Page header ────────────────────────────────────────────────────────── -->
 <div class="hero" style="padding: 3.5rem 1rem 3rem;">
   <div class="container">
-    <p class="s-sub mb-1" style="color:var(--muted);">Safe HTML/CSS/JS renderer for security researchers</p>
+    <p class="s-sub mb-1" style="color:var(--muted);">Confined HTML/CSS/JS renderer for security researchers</p>
     <img src="Images/carapace-logo.png" alt="Carapace" style="max-width:min(180px,40vw); width:100%; height:auto; margin-bottom:1rem; border-radius:16px; filter:drop-shadow(0 0 24px rgba(189,54,58,.35));">
     <h1>Carapace</h1>
     <p class="sub" style="max-width:660px; margin:0 auto 1.5rem;">
-      Carapace fetches a URL, sanitises the page, analyses the JavaScript, and renders it to a PNG — with
-      <strong>every outbound network request intercepted and blocked</strong>. Dynamic attacks render visibly in
-      the screenshot; nothing ever leaves the machine. A threat report is produced alongside every render.
+      Carapace loads a URL in headless Chromium with <strong>JavaScript enabled</strong> — so runtime-injected
+      attacks actually render — behind an <strong>SSRF-enforcing policy proxy</strong>: the page's own content loads
+      live, and every cross-origin request is refused and recorded. A threat report accompanies every render.
     </p>
     <div class="cta">
       <a href="#quick-start" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Quick Start</a>
@@ -62,6 +62,7 @@
       <img src="https://img.shields.io/badge/Rust-000000?logo=rust&logoColor=white" alt="Rust">
       <img src="https://img.shields.io/badge/Chromium-headless-4285F4?logo=googlechrome&logoColor=white" alt="Chromium">
       <img src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white" alt="Docker">
+      <img src="https://img.shields.io/badge/version-0.2.3-7c3aed" alt="Version">
     </div>
   </div>
 </div>
@@ -86,8 +87,10 @@
         <li class="d-group">Reference</li>
         <li><a href="#cli">CLI Reference</a></li>
         <li><a href="#api">HTTP API</a></li>
+        <li><a href="#solve">Getting Past Gates</a></li>
         <li><a href="#threat-report">Threat Report</a></li>
         <li><a href="#flag-codes">Flag Codes</a></li>
+        <li><a href="#env">Environment</a></li>
         <li><a href="#tech-stack">Tech Detection</a></li>
         <li><a href="#fallback">Renderer Fallback</a></li>
 
@@ -103,43 +106,66 @@
       <!-- ── Overview ── -->
       <h2 id="overview"><i class="bi bi-camera me-2" style="color:var(--accent);"></i>What is Carapace</h2>
       <p>
-        Carapace is a safe HTML/CSS/JS renderer for security researchers, written in Rust. Point it at a hostile URL
-        and it fetches, sanitises, statically analyses, and renders the page to a PNG — while routing every outbound
-        network request through a local logging proxy that <strong>rejects every connection</strong>. This lets
-        dynamic overlays (ClickFix, SocGholish, ClearFake, wallet drainers) execute and become visible in the
-        screenshot, revealing the actual attack UI rather than a blank page — without a single byte reaching the
-        attacker's infrastructure.
+        Carapace is a confined HTML/CSS/JS renderer for security researchers, written in Rust. Point it at a hostile URL
+        and it loads the page in headless Chromium <strong>with JavaScript enabled</strong> — so runtime-injected attacks
+        (ClickFix, SocGholish, ClearFake, wallet drainers) actually render and become visible in the screenshot, rather
+        than showing the blank page a JS-disabled scanner sees.
       </p>
-      <div class="callout"><strong>Open-source (MIT):</strong> source, issues, and releases live at <a href="https://github.com/DanDreadless/Carapace" target="_blank">github.com/DanDreadless/Carapace</a>. Carapace is standalone, but also drops in as the visual renderer for <a href="insight.html">Insight</a> — see <a href="#insight">Works With Insight</a>.</div>
+      <p>
+        Because it executes attacker code, the browser is treated as hostile: every connection it makes goes through an
+        <strong>SSRF-enforcing policy proxy</strong>. The page's own same-origin content and a vetted CDN/font list are
+        fetched live, so the page renders as a visitor would see it; every cross-origin request — the C2 and exfiltration
+        signal — is refused and recorded as evidence. A threat report is produced alongside every render.
+      </p>
+      <p>
+        A <code>/solve</code> endpoint gets past Cloudflare challenges and JavaScript cloaking gates and returns the page
+        the server actually served, with the navigation chain the browser was sent down.
+      </p>
+      <div class="callout"><strong>Open-source (MIT):</strong> source, issues, and releases live at <a href="https://github.com/DanDreadless/Carapace" target="_blank">github.com/DanDreadless/Carapace</a>. Carapace is standalone, but also drops in as the renderer for <a href="insight.html">Insight</a> — see <a href="#insight">Works With Insight</a>.</div>
 
       <!-- ── How it works ── -->
       <h2 id="how"><i class="bi bi-diagram-2 me-2" style="color:var(--accent);"></i>How It Works</h2>
-      <p>Every render runs the same eight-stage pipeline:</p>
+      <p>Every render runs the same pipeline:</p>
       <ol style="color:var(--muted); font-size:.875rem; padding-left:1.2rem;">
         <li style="margin-bottom:.5rem;"><strong>Fetch</strong> — a hardened Rust HTTP client (reqwest, HTTP/2) fetches the URL with SSRF protection and decompression-bomb limits.</li>
-        <li style="margin-bottom:.5rem;"><strong>Parse &amp; sanitise</strong> — the HTML is scrubbed: <code>&lt;script&gt;</code> tags, event handlers, <code>javascript:</code> URIs, and <code>data:</code> URLs are stripped before the page reaches the browser.</li>
+        <li style="margin-bottom:.5rem;"><strong>Parse &amp; sanitise</strong> — the HTML is parsed and scrubbed: <code>&lt;script&gt;</code> tags, event handlers, <code>javascript:</code> URIs, and <code>data:</code> URLs are stripped, recording an HTML flag for each removal.</li>
         <li style="margin-bottom:.5rem;"><strong>Static JS analysis</strong> — all collected script content is walked with an AST analyser (OXC) before removal — detecting eval, obfuscation, exfiltration calls, DOM sinks, clipboard hijacks, and sandbox-evasion probes.</li>
         <li style="margin-bottom:.5rem;"><strong>JS sandbox</strong> — for framework-driven pages (React, Vue, Angular…), scripts run in an isolated rquickjs runtime; network APIs are shimmed to log and block all outbound calls.</li>
-        <li style="margin-bottom:.5rem;"><strong>Inline resources</strong> — external stylesheets and images are fetched and inlined as data URIs; external <code>url()</code> references in CSS are blocked.</li>
-        <li style="margin-bottom:.5rem;"><strong>Render</strong> — a self-contained HTML file is handed to Chromium headless with <strong>JavaScript enabled</strong> and all network requests routed through a local logging proxy that records every URL and immediately rejects the connection.</li>
+        <li style="margin-bottom:.5rem;"><strong>Inline resources</strong> — external stylesheets and images are fetched and inlined as data URIs (bounded in size); external <code>url()</code> references in CSS are blocked. This produces the self-contained page used by the offline fallback.</li>
+        <li style="margin-bottom:.5rem;"><strong>Render (live)</strong> — Chromium navigates the <strong>real URL</strong> with JavaScript enabled, driven over the Chrome DevTools Protocol through a pipe (<code>--remote-debugging-pipe</code> — no debug port a page could reach) when <code>CARAPACE_CDP</code> is on, otherwise via Chromium's CLI. All traffic goes through the policy proxy. A Windows identity is presented so OS-gated payloads execute, navigation is suppressed so the attack UI stays on screen, and the page settles on network-idle — floored, so a delayed overlay still injects — before the screenshot and post-JS DOM are captured.</li>
+        <li style="margin-bottom:.5rem;"><strong>Navigation capture</strong> — main-frame navigations are intercepted with CDP <code>Fetch</code> (Document requests only): the first is the validated page load and continues; every later one is a client-side redirect whose JS-computed destination is recorded and blocked, never dispatched. Destinations come back as <code>nav_targets</code> for the caller to SSRF-validate and scan.</li>
+        <li style="margin-bottom:.5rem;"><strong>Offline fallback</strong> — if the live render fails or comes back blank, the self-contained sanitised page from step 5 is rendered with a proxy that refuses every connection and a <code>fetch</code>/<code>XMLHttpRequest</code> mock, so data-driven pages still show something.</li>
         <li style="margin-bottom:.5rem;"><strong>Threat report</strong> — findings from static analysis, the JS sandbox, the CSS overlay detector, the post-render DOM diff, and the network intercept log are collected into a JSON report.</li>
         <li><strong>Annotation</strong> — a verdict badge is composited onto every screenshot showing the domain, risk score, verdict label, and scan timestamp.</li>
       </ol>
 
       <!-- ── Security model ── -->
       <h2 id="security"><i class="bi bi-shield-lock me-2" style="color:var(--accent);"></i>Security Model</h2>
+      <p>
+        Carapace <strong>executes attacker JavaScript</strong>. The browser is therefore treated as hostile and the
+        container is the trust boundary — not the sanitiser.
+      </p>
       <ul>
-        <li>All outbound connections from Chromium are routed through a local logging proxy that immediately rejects every connection — <strong>no data ever leaves the machine</strong>. Every attempted URL is recorded as an <code>INTERCEPTED_REQUEST</code> finding.</li>
-        <li><code>--disable-blink-features=AutomationControlled</code> suppresses the <code>navigator.webdriver</code> flag so evasive scripts execute their real attack path rather than a clean scanner path.</li>
-        <li><code>--virtual-time-budget=5000</code> lets JS timers fire for up to 5 seconds before capture, catching attacks that delay their overlay to evade scanners.</li>
+        <li><strong>Policy proxy</strong> — every Chromium connection goes through it. Same-origin (the page's own host and subdomains) and a vetted read-only CDN/font list are forwarded; everything else is refused with a 503 and recorded as <code>INTERCEPTED_REQUEST</code>. The proxy resolves each host itself and rejects the connection if <em>any</em> resolved IP is private, loopback, link-local, metadata or CGNAT — which also defeats DNS rebinding. Forwarded connections are bounded in count, time and bytes.</li>
+        <li><strong>Control channel</strong> — CDP runs over <code>--remote-debugging-pipe</code>, never a TCP port, so the page cannot reach it. Event domains an adversarial page could flood are kept off, or drained with bounded queues.</li>
+        <li><strong>Hard deadlines</strong> — each browser runs in its own process group with a watchdog that <code>killpg</code>s it at the deadline. A hung or hostile page cannot outlive its budget.</li>
+        <li><strong>Memory bounds</strong> — one renderer process per page, a capped V8 heap, and <code>oom_score_adj=1000</code> so a runaway page loses its own browser rather than taking down the server.</li>
+        <li><strong>Isolation between renders</strong> — a fresh browser process and a private profile per render.</li>
+        <li><code>--disable-blink-features=AutomationControlled</code> suppresses the <code>navigator.webdriver</code> flag, so evasive scripts execute their real attack path rather than a clean scanner path.</li>
         <li><code>--run-all-compositor-stages-before-draw</code> ensures layout, paint, and compositing complete before the PNG is captured, preventing partial blank renders.</li>
-        <li>Remote fonts are blocked; CSS <code>@import</code>, external <code>url()</code>, and <code>@font-face</code> are stripped before injection.</li>
-        <li>The HTML sanitiser removes every <code>on*</code> attribute, <code>&lt;script&gt;</code>, <code>&lt;iframe&gt;</code>, <code>&lt;object&gt;</code>, <code>&lt;embed&gt;</code>, and <code>&lt;form&gt;</code> before the page is handed to Chromium.</li>
-        <li>SSRF protection blocks private, loopback, and link-local IP ranges at both URL-validation and DNS-resolution time.</li>
-        <li>The rquickjs sandbox shims <code>fetch</code>, <code>XMLHttpRequest</code>, and <code>WebSocket</code> — all network calls are logged and blocked.</li>
-        <li>Docker: runs as a non-root user (uid 1000) with all Linux capabilities dropped. The <code>wkhtmltoimage</code> fallback uses <code>--disable-javascript</code>.</li>
+        <li>SSRF protection blocks private, loopback, and link-local ranges at both URL-validation and DNS-resolution time.</li>
+        <li>The rquickjs sandbox shims <code>fetch</code>, <code>XMLHttpRequest</code>, and <code>WebSocket</code> — every network call is logged and blocked.</li>
+        <li><strong>Docker</strong> — runs as a non-root user (uid 1000) with all Linux capabilities dropped. In production also run it <code>--read-only</code> (tmpfs for <code>/tmp</code>, <code>/home/carapace</code>, <code>/output</code>), with <code>--init</code> to reap Chromium's children, bounded memory / CPU / PIDs, and on a network that can reach nothing but the internet. Insight runs it inside a VPN namespace attached to a render-only network, with a host egress firewall dropping private ranges.</li>
       </ul>
-
+      <p style="color:var(--muted); font-size:.875rem;">
+        <strong style="color:var(--text);">Offline path only.</strong> On the offline fallback the live page is never
+        loaded, so that path additionally blocks remote fonts (<code>--disable-remote-fonts</code>), strips CSS
+        <code>@import</code>, external <code>url()</code> and <code>@font-face</code>, removes every <code>on*</code>
+        attribute, <code>&lt;script&gt;</code>, <code>&lt;iframe&gt;</code>, <code>&lt;object&gt;</code>,
+        <code>&lt;embed&gt;</code> and <code>&lt;form&gt;</code> before handing the page to Chromium, and gives JS timers
+        up to 5 seconds of virtual time (<code>--virtual-time-budget=5000</code>) so delayed overlays still fire. The
+        <code>wkhtmltoimage</code> fallback of last resort runs with <code>--disable-javascript</code>.
+      </p>
       <!-- ── Quick start ── -->
       <h2 id="quick-start"><i class="bi bi-play-circle me-2" style="color:var(--accent);"></i>Quick Start</h2>
 
@@ -255,6 +281,56 @@
       <pre>{ "url": "https://example.com/app.js", "content": null, "max_size": null, "source_name": null }</pre>
       <p>For files larger than 512&nbsp;KB, analysis runs on overlapping 256&nbsp;KB chunks (32&nbsp;KB overlap) to catch patterns split at a boundary. The response has the same shape as <code>/render</code> with <code>output: null</code>; only <code>threat_report</code> is populated.</p>
 
+      <!-- ── Solve ── -->
+      <h2 id="solve"><i class="bi bi-door-open me-2" style="color:var(--accent);"></i>Getting Past Gates (<code>POST /solve</code>)</h2>
+      <p>
+        Some pages show a scanner nothing until a real browser has passed a gate. <code>/solve</code> loads the URL in
+        the confined browser, lets whatever stands in front of the content play out, and returns
+        <strong>the document the server actually served</strong> plus the path the browser was sent down. Two uses:
+      </p>
+      <ul>
+        <li><strong>Cloudflare bot challenges</strong> that a plain or TLS-impersonating client cannot pass. The policy proxy additionally allows <code>challenges.cloudflare.com</code> (Turnstile); the User-Agent is Chromium's own with the <code>HeadlessChrome</code> token removed, set by flag so the Sec-CH-UA client hints stay native and consistent.</li>
+        <li><strong>JavaScript cloaking gates</strong> — a content-less page that re-requests itself with a proof-of-JS token, after which the server picks what to serve. No render bootstrap is injected, so the gate's own navigation fires. If the gate forwards off-site (a TDS doorway) the cross-origin hop is <strong>recorded in <code>nav_chain</code> but never fetched</strong> — the policy proxy still refuses it.</li>
+      </ul>
+      <pre>curl -s -X POST http://localhost:8080/solve \
+  -H "Content-Type: application/json" -H "X-API-Key: s3cr3t" \
+  -d '{"url":"https://example.com/"}'</pre>
+      <p>
+        Request: <code>{"url": "https://..."}</code> — http(s) only (https-only when the server enforces it), a hostname
+        rather than an IP literal, and no credentials in the URL.
+      </p>
+      <p>Response:</p>
+      <pre>{
+  "solved": true,
+  "challenge_absent": false,
+  "clearance_source": "fresh",
+  "final_url": "https://example.com/",
+  "title": "Example",
+  "cookie_names": ["cf_clearance"],
+  "user_agent": "Mozilla/5.0 (X11; Linux x86_64) ... Chrome/151.0.0.0 Safari/537.36",
+  "document": {
+    "url": "https://example.com/",
+    "status": 200,
+    "headers": { "content-type": "text/html; charset=utf-8", "server": "cloudflare" },
+    "body_b64": "&lt;base64 raw response body&gt;",
+    "truncated": false
+  },
+  "nav_chain": ["https://example.com/", "https://example.com/?__cf_chl_tk=..."],
+  "elapsed_ms": 3162,
+  "intercepted": []
+}</pre>
+      <ul>
+        <li><strong><code>solved</code></strong> — <code>cf_clearance</code> was issued <em>and</em> the "Just a moment…" interstitial is gone. <strong><code>challenge_absent</code></strong> — the page loaded with no challenge at all (or a JS gate was followed). An interactive Turnstile that cannot be passed returns both <code>false</code>, never an error.</li>
+        <li><strong><code>document</code></strong> — the last <strong>main-frame</strong> response the browser received (sub-frames such as the Turnstile iframe are ignored), captured over CDP <code>Network</code>: raw body (base64, capped at 5&nbsp;MB) plus headers. <code>null</code> if it could not be captured, and never returned for an uncleared interstitial.</li>
+        <li><strong><code>nav_chain</code></strong> — ordered main-frame navigations (&le; 10, http/https), server redirects included.</li>
+        <li><strong><code>clearance_source</code></strong> — <code>fresh</code>, <code>cached</code>, or <code>none</code>. Clearance cookies are cached <strong>per host inside Carapace</strong> (&le; 25 min) and fed back into the next solve's browser before it navigates, so a repeat request skips the challenge. <strong>Clearance values never leave Carapace</strong> — only <code>cookie_names</code> are returned. Returning the page rather than the cookies also matters when the caller's egress IP differs from Carapace's: clearance is bound to the IP that solved it.</li>
+      </ul>
+      <div class="callout">
+        <strong>Treat the response as untrusted input.</strong> Every field was produced by a browser that has just run
+        the target's JavaScript. A solve holds a render slot and is capped at 25 seconds, and always uses CDP regardless
+        of how the <a href="#env">CDP environment flags</a> are set.
+      </div>
+
       <!-- ── Threat report ── -->
       <h2 id="threat-report"><i class="bi bi-file-earmark-medical me-2" style="color:var(--accent);"></i>Threat Report</h2>
       <p>Every render produces a threat report. From the CLI it is written to <code>&lt;output&gt;.threat.json</code>; via the API it is returned inline as <code>threat_report</code>.</p>
@@ -271,43 +347,50 @@
   "rendered_html": "",
   "normalized_scripts": [],
   "decoded_payloads": [],
+  "runtime_scripts": [],
+  "nav_targets": [],
   "html_flags": [],
   "js_flags": [],
   "blocked_network": [],
   "flags": []
 }</pre>
       <ul>
-        <li><strong><code>risk_score</code></strong> — 0–100. Static JS analysis, HTML sanitisation, CSS overlay detection, post-render DOM diff, runtime network interception, drive-by detection, QR-code (quishing) decoding, and Browser-in-the-Browser detection all contribute.</li>
-        <li><strong><code>flags</code></strong> — the deduplicated primary findings list. <code>html_flags</code> / <code>js_flags</code> are the raw per-occurrence lists (used for accurate volume scoring); <code>blocked_network</code> lists every URL JavaScript tried to reach at runtime (all rejected).</li>
-        <li><strong><code>render_mode</code></strong> — <code>"live"</code>, <code>"offline_fallback"</code>, or <code>"offline"</code>. <strong><code>render_blank</code></strong> / <strong><code>blank_ratio</code></strong> flag a screenshot that came back effectively all-white after the retry ladder.</li>
-        <li><strong><code>rendered_html</code></strong> — the post-JS DOM of a live render (capped), so callers can re-analyse what the browser actually rendered (service-worker-gated content, JS-rendered SPAs). <strong><code>normalized_scripts</code></strong> (Tier-0 deobfuscation) and <strong><code>decoded_payloads</code></strong> (Tier-2, captured from eval/Function/document.write sinks) expose the cleartext behind obfuscation.</li>
-        <li><strong><code>render_skipped</code></strong> — <code>true</code> when the content-type was not <code>text/html</code>; the render pipeline is bypassed and OXC analysis runs on the raw body (e.g. a <code>.js</code> URL to <code>/analyse</code>).</li>
+        <li><strong><code>risk_score</code></strong> — 0–100. Static JS analysis, HTML sanitisation, CSS overlay detection, post-render DOM diff, runtime network interception, drive-by detection, QR-code (quishing) decoding, and Browser-in-the-Browser detection all contribute. Base score is one weight per <em>unique</em> code (Critical 40, High 20, Medium 10, Low 5); a repeated code adds 2 points per extra occurrence, capped at 10 per code; the total is capped at 100.</li>
+        <li><strong><code>flags</code></strong> — the deduplicated primary findings list. <code>html_flags</code> / <code>js_flags</code> are the raw per-occurrence lists behind the volume bonus; <code>blocked_network</code> lists every URL JavaScript tried to reach at runtime and had refused.</li>
+        <li><strong><code>render_mode</code></strong> — which strategy produced the delivered screenshot: <code>"live"</code> (navigated the real URL through the policy proxy), <code>"offline_fallback"</code> (live render failed or came back blank), or <code>"offline"</code> (live disabled). <strong><code>render_blank</code></strong> / <strong><code>blank_ratio</code></strong> flag a screenshot that came back effectively all-white after the retry ladder was exhausted.</li>
+        <li><strong><code>rendered_html</code></strong> — the post-JS DOM of a successful live render (capped for transport), so a caller can re-run its own analysers on what the browser actually rendered. Essential for service-worker-gated content (IPFS <code>dweb.link</code>) and fully JS-rendered SPAs.</li>
+        <li><strong><code>normalized_scripts</code></strong> (Tier-0 deobfuscation: constants folded) and <strong><code>decoded_payloads</code></strong> (Tier-2: cleartext captured from <code>eval</code> / <code>Function</code> / <code>document.write</code> sinks while the script's own decoder ran) expose the resolved payload behind obfuscation.</li>
+        <li><strong><code>nav_targets</code></strong> — main-frame redirect destinations captured and blocked, never dispatched, on a live render; includes JS-computed interstitial and TDS destinations no static analysis can resolve (&le; 10; needs <code>CARAPACE_CDP_NAV_CAPTURE</code>). The caller SSRF-validates them before following.</li>
+        <li><strong><code>runtime_scripts</code></strong> — bodies of scripts loaded at runtime via <code>fetch()+eval</code> or dynamic <code>import()</code> that never appear as <code>&lt;script&gt;</code> tags (needs <code>CARAPACE_CDP_CAPTURE</code>).</li>
+        <li><strong><code>render_skipped</code></strong> — <code>true</code> when the content-type was not <code>text/html</code>: the HTML/render pipeline is bypassed and OXC analysis runs on the raw body (e.g. a <code>.js</code> URL submitted to <code>/analyse</code>).</li>
       </ul>
-
       <!-- ── Flag codes ── -->
       <h2 id="flag-codes"><i class="bi bi-flag me-2" style="color:var(--accent);"></i>Flag Codes</h2>
-      <p>Findings are emitted as stable codes. The full set, grouped by detector:</p>
+      <p>
+        Findings are emitted as stable codes, each carrying a severity that feeds the risk score. The full set, grouped
+        by detector:
+      </p>
 
       <h3>JavaScript — static &amp; runtime</h3>
       <div class="v-wrap">
         <table class="v-table">
-          <thead><tr><th>Code</th><th>Description</th></tr></thead>
+          <thead><tr><th>Code</th><th>Severity</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>JS_EVAL_DETECTED</code></td><td><code>eval()</code> call detected</td></tr>
-            <tr><td><code>JS_FUNCTION_CONSTRUCTOR</code></td><td><code>new Function("...")</code> — dynamic code from a string literal</td></tr>
-            <tr><td><code>JS_FUNCTION_CONSTRUCTOR_DYNAMIC</code></td><td><code>new Function(expr)</code> — body assembled at runtime; not statically readable</td></tr>
-            <tr><td><code>BASE64_OBFUSCATION</code></td><td><code>atob()</code> decoding a string literal (decoded value in evidence)</td></tr>
-            <tr><td><code>HEX_OBFUSCATION</code></td><td>High-density <code>\xNN</code> hex escape sequences</td></tr>
-            <tr><td><code>OBFUSCATION_UNRESOLVED</code></td><td>Obfuscated code that could not be statically resolved</td></tr>
-            <tr><td><code>INNER_HTML_MUTATION</code></td><td>Assignment to <code>innerHTML</code> / <code>outerHTML</code> / <code>insertAdjacentHTML</code></td></tr>
-            <tr><td><code>DOCUMENT_WRITE</code></td><td><code>document.write()</code> call</td></tr>
-            <tr><td><code>TIMER_STRING_EXEC</code></td><td><code>setTimeout</code> / <code>setInterval</code> called with a string argument</td></tr>
-            <tr><td><code>WEBSOCKET_ATTEMPT</code></td><td><code>new WebSocket()</code> constructor</td></tr>
-            <tr><td><code>REDIRECT_ATTEMPT</code></td><td>Assignment to <code>window.location</code> or similar</td></tr>
-            <tr><td><code>COOKIE_ACCESS</code></td><td>Write to <code>document.cookie</code></td></tr>
-            <tr><td><code>CRYPTO_WALLET_API</code></td><td>Wallet RPC method invoked (e.g. <code>eth_sendTransaction</code>) — drainer behaviour</td></tr>
-            <tr><td><code>ETHERHIDING_ONCHAIN_READ</code></td><td><code>eth_call</code> on-chain read with no wallet — ClearFake EtherHiding C2</td></tr>
-            <tr><td><code>CLIENTSIDE_DECRYPTED_PAGE</code></td><td>AES-GCM client-side page decryption injected into the DOM (EvilTokens ghost code)</td></tr>
+            <tr><td><code>JS_EVAL_DETECTED</code></td><td><span style="color:#f87171;">CRITICAL</span></td><td><code>eval()</code> call detected</td></tr>
+            <tr><td><code>JS_FUNCTION_CONSTRUCTOR</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>new Function("...")</code> — dynamic code from a string literal</td></tr>
+            <tr><td><code>JS_FUNCTION_CONSTRUCTOR_DYNAMIC</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>new Function(expr)</code> — body assembled at runtime; not statically readable</td></tr>
+            <tr><td><code>BASE64_OBFUSCATION</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>atob()</code> decoding a string literal (decoded value in evidence)</td></tr>
+            <tr><td><code>HEX_OBFUSCATION</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>High-density <code>\xNN</code> hex escape sequences</td></tr>
+            <tr><td><code>TIMER_STRING_EXEC</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>setTimeout</code> / <code>setInterval</code> called with a string argument</td></tr>
+            <tr><td><code>WEBSOCKET_ATTEMPT</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>new WebSocket()</code> constructor</td></tr>
+            <tr><td><code>CRYPTO_WALLET_API</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>Wallet RPC method invoked (e.g. <code>eth_sendTransaction</code>) — drainer behaviour</td></tr>
+            <tr><td><code>CLIENTSIDE_DECRYPTED_PAGE</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>AES-GCM client-side page decryption injected into the DOM (EvilTokens ghost code)</td></tr>
+            <tr><td><code>INNER_HTML_MUTATION</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Assignment to <code>innerHTML</code> / <code>outerHTML</code> / <code>insertAdjacentHTML</code></td></tr>
+            <tr><td><code>DOCUMENT_WRITE</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>document.write()</code> call</td></tr>
+            <tr><td><code>REDIRECT_ATTEMPT</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Assignment to <code>window.location</code> or similar</td></tr>
+            <tr><td><code>COOKIE_ACCESS</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Write to <code>document.cookie</code></td></tr>
+            <tr><td><code>ETHERHIDING_ONCHAIN_READ</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>eth_call</code> on-chain read with no connected wallet — ClearFake EtherHiding C2</td></tr>
+            <tr><td><code>OBFUSCATION_UNRESOLVED</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Obfuscated code that could not be statically resolved</td></tr>
           </tbody>
         </table>
       </div>
@@ -315,34 +398,46 @@
       <h3>Overlays &amp; ClickFix</h3>
       <div class="v-wrap">
         <table class="v-table">
-          <thead><tr><th>Code</th><th>Description</th></tr></thead>
+          <thead><tr><th>Code</th><th>Severity</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>CLIPBOARD_HIJACK</code></td><td><code>navigator.clipboard.writeText()</code> or a <code>copy</code> handler wrote to the system clipboard</td></tr>
-            <tr><td><code>CLIPBOARD_HIJACK_CLICKFIX</code></td><td>Clipboard write contained a shell command — confirmed ClickFix paste-and-run</td></tr>
-            <tr><td><code>CSS_OVERLAY_INJECTED</code></td><td>Fullscreen <code>position:fixed</code> overlay in static CSS — ClickFix / SocGholish signature</td></tr>
-            <tr><td><code>DYNAMIC_OVERLAY_INJECTED</code></td><td>Viewport-spanning element in the post-JS DOM but absent from static HTML</td></tr>
-            <tr><td><code>DYNAMIC_OVERLAY_INJECTED_CLICKFIX</code></td><td>JS-injected overlay confirmed alongside clipboard hijack — full ClickFix chain</td></tr>
-            <tr><td><code>BITB_FAKE_WINDOW</code></td><td><strong>Critical</strong> — Browser-in-the-Browser: fake window frame rendering another brand's login URL above a password field</td></tr>
-            <tr><td><code>QR_CODE_URL</code></td><td>URL payload decoded from a QR code in page images or the screenshot (quishing)</td></tr>
+            <tr><td><code>CLIPBOARD_HIJACK_CLICKFIX</code></td><td><span style="color:#f87171;">CRITICAL</span></td><td>Clipboard write contained a shell command — confirmed ClickFix paste-and-run</td></tr>
+            <tr><td><code>DYNAMIC_OVERLAY_INJECTED_CLICKFIX</code></td><td><span style="color:#f87171;">CRITICAL</span></td><td>JS-injected overlay confirmed alongside a clipboard hijack — the full ClickFix chain</td></tr>
+            <tr><td><code>BITB_FAKE_WINDOW</code></td><td><span style="color:#f87171;">CRITICAL</span></td><td>Browser-in-the-Browser: a fake window frame rendering another brand's login URL as address-bar text above a password field (Sneaky2FA / M365 / Facebook BitB)</td></tr>
+            <tr><td><code>CLIPBOARD_HIJACK</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>navigator.clipboard.writeText()</code> or a <code>copy</code> handler wrote to the system clipboard</td></tr>
+            <tr><td><code>CSS_OVERLAY_INJECTED</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>Fullscreen <code>position:fixed</code> overlay in static CSS — ClickFix / SocGholish signature</td></tr>
+            <tr><td><code>DYNAMIC_OVERLAY_INJECTED</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>Viewport-spanning element in the post-JS DOM but absent from the static HTML</td></tr>
+            <tr><td><code>QR_CODE_URL</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>URL payload decoded from a QR code in page images or the rendered screenshot (quishing)</td></tr>
           </tbody>
         </table>
       </div>
 
       <h3>Sandbox evasion (headless-detection probes)</h3>
+      <p style="color:var(--muted); font-size:.875rem;">
+        These probes are split on whether the result actually <em>gates content delivery</em> — a redirect, DOM rewrite,
+        script injection or fetch nearby. Gated is the cloaking case and stays HIGH. Ungated is ordinary anti-fraud SDK,
+        analytics and framework behaviour, so it drops to LOW and carries no verdict on its own. <code>HeadlessChrome</code>
+        and friends are the exception: they name automation <em>tooling</em>, which is a tight enough signal to stay HIGH
+        without a gate.
+      </p>
       <div class="v-wrap">
         <table class="v-table">
-          <thead><tr><th>Code</th><th>Description</th></tr></thead>
+          <thead><tr><th>Code</th><th>Severity</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>SANDBOX_EVASION_WEBDRIVER</code></td><td><code>navigator.webdriver</code> read</td></tr>
-            <tr><td><code>SANDBOX_EVASION_HEADLESS_STRING</code></td><td>Headless identifier string (<code>HeadlessChrome</code>, <code>PhantomJS</code>, <code>$cdc_</code>)</td></tr>
-            <tr><td><code>SANDBOX_EVASION_SCREEN_PROBE</code></td><td><code>window.outerHeight</code> / <code>outerWidth</code> read</td></tr>
-            <tr><td><code>SANDBOX_EVASION_PLUGINS_PROBE</code></td><td><code>navigator.plugins</code> read</td></tr>
-            <tr><td><code>SANDBOX_EVASION_CHROME_RUNTIME</code></td><td><code>window.chrome</code> / <code>chrome.runtime</code> read</td></tr>
-            <tr><td><code>SANDBOX_EVASION_FOCUS_PROBE</code></td><td><code>document.hasFocus()</code> call</td></tr>
-            <tr><td><code>SANDBOX_EVASION_CANVAS_FINGERPRINT</code></td><td>WebGL <code>UNMASKED_RENDERER</code> access — GPU fingerprinting</td></tr>
-            <tr><td><code>SANDBOX_EVASION_LANGUAGES</code></td><td><code>navigator.languages</code> read (empty in headless)</td></tr>
-            <tr><td><code>SANDBOX_EVASION_NOTIFICATION</code></td><td><code>Notification.permission</code> read</td></tr>
-            <tr><td><code>SANDBOX_EVASION_HARDWARE_FINGERPRINT</code></td><td><code>navigator.deviceMemory</code> / <code>hardwareConcurrency</code> read</td></tr>
+            <tr><td><code>SANDBOX_EVASION_WEBDRIVER</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>navigator.webdriver</code> read that gates content delivery</td></tr>
+            <tr><td><code>SANDBOX_EVASION_HEADLESS_STRING</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>Automation identifier string (<code>HeadlessChrome</code>, <code>PhantomJS</code>, <code>$cdc_</code>)</td></tr>
+            <tr><td><code>SANDBOX_EVASION_CHROME_RUNTIME</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>window.chrome</code> / <code>chrome.runtime</code> read that gates content</td></tr>
+            <tr><td><code>SANDBOX_EVASION_FOCUS_PROBE</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>document.hasFocus()</code> call that gates content</td></tr>
+            <tr><td><code>SANDBOX_EVASION_CANVAS_FINGERPRINT</code></td><td><span style="color:#fb923c;">HIGH</span></td><td>WebGL <code>UNMASKED_RENDERER</code> / <code>UNMASKED_VENDOR</code> access that gates content — GPU fingerprinting</td></tr>
+            <tr><td><code>SANDBOX_EVASION_NOTIFICATION</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>Notification.permission</code> read that gates content</td></tr>
+            <tr><td><code>SANDBOX_EVASION_SCREEN_PROBE</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>window.outerHeight</code> / <code>outerWidth</code> read</td></tr>
+            <tr><td><code>SANDBOX_EVASION_WEBDRIVER_UNGATED</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>Same read, nothing gated on the result — no content difference was observed, so the cloaking claim is unsupported</td></tr>
+            <tr><td><code>SANDBOX_EVASION_CHROME_RUNTIME_UNGATED</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>Extension-aware pages and Chrome-only API shims read these routinely</td></tr>
+            <tr><td><code>SANDBOX_EVASION_FOCUS_PROBE_UNGATED</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>Engagement / dwell-time analytics, or one signal in an anti-fraud SDK</td></tr>
+            <tr><td><code>SANDBOX_EVASION_CANVAS_FINGERPRINT_UNGATED</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>Anti-fraud SDKs, and 3D / mapping libraries picking a quality tier</td></tr>
+            <tr><td><code>SANDBOX_EVASION_NOTIFICATION_UNGATED</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>Every site offering web-push reads this before showing its opt-in prompt</td></tr>
+            <tr><td><code>SANDBOX_EVASION_PLUGINS_PROBE</code></td><td><span style="color:#60a5fa;">LOW</span></td><td><code>navigator.plugins</code> read</td></tr>
+            <tr><td><code>SANDBOX_EVASION_LANGUAGES</code></td><td><span style="color:#60a5fa;">LOW</span></td><td><code>navigator.languages</code> read (empty in headless) — treated as exculpatory by Insight's own analyser, so flagging it higher would make the two layers contradict each other</td></tr>
+            <tr><td><code>SANDBOX_EVASION_HARDWARE_FINGERPRINT</code></td><td><span style="color:#60a5fa;">LOW</span></td><td><code>navigator.deviceMemory</code> / <code>hardwareConcurrency</code> read — same reasoning</td></tr>
           </tbody>
         </table>
       </div>
@@ -350,21 +445,44 @@
       <h3>HTML sanitiser, network &amp; fetcher</h3>
       <div class="v-wrap">
         <table class="v-table">
-          <thead><tr><th>Code</th><th>Description</th></tr></thead>
+          <thead><tr><th>Code</th><th>Severity</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>BLOCKED_ELEMENT_SCRIPT</code></td><td><code>&lt;script&gt;</code> tag removed before render</td></tr>
-            <tr><td><code>BLOCKED_ELEMENT_IFRAME</code></td><td><code>&lt;iframe&gt;</code> tag removed before render</td></tr>
-            <tr><td><code>BLOCKED_ELEMENT_OTHER</code></td><td>Other disallowed element (<code>&lt;object&gt;</code>, <code>&lt;embed&gt;</code>, <code>&lt;form&gt;</code>, …) removed</td></tr>
-            <tr><td><code>EVENT_HANDLER_STRIPPED</code></td><td>Inline <code>on*</code> event handler removed</td></tr>
-            <tr><td><code>JAVASCRIPT_URL_STRIPPED</code></td><td><code>javascript:</code> URI or other blocked attribute removed</td></tr>
-            <tr><td><code>META_REDIRECT_STRIPPED</code></td><td><code>&lt;meta http-equiv="refresh"&gt;</code> redirect removed</td></tr>
-            <tr><td><code>INTERCEPTED_REQUEST</code></td><td>URL Chromium attempted at runtime (all blocked); list in evidence</td></tr>
-            <tr><td><code>NETWORK_ATTEMPT_BLOCKED</code></td><td><code>fetch</code> / <code>XHR</code> / <code>WebSocket</code> attempted inside the rquickjs sandbox and blocked</td></tr>
-            <tr><td><code>DRIVE_BY_DOWNLOAD</code></td><td>Automatic file download intercepted (executables/archives only)</td></tr>
+            <tr><td><code>DRIVE_BY_DOWNLOAD</code></td><td><span style="color:#f87171;">CRITICAL</span></td><td>Automatic file download intercepted — executables and archives only, images and fonts suppressed. Never written to disk; hash only.</td></tr>
+            <tr><td><code>BLOCKED_ELEMENT_SCRIPT</code></td><td><span style="color:#fb923c;">HIGH</span></td><td><code>&lt;script&gt;</code> tag removed before the offline render</td></tr>
+            <tr><td><code>EVENT_HANDLER_STRIPPED</code></td><td><span style="color:#fb923c;">HIGH</span> / <span style="color:#fbbf24;">MEDIUM</span></td><td>Inline <code>on*</code> event handler removed — HIGH when it fires automatically (no user interaction needed)</td></tr>
+            <tr><td><code>BLOCKED_ELEMENT_IFRAME</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;iframe&gt;</code> tag removed</td></tr>
+            <tr><td><code>JAVASCRIPT_URL_STRIPPED</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>javascript:</code> URI or other blocked attribute removed</td></tr>
+            <tr><td><code>META_REDIRECT_STRIPPED</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;meta http-equiv="refresh"&gt;</code> redirect removed</td></tr>
+            <tr><td><code>INTERCEPTED_REQUEST</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Cross-origin URLs the page requested at render time that the policy proxy refused; the list is the evidence</td></tr>
+            <tr><td><code>NETWORK_ATTEMPT_BLOCKED</code></td><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>fetch</code> / <code>XHR</code> / <code>WebSocket</code> attempted inside the rquickjs sandbox and blocked</td></tr>
+            <tr><td><code>BLOCKED_ELEMENT_OTHER</code></td><td><span style="color:#60a5fa;">LOW</span></td><td>Other disallowed element (<code>&lt;object&gt;</code>, <code>&lt;embed&gt;</code>, <code>&lt;form&gt;</code>, …) removed</td></tr>
           </tbody>
         </table>
       </div>
+      <p style="color:var(--muted); font-size:.875rem;">
+        Sanitiser codes describe what was removed before the <em>offline</em> render, so on most real pages they are
+        routine rather than suspicious — which is why a caller such as Insight aggregates them into a single
+        informational finding instead of surfacing each one.
+      </p>
 
+      <!-- ── Environment ── -->
+      <h2 id="env"><i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Environment Variables</h2>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>CARAPACE_API_KEY</code></td><td>none</td><td>Same as <code>--api-key</code> — require an <code>X-API-Key</code> header</td></tr>
+            <tr><td><code>CARAPACE_LIVE_RENDER</code></td><td>on</td><td>The live render of the real URL through the policy proxy. Set <code>0</code> / <code>false</code> / <code>off</code> to force the fully offline self-contained render instead.</td></tr>
+            <tr><td><code>CARAPACE_CDP</code></td><td>off <em>(Insight sets <code>1</code>)</em></td><td>Drive the live render over CDP in one browser session. Off: the live render uses Chromium's CLI (<code>--screenshot</code> / <code>--dump-dom</code>) through the same policy proxy.</td></tr>
+            <tr><td><code>CARAPACE_CDP_NAV_CAPTURE</code></td><td>off <em>(Insight sets <code>1</code>)</em></td><td>Capture main-frame redirect destinations (<code>nav_targets</code>) via CDP <code>Fetch</code> interception. Requires <code>CARAPACE_CDP</code>.</td></tr>
+            <tr><td><code>CARAPACE_CDP_CAPTURE</code></td><td>off</td><td>Capture runtime-loaded script bodies (<code>runtime_scripts</code>) via CDP <code>Network</code>. Requires <code>CARAPACE_CDP</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--muted); font-size:.875rem;">
+        Flags accept <code>1</code>, <code>true</code> or <code>on</code>. <code>/solve</code> always uses CDP, whatever
+        these are set to.
+      </p>
       <!-- ── Tech detection ── -->
       <h2 id="tech-stack"><i class="bi bi-stack me-2" style="color:var(--accent);"></i>Tech Detection</h2>
       <p>
@@ -376,24 +494,40 @@
 
       <!-- ── Fallback ── -->
       <h2 id="fallback"><i class="bi bi-arrow-repeat me-2" style="color:var(--accent);"></i>Renderer Fallback</h2>
+      <p>The render ladder, in order:</p>
+      <ol style="color:var(--muted); font-size:.875rem; padding-left:1.2rem;">
+        <li style="margin-bottom:.5rem;"><strong>Live render</strong> — the real URL, JavaScript enabled, through the policy proxy. Over CDP when <code>CARAPACE_CDP</code> is on, with the CLI live render as its own fallback.</li>
+        <li style="margin-bottom:.5rem;"><strong>Offline render</strong> — the sanitised self-contained page, JavaScript still enabled, every connection refused and the network APIs mocked. Used when the live render fails or comes back blank.</li>
+        <li><strong><code>wkhtmltoimage</code></strong> — only if Chromium is unavailable at all, with JavaScript disabled.</li>
+      </ol>
       <p>
-        The primary render path is Chromium headless with JavaScript enabled and the logging network proxy. If Chromium
-        is unavailable, Carapace falls back to <code>wkhtmltoimage</code> with JavaScript disabled. Pass <code>--no-browser</code>
-        to force the built-in Rust renderer (tiny-skia + taffy layout) — approximate, supporting the basic box model,
-        flexbox, and inline text only; use it when no headless browser is available.
+        <code>render_mode</code> in the threat report records which one produced the delivered screenshot, and
+        <code>render_blank</code> / <code>blank_ratio</code> record whether it still came back effectively all-white.
+        Pass <code>--no-browser</code> to force the built-in Rust renderer (tiny-skia + taffy layout) — approximate,
+        supporting the basic box model, flexbox, and inline text only; use it when no headless browser is available.
       </p>
 
       <!-- ── Works with Insight ── -->
       <h2 id="insight"><i class="bi bi-radar me-2" style="color:var(--accent);"></i>Works With Insight</h2>
       <p>
-        Carapace runs standalone, but it is also designed to drop in as the visual renderer for
+        Carapace runs standalone, but it is also the renderer behind
         <a href="insight.html">Insight</a>. Deploy it as a sidecar and point Insight at it with
-        <code>CARAPACE_URL</code> (and optionally <code>CARAPACE_API_KEY</code>): every Insight scan then calls Carapace's
+        <code>CARAPACE_URL</code> (and optionally <code>CARAPACE_API_KEY</code>). Every Insight scan then calls
         <code>/render</code>, embeds the screenshot, and converts Carapace's threat flags into Insight findings under the
-        <code>Renderer</code> category. If Carapace is unavailable, the Insight scan continues normally — it is entirely
-        best-effort. See the <a href="insight.html#carapace">Insight documentation</a> for the integration details.
+        <code>Renderer</code> category — remapping a few severities to suit a whole-scan verdict rather than a single
+        render, and aggregating the routine sanitiser codes into one informational finding.
       </p>
-
+      <p>
+        Insight also uses <code>/solve</code> for gate handling: a Cloudflare challenge that survives TLS-fingerprint
+        impersonation, and JavaScript cloaking gates whose off-site forwards identify a TDS doorway. The document
+        <code>/solve</code> returns becomes the page Insight analyses, and the <code>nav_chain</code> becomes the
+        evidence. Insight runs the container inside a VPN namespace on a render-only network, so the renderer cannot
+        reach its database or cache and never visits a target from the host's own IP.
+      </p>
+      <p>
+        If Carapace is unavailable the Insight scan continues without it — the renderer phase is best-effort, never a
+        hard dependency. See the <a href="insight.html#carapace">Insight documentation</a> for the integration details.
+      </p>
       <!-- ── License ── -->
       <h2 id="license"><i class="bi bi-file-earmark-text me-2" style="color:var(--accent);"></i>License</h2>
       <p>Carapace is released under the <strong>MIT License</strong>. See the <a href="https://github.com/DanDreadless/Carapace" target="_blank">repository</a> for details.</p>
