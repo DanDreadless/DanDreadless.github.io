@@ -46,7 +46,7 @@
     <p class="s-sub mb-1" style="color:var(--muted);">Open-source malware static analysis platform</p>
     <img src="Images/logo-no-background.png" alt="Vault1337 | Malware Analysis Platform" style="max-width:min(480px,75vw); width:100%; height:auto; margin-bottom:.5rem;">
     <p class="sub" style="max-width:640px; margin:0 auto 1.5rem;">
-      Self-hosted malware analysis workbench for a single analyst. Upload samples, extract IOCs, map behaviour to MITRE ATT&amp;CK, search and diff your collection, group samples into cases, export STIX 2.1 and portable case archives, and generate PDF analyst reports — all from one container, with everything stored in one data directory you control.
+      Self-hosted malware analysis workbench for a single analyst. Upload samples, extract IOCs, map behaviour to MITRE ATT&amp;CK, search and diff your collection, group samples into cases, triage samples with your own Claude account over MCP, export STIX 2.1 and portable case archives, and generate PDF analyst reports — all from one container, with everything stored in one data directory you control.
     </p>
     <div class="cta">
       <a href="#install-docker" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Getting Started</a>
@@ -97,6 +97,7 @@
         <li><a href="#tools">Analysis Tools</a></li>
         <li><a href="#search">Full-Text Search</a></li>
         <li><a href="#cases">Cases &amp; Portable Archives</a></li>
+        <li><a href="#mcp">AI Triage with Claude (MCP)</a></li>
         <li><a href="#diff">Sample Diffing</a></li>
         <li><a href="#cluster">SimHash Clustering</a></li>
         <li><a href="#config-extract">Config Extraction</a></li>
@@ -218,6 +219,8 @@
     restart: unless-stopped
     ports:
       - "1337:1337"
+      # Optional: the MCP server for AI triage with Claude Code. Loopback only.
+      # - "127.0.0.1:1338:1338"
     environment:
       # The only variable the running application needs. Everything else is
       # configured in the UI and stored in /data/config.json.
@@ -525,7 +528,13 @@ npm run dev</pre>
       </ul>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Pagination</h3>
-      <p>The bottom of the vault list shows <strong>« ‹ page X of Y › »</strong> controls — first, previous, next, and last page buttons alongside the current page indicator.</p>
+      <p>The vault list shows 10 samples per page. The bottom of the list shows <strong>« ‹ page X of Y › »</strong> controls — first, previous, next, and last page buttons alongside the current page indicator.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Tags &amp; Tag Cloud</h3>
+      <ul>
+        <li>Each row shows the sample's tags on a single line. Tags that don't fit collapse into a <strong>+N more</strong> chip; hover over it to see the rest.</li>
+        <li>Below the table, the <strong>tag cloud</strong> lists every tag in the vault with the number of samples carrying it. Click a tag to show only samples with exactly that tag; click it again, or the <strong>✕</strong> next to the sample count, to clear the filter. The tag filter combines with the file-type chips and the search box.</li>
+      </ul>
 
       <!-- ── Tools ── -->
       <h2 id="tools"><i class="bi bi-tools me-2" style="color:var(--accent);"></i>Analysis Tools</h2>
@@ -718,6 +727,8 @@ npm run dev</pre>
       <ul>
         <li>Create a case, give it a description, and add samples to it — from the case page, or by selecting samples on the Vault page and choosing <strong>Add to case</strong>.</li>
         <li>A sample can belong to any number of cases. Removing a sample from a case never deletes the sample itself; deleting a case never deletes its samples.</li>
+        <li>Every case gets an index number (<code>001</code>, <code>002</code>, …), and the newest case is at the top of the list.</li>
+        <li>Cases opened by Claude carry an <strong>AI</strong> badge and record the whole analysis. See <a href="#mcp">AI Triage with Claude (MCP)</a>.</li>
       </ul>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Export &amp; Import (<code>.vault</code> archives)</h3>
@@ -729,6 +740,152 @@ npm run dev</pre>
         <li>Samples already present in the target vault are attached to the case without being overwritten, preserving your existing analysis.</li>
       </ul>
       <div class="callout">Export a case from its detail page with <strong>Export .vault</strong>; import one with <strong>Import .vault archive</strong> on the Cases page. Import restores the analyst context as-is rather than re-analysing, so IOC true/false verdicts and comments survive the round-trip.</div>
+
+      <!-- ── AI Triage (MCP) ── -->
+      <h2 id="mcp"><i class="bi bi-robot me-2" style="color:var(--accent);"></i>AI Triage with Claude (MCP)</h2>
+      <p>Vault1337 can be driven by <strong>Claude Code</strong> through the <a href="https://modelcontextprotocol.io" target="_blank">Model Context Protocol</a>. Claude triages a sample using Vault1337's own static tools, and everything it does is recorded in a case you review in the UI.</p>
+      <div class="callout"><strong>Vault1337 never calls a model.</strong> It only exposes tools; the model runs in your Claude Code client, on your own Claude account. No AI API key is stored in Vault1337 and nothing is billed per call.</div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">What Claude can do</h3>
+      <div class="v-wrap mb-3">
+        <table class="v-table">
+          <thead><tr><th>Tool</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>list_samples</code>, <code>get_sample</code></td><td>Find samples and read their metadata, tags, IOCs and VirusTotal summary</td></tr>
+            <tr><td><code>start_case</code></td><td>Open a case for the analysis. Every analysis happens inside one</td></tr>
+            <tr><td><code>run_tool</code></td><td>Run a static analysis tool (strings, YARA, LIEF, oletools, PDF parser, IOC extractor, …)</td></tr>
+            <tr><td><code>get_analysis_result</code></td><td>Re-read an earlier result instead of re-running the tool. Large output is paged</td></tr>
+            <tr><td><code>decode_snippet</code></td><td>Decode part of a result: base64, hex, charcode arrays, URL/JS/HTML escapes, XOR, ROT13, reverse, gzip/zlib/raw inflate, UTF-16LE. Layers chain, and each decode is stored</td></tr>
+            <tr><td><code>add_case_note</code></td><td>Record reasoning or intermediate findings in the case</td></tr>
+            <tr><td><code>save_case_report</code></td><td>Save the verdict, confidence, summary and report, with each finding citing an excerpt from a stored result</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>There is also a ready-made prompt: in Claude Code, run <code>/mcp__vault1337__triage &lt;sha256&gt;</code>.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">What you see in Vault1337</h3>
+      <ul>
+        <li><strong>Cases page.</strong> The case shows an <strong>AI</strong> badge and an index number, newest first. At the top is the samples table, then the <strong>verdict and report</strong>, then the <strong>timeline</strong> of every tool run with its output in a dropdown. While the analysis is running, the page updates by itself and shows that it is in progress.</li>
+        <li><strong>Evidence checks.</strong> Each finding in the report cites a result ID and an exact excerpt. Vault1337 checks the excerpt against the stored output and marks the finding verified or unverified.</li>
+        <li><strong>Decoded stages.</strong> When Claude decodes a real payload or next stage, it can save it as a new sample. The new sample is linked to the one it came from: the parent's page lists it under <strong>Child files</strong>, and the child's page links back with <strong>Decoded from</strong>. Each decode in the timeline has an <strong>Open in CyberChef</strong> link that replays the same recipe.</li>
+        <li><strong>Notes.</strong> The verdict is posted to each sample's Notes tab, with a link to the case.</li>
+      </ul>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">How it is kept safe</h3>
+      <p>Every byte a tool returns comes from malware, so the design limits what a successful prompt injection could do instead of trying to prevent one:</p>
+      <ul>
+        <li><strong>Read-only analysis.</strong> Claude can only run tools that do nothing beyond recording their own result. Tools that ingest new files, reach the network or return raw image bytes are not available. Nothing executes a sample.</li>
+        <li><strong>Narrow writes.</strong> Claude can only write into cases it opened, and only notes, decoded stages and its report. It cannot touch your own cases, tags or verdicts, and cannot delete anything.</li>
+        <li><strong>A complete record.</strong> Every tool run is logged by the server, not by Claude, so the timeline doesn't depend on Claude choosing to log its steps.</li>
+        <li><strong>Framing and defanging.</strong> Sample-derived text is wrapped in delimiters with a random per-response ID, and URLs and IPs are defanged both going out and in anything written back.</li>
+        <li><strong>Injection detection.</strong> Text in tool output that addresses an AI is returned as a warning, recorded in the case, and tags the sample <code>prompt-injection</code>.</li>
+        <li><strong>Inert rendering.</strong> Anything Claude writes is shown as Markdown with links disabled, images removed and raw HTML dropped.</li>
+        <li><strong>Your veto.</strong> Set a sample to <strong>AI analysis: blocked</strong> on its page and it is invisible to Claude.</li>
+        <li><strong>Loopback and a revocable token.</strong> The MCP port is published on <code>127.0.0.1</code> only, every request needs a bearer token, and only a hash of that token is stored.</li>
+      </ul>
+      <div class="callout">Saving a decoded stage runs the normal <a href="#ingest">ingest pipeline</a>, including IOC extraction, and new IPs and domains are enriched against VirusTotal, AbuseIPDB and OTX if you have keys configured, just as for any upload.</div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Setting it up</h3>
+
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Publish the MCP port</h5>
+          <p>Uncomment the port in your compose file and recreate the container:</p>
+          <pre>    ports:
+      - "1337:1337"
+      - "127.0.0.1:1338:1338"</pre>
+          <p>Keep the <code>127.0.0.1:</code> prefix. Anyone holding the token can read your collection, so the port should not be reachable from other machines.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>Create a token</h5>
+          <p>Go to <strong>Management → Claude (MCP)</strong> and click <strong>Create token</strong>. The token is shown <strong>once</strong>; copy it then. The same tab shows whether the server is running, whether a token is set, and when Claude last connected. A request with a wrong token is shown as a warning there.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Store it as an environment variable</h5>
+          <p>This keeps the token out of every config file.</p>
+          <pre># Windows
+setx VAULT_MCP_TOKEN "&lt;token&gt;"
+
+# Linux / macOS (add to ~/.bashrc or ~/.zshrc)
+export VAULT_MCP_TOKEN="&lt;token&gt;"</pre>
+          <p>Open a new terminal afterwards. <code>setx</code> does not affect windows that are already open.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-b">
+          <h5>Connect Claude Code</h5>
+          <p><strong>Option A: a locked-down analysis workspace (recommended).</strong> Make a folder that is used only for triage, and start Claude Code there with no tools except Vault1337's. A sample that fooled Claude would then have nothing to act with: no shell, no file access, no web.</p>
+          <p><code>vault-mcp.json</code>:</p>
+          <pre>{
+  "mcpServers": {
+    "vault1337": {
+      "type": "http",
+      "url": "http://127.0.0.1:1338/mcp",
+      "headers": { "Authorization": "Bearer ${VAULT_MCP_TOKEN}" }
+    }
+  }
+}</pre>
+          <p><code>.claude/settings.json</code>, a second layer in case <code>claude</code> is started in this folder without the launcher:</p>
+          <pre>{
+  "permissions": {
+    "allow": ["mcp__vault1337__*"],
+    "deny": ["Bash", "PowerShell", "Read", "Edit", "Write", "NotebookEdit",
+             "Glob", "Grep", "WebFetch", "WebSearch", "Agent"],
+    "disableBypassPermissionsMode": "disable"
+  }
+}</pre>
+          <p>The launcher, <code>analyse.ps1</code> (Windows):</p>
+          <pre>if (-not $env:VAULT_MCP_TOKEN) {
+    $env:VAULT_MCP_TOKEN = [Environment]::GetEnvironmentVariable('VAULT_MCP_TOKEN', 'User')
+}
+Set-Location $PSScriptRoot
+claude --strict-mcp-config --mcp-config "$PSScriptRoot\vault-mcp.json" --tools "" @args</pre>
+          <p>or <code>analyse.sh</code> (Linux / macOS):</p>
+          <pre>#!/usr/bin/env bash
+cd "$(dirname "$0")"
+exec claude --strict-mcp-config --mcp-config ./vault-mcp.json --tools "" "$@"</pre>
+          <p><code>--strict-mcp-config</code> loads only Vault1337's server and ignores any others on the machine. <code>--tools ""</code> removes every built-in tool. MCP tools are not affected. You can also pass your own standing instructions with <code>--append-system-prompt-file</code>.</p>
+          <p><strong>Option B: any Claude Code session.</strong> Register the server once:</p>
+          <pre>claude mcp add --transport http vault1337 http://127.0.0.1:1338/mcp \
+  --header "Authorization: Bearer &lt;token&gt;"</pre>
+          <p>This is simpler, but Claude keeps its usual tools (shell, files, web) while it reads malware output, and the token is saved in Claude Code's config instead of the environment.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-b">
+          <h5>Check the connection</h5>
+          <p>Run <code>/mcp</code> in Claude Code: <code>vault1337</code> should show as connected. Within a few seconds, <strong>Management → Claude (MCP)</strong> shows <strong>Connected</strong>.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-n">6</div>
+        <div class="step-b">
+          <h5>Triage</h5>
+          <p>Run <code>/mcp__vault1337__triage &lt;sha256&gt;</code>, or simply ask Claude to analyse a sample. Then open <strong>Cases</strong> to follow it.</p>
+        </div>
+      </div>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Replacing or revoking the token</h3>
+      <p>The server checks the token on every request, so changes take effect at once without restarting anything.</p>
+      <ul>
+        <li><strong>Replace:</strong> in <strong>Management → Claude (MCP)</strong>, click <strong>Replace token</strong>, copy the new token, and update <code>VAULT_MCP_TOKEN</code> as in step 3. Then quit Claude Code and start it again <strong>from a new terminal</strong>. A terminal that was already open still holds the old token. If you used Option B, run <code>claude mcp remove vault1337</code> and add it again with the new token.</li>
+        <li><strong>Revoke:</strong> click <strong>Revoke</strong>. Every MCP request is refused until you create a new token.</li>
+      </ul>
+      <p>From the command line: <code>docker exec vault1337 python manage.py mcp_token</code> creates or replaces a token, and <code>--revoke</code> removes it.</p>
 
       <!-- ── Sample Diffing ── -->
       <h2 id="diff"><i class="bi bi-distribute-vertical me-2" style="color:var(--accent);"></i>Sample Diffing</h2>
@@ -877,7 +1034,7 @@ npm run dev</pre>
         <li>Add comma-separated tags when uploading a sample, or add/remove tags from any sample on its detail page.</li>
         <li>Ingest applies tags automatically — the file extension, the source it came from, and one <code>yara:&lt;rule&gt;</code> tag per matching YARA rule.</li>
         <li>All tags are stored in lowercase.</li>
-        <li>Filter the <strong>Vault</strong> page by filename, hash, or tag with its search box and the file-type chips; for content search across tool output and IOCs, use <a href="#search">Full-Text Search</a>.</li>
+        <li>Filter the <strong>Vault</strong> page by filename, hash, or tag with its search box and the file-type chips, or click a tag in the <a href="#vault-page">tag cloud</a> below the table; for content search across tool output and IOCs, use <a href="#search">Full-Text Search</a>.</li>
       </ul>
 
       <!-- ── Analyst Notes ── -->
@@ -889,6 +1046,7 @@ npm run dev</pre>
         <li>Note types: <code>note</code> (general observation), <code>hypothesis</code> (a working theory), <code>ioc_context</code> (indicator context), and <code>verdict</code> (final assessment).</li>
         <li>Notes are preserved across sessions and included in the full-text search index.</li>
         <li>Notes appear in the PDF report export under the <strong>Analyst Notes</strong> section.</li>
+        <li>An AI triage posts its verdict as a note by <strong>Claude (MCP)</strong>, with a link to the case that holds the full report.</li>
       </ul>
       <div class="callout">Note bodies are rendered as Markdown in the UI — use headings, bullet lists, code blocks, and bold/italic formatting to structure your findings.</div>
 
@@ -968,7 +1126,7 @@ npm run dev</pre>
 
       <!-- ── Management Page ── -->
       <h2 id="management"><i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Management Page</h2>
-      <p>Navigate to <strong>Management</strong> in the navigation bar (staff account only) to administer the instance across five tabs. There is no user or role management, no audit log, and no SSO — v2 is a single-analyst platform, so those enterprise features were removed.</p>
+      <p>Navigate to <strong>Management</strong> in the navigation bar (staff account only) to administer the instance across six tabs. There is no user or role management, no audit log, and no SSO — v2 is a single-analyst platform, so those enterprise features were removed.</p>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Dashboard</h3>
       <p>At-a-glance health and counts: total samples, IOCs, YARA rules, recent activity, and the all-important <strong>storage durability</strong> status — a prominent warning here means your data directory is on ephemeral storage and your collection is at risk (see <a href="#data-dir">The Data Directory</a>).</p>
@@ -987,6 +1145,9 @@ npm run dev</pre>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">CyberChef</h3>
       <p>Check the bundled CyberChef version and update it to the latest GitHub release with a single click. The update installs into the data directory, so it survives image upgrades. No internet access is required at runtime — CyberChef is served entirely from your instance.</p>
+
+      <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Claude (MCP)</h3>
+      <p>Create, replace or revoke the token Claude Code uses to reach the <a href="#mcp">MCP server</a>, and see at a glance whether the server is running, whether a token is set, and when Claude last connected. A rejected request (a wrong or old token) shows as a warning. The token is shown once when it is created, with copy buttons for the setup commands; only its hash is stored.</p>
 
       <h3 class="mt-4 mb-2" style="font-size:1rem; color:var(--accent);">Settings</h3>
       <p>View and change runtime settings, written to <code>config.json</code> (no server restart needed unless noted):</p>
