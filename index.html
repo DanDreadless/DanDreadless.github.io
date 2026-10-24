@@ -82,20 +82,20 @@
             </div>
             <div>
               <h3 style="font-size:1.15rem; font-weight:700; margin:0;">Minos</h3>
-              <p style="color:var(--muted); font-size:.8rem; margin:0;">DNS Sinkhole &middot; Pi-hole Alternative</p>
+              <p style="color:var(--muted); font-size:.8rem; margin:0;">Network-wide Blocking &middot; Pi-hole Alternative</p>
             </div>
           </div>
           <p style="color:var(--muted); font-size:.875rem; margin-bottom:1.2rem;">
-            A modern, user-friendly DNS sinkhole written in Go — a single static binary with an embedded web UI,
-            light enough for a Raspberry Pi. Every DNS query is judged against your blocklists and sentenced;
-            allowed queries are forwarded upstream over encrypted DoH or DoT.
+            Blocks ads, trackers and malware for every device on your network — one Go binary with the web
+            interface built in, light enough for a Raspberry Pi. Every block names the list and rule behind it,
+            with Allow one click away.
           </p>
           <ul style="color:var(--muted); font-size:.82rem; padding-left:1.2rem; margin-bottom:1.4rem;">
-            <li>Blocklist filtering (hosts, plain, AdBlock) with one-click pardons from the live log</li>
-            <li>Family controls — per-device groups, blocked services, schedules, Safe Search enforcement</li>
-            <li>Response cache, serve-stale (RFC 8767), and automatic upstream failover</li>
-            <li>Client-facing DoT/DoH with automatic ACME certificates — no telemetry, ever</li>
-            <li>Device identity (vendor + hostname), full-history dashboard drill-downs, and in-app upgrade guidance</li>
+            <li>Self-healing blocklists, regex rules, CNAME-cloak inspection and audit (dry-run) lists</li>
+            <li>Family controls — device groups, schedules, blocked services, Safe Search</li>
+            <li>DoH, DoT, DNS over QUIC and HTTP/3 both ways, DDR, and in-process DNSSEC validation</li>
+            <li>Millisecond Query Log search, the app log and a full guide built in, phone-ready</li>
+            <li>Password sign-in with authenticator codes, signed one-click updates — no telemetry, ever</li>
           </ul>
           <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
             <a href="minos.html" class="btn-v solid" style="font-size:.84rem; padding:.4rem 1rem;">
@@ -235,20 +235,20 @@
 <!-- ── Minos detail ───────────────────────────────────────────────────────── -->
 <section class="section section-alt" id="minos">
   <div class="container">
-    <p class="s-sub mb-1">Minos — DNS Sinkhole</p>
+    <p class="s-sub mb-1">Minos — Network-wide Blocking</p>
     <h2 class="s-head">Every Query Gets Judged.</h2>
     <p style="color:var(--muted); font-size:.95rem; max-width:720px; margin:.5rem 0 2.5rem;">
-      Named for the judge of the underworld, Minos is a modern Pi-hole alternative written in Go — a single
-      static binary with an embedded web UI, light enough for a Raspberry Pi Zero. Every DNS query that arrives
-      is judged against your blocklists and sentenced; no exceptions, no appeals (well, except pardons).
+      Named for the judge of the underworld, Minos is a modern Pi-hole and AdGuard Home alternative written in
+      Go — one static binary with the web interface built in, light enough for a Raspberry Pi Zero. Every DNS
+      query is checked against your blocklists and your own rules, and every block says exactly why.
     </p>
     <div class="row g-4 mt-1">
 
       <div class="col-sm-6 col-lg-4">
         <div class="f-card">
           <div class="f-icon"><i class="bi bi-funnel"></i></div>
-          <h5>Blocklist Filtering</h5>
-          <p>Judges every query on :53 (UDP + TCP) against compiled hosts, plain, and AdBlock blocklists. Blocked queries show which list and rule condemned them — with a one-click pardon from the live log.</p>
+          <h5>Blocking That Explains Itself</h5>
+          <p>Hosts, plain and AdBlock lists from a verified catalog, kept working through outages with mirrors; regex rules, CNAME-cloak inspection and audit lists. Every block names its list and rule, with Allow on the row.</p>
         </div>
       </div>
 
@@ -256,39 +256,39 @@
         <div class="f-card">
           <div class="f-icon"><i class="bi bi-people"></i></div>
           <h5>Family Controls</h5>
-          <p>Devices are identified by vendor and hostname, then placed in groups with extra rules, full bypass, or no DNS at all. One-click blocked services (TikTok, YouTube, Discord…) with schedules, plus provider-enforced Safe Search that can't be switched off.</p>
+          <p>Devices are named from DHCP, mDNS, UPnP and their vendor, then placed in groups with extra rules, full bypass, or no DNS at all — on schedules. One-click blocked services (TikTok, YouTube, Discord…) and provider-enforced Safe Search.</p>
         </div>
       </div>
 
       <div class="col-sm-6 col-lg-4">
         <div class="f-card">
           <div class="f-icon"><i class="bi bi-lightning-charge"></i></div>
-          <h5>Fast Resolver Core</h5>
-          <p>Built-in response cache with request coalescing, serve-stale answers (RFC 8767), and automatic upstream failover — one dead resolver never slows the whole network.</p>
+          <h5>Fast, Hardened Resolver</h5>
+          <p>Response cache with request coalescing, serve-stale (RFC 8767) and automatic failover; DNS rebinding protection, rate limiting, an open-resolver guard and Extended DNS Errors.</p>
         </div>
       </div>
 
       <div class="col-sm-6 col-lg-4">
         <div class="f-card">
           <div class="f-icon"><i class="bi bi-shield-lock"></i></div>
-          <h5>Encrypted DNS</h5>
-          <p>Forwards upstream over DoH or DoT, and serves encrypted DNS to clients — DoT for Android Private DNS, DoH at /dns-query. Bring a certificate or let Minos fetch and renew one automatically via ACME.</p>
+          <h5>Modern, Encrypted DNS</h5>
+          <p>DoH, DoT, DNS over QUIC and HTTP/3 upstream and to your devices, with DDR so they upgrade by themselves, automatic ACME certificates, and in-process DNSSEC validation.</p>
         </div>
       </div>
 
       <div class="col-sm-6 col-lg-4">
         <div class="f-card">
-          <div class="f-icon"><i class="bi bi-hdd-network"></i></div>
-          <h5>Network Features</h5>
-          <p>Local DNS records for your LAN, conditional forwarding, and private reverse zones answered locally (RFC 6303) — internal lookups never leak to public resolvers.</p>
+          <div class="f-icon"><i class="bi bi-lock"></i></div>
+          <h5>Safe by Default</h5>
+          <p>Password sign-in with authenticator codes, signed one-click updates that roll back a release that does not start, and Minos never running as root. Local DNS records and private reverse zones that never leak.</p>
         </div>
       </div>
 
       <div class="col-sm-6 col-lg-4">
         <div class="f-card">
           <div class="f-icon"><i class="bi bi-graph-up"></i></div>
-          <h5>Dashboard &amp; API</h5>
-          <p>Query charts, top blocked domains, and busiest clients — clickable to drill into the full-history log — over WebSocket. Prometheus /metrics with a Grafana dashboard, a documented REST API, Home Assistant recipes, and one-command Pi-hole/AdGuard import. No telemetry, ever.</p>
+          <h5>Dashboard, Logs &amp; API</h5>
+          <p>90-day dashboards and millisecond Query Log search, the app log and a full guide in the interface, useful notifications, Prometheus /metrics, a documented REST API, Home Assistant recipes, and one-command Pi-hole/AdGuard import. No telemetry, ever.</p>
         </div>
       </div>
 

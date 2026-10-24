@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Minos documentation — a modern DNS sinkhole and Pi-hole alternative written in Go, with in-process DNSSEC validation. Install, deploy on a Raspberry Pi, configure, and use.">
-  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, adguard alternative, dns, dnssec, dnssec validation, doh, dot, go, raspberry pi, adblock">
+  <meta name="description" content="Minos documentation — a network-wide ad, tracker and malware blocker for your home, written in Go. A Pi-hole and AdGuard Home alternative with in-process DNSSEC, DNS over QUIC, signed one-click updates and a built-in guide.">
+  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, adguard home alternative, dns, dnssec, doh, dot, doq, dns over quic, ddr, regex, raspberry pi, adblock, parental controls">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
   <title>Minos - Documentation</title>
@@ -12,6 +12,13 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="custom.css">
   <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
+  <style>
+    .shot { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0 .4rem; }
+    .shot-cap { color: var(--muted); font-size: .78rem; margin-bottom: 1.4rem; }
+    .shot-pair { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .shot-pair img { width: calc(50% - .5rem); min-width: 200px; flex: 1; }
+    .v-table td.c { text-align: center; white-space: nowrap; }
+  </style>
 </head>
 <body>
 
@@ -44,12 +51,12 @@
 <!-- ── Page header ────────────────────────────────────────────────────────── -->
 <div class="hero" style="padding: 3.5rem 1rem 3rem;">
   <div class="container">
-    <p class="s-sub mb-1" style="color:var(--muted);">Modern DNS sinkhole &middot; Pi-hole alternative</p>
+    <p class="s-sub mb-1" style="color:var(--muted);">Network-wide blocking &middot; Pi-hole &amp; AdGuard Home alternative</p>
     <img src="Images/minos-banner.png" alt="Minos — DNS server" style="max-width:min(460px,80vw); width:100%; height:auto; margin-bottom:1rem; filter:drop-shadow(0 0 24px rgba(189,54,58,.35));">
-    <p class="sub" style="max-width:640px; margin:0 auto 1.5rem;">
-      <em>Every query gets judged.</em> A single static Go binary with an embedded web UI, light enough for a
-      Raspberry Pi. Every DNS query is judged against your blocklists and sentenced — allowed queries are
-      forwarded upstream over encrypted DoH or DoT. No telemetry, ever.
+    <p class="sub" style="max-width:660px; margin:0 auto 1.5rem;">
+      <em>Every query gets judged.</em> Minos blocks ads, trackers and malware for every device on your network —
+      one Go binary with the web interface built in, light enough for a Raspberry Pi. Every block names the list
+      and rule behind it, with Allow one click away. No telemetry, ever.
     </p>
     <div class="cta">
       <a href="#quick-start" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Quick Start</a>
@@ -61,6 +68,7 @@
       <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white" alt="Go">
       <img src="https://img.shields.io/badge/Docker-multi--arch-2496ED?logo=docker&logoColor=white" alt="Docker">
       <img src="https://img.shields.io/badge/Raspberry%20Pi-ready-A22846?logo=raspberrypi&logoColor=white" alt="Raspberry Pi">
+      <img src="https://img.shields.io/badge/version-0.31.0-7c3aed" alt="Version">
     </div>
   </div>
 </div>
@@ -74,25 +82,25 @@
       <ul class="d-nav">
         <li class="d-group">Overview</li>
         <li><a href="#overview">What is Minos</a></li>
+        <li><a href="#why">Why Minos</a></li>
         <li><a href="#features">What It Does</a></li>
+        <li><a href="#compare">How It Compares</a></li>
 
         <li class="d-group">Getting Started</li>
         <li><a href="#quick-start">Quick Start</a></li>
-        <li><a href="#install-script">Install Script</a></li>
-        <li><a href="#docker">Docker</a></li>
-        <li><a href="#build">Build From Source</a></li>
         <li><a href="#first-run">First Run</a></li>
-        <li><a href="#cli">CLI Verbs</a></li>
-
-        <li class="d-group">Deployment</li>
         <li><a href="#deploy">Raspberry Pi / Linux</a></li>
-        <li><a href="#encrypted-dns">Encrypted DNS</a></li>
-        <li><a href="#dnssec">DNSSEC Validation</a></li>
+        <li><a href="#updating">Updating</a></li>
+        <li><a href="#cli">Command Line</a></li>
 
         <li class="d-group">Using Minos</li>
-        <li><a href="#family">Family Controls</a></li>
-        <li><a href="#network">Network Features</a></li>
-        <li><a href="#monitoring">Dashboard, Metrics &amp; API</a></li>
+        <li><a href="#pages">The Interface</a></li>
+        <li><a href="#blocking">Blocking</a></li>
+        <li><a href="#family">Devices &amp; Family</a></li>
+        <li><a href="#security">Sign-in &amp; Access</a></li>
+        <li><a href="#encrypted-dns">Encrypted DNS</a></li>
+        <li><a href="#dnssec">DNSSEC Validation</a></li>
+        <li><a href="#monitoring">Logs, Metrics &amp; API</a></li>
         <li><a href="#migrate">Migrating In</a></li>
 
         <li class="d-group">Reference</li>
@@ -109,267 +117,317 @@
       <!-- ── Overview ── -->
       <h2 id="overview"><i class="bi bi-shield-shaded me-2" style="color:var(--accent);"></i>What is Minos</h2>
       <p>
-        Minos is a modern, user-friendly DNS sinkhole — a Pi-hole alternative — written in Go. It ships as a single
-        static binary with an embedded web UI, light enough to run on a Raspberry Pi Zero through a Pi 4. Named for
-        the judge of the underworld, every DNS query that arrives is judged against your blocklists and sentenced —
-        no exceptions, no appeals (well, except pardons).
+        Minos is a DNS server for your home network that blocks ads, trackers and malware before they load. Point your
+        router's DNS at it and every device that uses it — phones, TVs, consoles, laptops — has each lookup checked
+        against your blocklists and your own rules: blocked names get an empty answer, everything else is looked up
+        through the upstream resolvers you choose, encrypted.
       </p>
       <p>
-        Blocked queries are answered with <code>0.0.0.0</code>/<code>::</code> or <code>NXDOMAIN</code> (your choice);
-        allowed queries are forwarded upstream over encrypted DoH or DoT (plaintext optional). Everything is managed
-        live from the web dashboard — no restarts — and nothing is ever sent home. No telemetry, ever.
+        It is one static Go binary with the web interface built in, light enough for a Raspberry Pi Zero, and
+        everything is managed live from the browser — on a desktop or a phone. Nothing is ever sent home.
       </p>
+      <img class="shot" src="Images/minos/dashboard.png" alt="The Minos dashboard: queries, blocks, a 24-hour chart, the most blocked domains and the busiest devices">
+      <p class="shot-cap">The dashboard — every number, domain and device is a link into the matching queries. (Demo data.)</p>
       <div class="callout"><strong>Open-source:</strong> Minos is released under the GPLv3 licence. The full source, issue tracker, and releases live at <a href="https://github.com/DanDreadless/minos" target="_blank">github.com/DanDreadless/minos</a>.</div>
+
+      <!-- ── Why ── -->
+      <h2 id="why"><i class="bi bi-stars me-2" style="color:var(--accent);"></i>Why Minos</h2>
+      <ul>
+        <li><strong>Every block explains itself.</strong> Each blocked lookup names the list and the rule that caught it, and <strong>Allow</strong> is on the row — never more than two clicks from seeing a block to fixing it.</li>
+        <li><strong>Try a list before you trust it.</strong> Audit mode shows what a new blocklist <em>would</em> block without blocking anything.</li>
+        <li><strong>Knows your devices.</strong> Names come from DHCP, mDNS, UPnP, NetBIOS and the MAC vendor registry, and rules follow a device across address changes.</li>
+        <li><strong>Modern DNS, both ways.</strong> Upstreams over DoH, HTTP/3, DoT or DNS-over-QUIC; devices can use Minos over DoT, DoH, HTTP/3 or QUIC, and Windows 11, iOS and macOS discover the encrypted endpoints themselves (DDR).</li>
+        <li><strong>Validates DNSSEC itself</strong> — and shows what enforcing it would cost before you turn it on.</li>
+        <li><strong>Updates itself, safely.</strong> One click installs a signed release and puts the old one back if the new one does not start.</li>
+        <li><strong>Explains itself.</strong> A built-in Help page covers every page and every setting.</li>
+      </ul>
 
       <!-- ── Features ── -->
       <h2 id="features"><i class="bi bi-list-check me-2" style="color:var(--accent);"></i>What It Does</h2>
 
-      <h3>Filtering</h3>
+      <h3>Blocking</h3>
       <ul>
-        <li>Listens for DNS queries on <code>:53</code> (UDP + TCP) and judges each one against compiled blocklists (hosts, plain, and AdBlock formats).</li>
-        <li>Blocked queries get <code>0.0.0.0</code>/<code>::</code> or <code>NXDOMAIN</code> (your choice); allowed queries are forwarded upstream over DoH or DoT.</li>
-        <li>Every blocked query shows <em>which list and rule</em> condemned it, with a one-click pardon from the live log — never more than two clicks from seeing a block to allowing it.</li>
-        <li>Repeat queries are answered from a built-in response cache — concurrent identical queries collapse into one, and stale answers are served instantly while a fresh one is fetched behind them (RFC 8767).</li>
-        <li>A failing upstream is sidestepped automatically and re-probed until it recovers — one dead resolver never slows the whole network.</li>
-        <li>Optional <a href="#dnssec">in-process DNSSEC validation</a> against the DNS root of trust — so even your upstream resolver can't forge an answer for a signed domain.</li>
-      </ul>
-
-      <h3>For the household</h3>
-      <ul>
-        <li>Device identity — IP, MAC, vendor (from the MAC), and hostname (reverse DNS via the gateway, with an mDNS <code>.local</code> fallback) — with per-device groups: extra rules, full bypass, or no DNS at all, plus a one-click block for any device.</li>
-        <li>One-click blocked services (TikTok, YouTube, Discord…) — globally or per group, with optional schedules ("no social media after 21:00").</li>
-        <li>Safe Search enforcement (Google, Bing, DuckDuckGo, YouTube) — network-wide or per group, enforced by the provider so it can't be switched off.</li>
+        <li>Hosts, plain-domain and AdBlock-syntax blocklists, with a curated catalog (balanced, strict, security, family) that is verified weekly by compiling every list.</li>
+        <li>Lists keep blocking from a local copy when their host is down, retry on a sensible schedule, refuse a suspiciously shrunken update, and fall back to publisher mirrors — and you are told when one stops updating.</li>
+        <li>Your own allowed and blocked domains, including <code>/regex/</code> rules, plus subscribed allowlists.</li>
+        <li><strong>CNAME-cloak inspection</strong> (on by default): a tracker hiding behind a first-party name — <code>metrics.shop.com → tracker.net</code> — is still blocked.</li>
+        <li>One-click blocked services (TikTok, YouTube, Discord…) and your own custom services, globally or per group.</li>
+        <li>Blocked answers as <code>0.0.0.0</code>/<code>::</code> or NXDOMAIN, with Extended DNS Errors (RFC 8914) naming the list for clients that ask.</li>
       </ul>
 
       <h3>For the network</h3>
       <ul>
-        <li>Local DNS records for your LAN (<code>nas.home.lab</code>, wildcards, CNAMEs, PTR).</li>
-        <li>Conditional forwarding: route <code>lan</code> or your reverse zone to the router.</li>
-        <li>Private reverse zones answered locally (RFC 6303) — <code>192.168.x.x</code> lookups never leak to public resolvers.</li>
-        <li>Serves encrypted DNS to clients: DoT for Android Private DNS, DoH at <code>/dns-query</code> — bring a certificate, or let Minos fetch and renew one automatically.</li>
+        <li>Local DNS records (<code>nas.home.arpa</code>, wildcards, CNAMEs, automatic PTR) and conditional forwarding to your router.</li>
+        <li>Private reverse lookups answered locally (RFC 6303) — <code>192.168.x.x</code> never leaks to public resolvers.</li>
+        <li>DNS rebinding protection, per-device rate limiting, and an open-resolver guard that answers only your own networks.</li>
+        <li>A response cache with request collapsing and serve-stale (RFC 8767); a failing upstream is sidestepped automatically.</li>
+        <li>Firefox's automatic DNS-over-HTTPS switched off network-wide, and iCloud Private Relay blockable, so filtering can't be bypassed quietly.</li>
       </ul>
 
       <h3>Running it</h3>
       <ul>
-        <li>Web dashboard with query charts, top blocked domains, and busiest clients — all clickable to drill straight into the matching, full-history log — cache hit rate, and a live query log streamed over WebSocket.</li>
-        <li>Full management from the UI: blocklists, allow/deny domains, upstreams, blocking mode, retention, API token — all applied live, no restarts.</li>
-        <li>Prometheus <code>/metrics</code> with a ready-made Grafana dashboard — scrape-only, never pushes.</li>
-        <li>A fully documented REST API with Home Assistant recipes — everything the UI does, your automations can do.</li>
-        <li>Webhook / <a href="https://ntfy.sh" target="_blank">ntfy</a> notifications: a new device on your network, an upstream failing or recovering, a new release.</li>
-        <li>Opt-in update check — when enabled, an in-app banner shows the exact upgrade command for how you installed (quick-install, Docker, or source); off by default, and nothing is sent beyond the request itself.</li>
-        <li>Batched SQLite persistence that respects SD cards. <strong>No telemetry. Ever.</strong></li>
+        <li>A Query Log over the full history that answers searches in milliseconds on millions of rows.</li>
+        <li>Dashboard windows from 24 hours to 90 days; host health (CPU, memory, temperature, disk) on non-container installs.</li>
+        <li>Minos's own application log in the browser, live, with secrets redacted.</li>
+        <li>Notifications by webhook or <a href="https://ntfy.sh" target="_blank">ntfy</a> that say what happened and what to do.</li>
+        <li>Built for SD cards: batched writes, capped memory, and nothing slow between a reboot and working DNS.</li>
+        <li><strong>No telemetry. Ever.</strong></li>
       </ul>
+
+      <!-- ── Compare ── -->
+      <h2 id="compare"><i class="bi bi-columns-gap me-2" style="color:var(--accent);"></i>How It Compares</h2>
+      <p>As of October 2026, against each project's current release. ✅ yes · — no · ◐ partly.</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th></th><th>Minos</th><th>Pi-hole v6</th><th>AdGuard Home</th></tr></thead>
+          <tbody>
+            <tr><td>Names the list <em>and rule</em> behind every block, with one-click allow</td><td class="c">✅</td><td class="c">◐</td><td class="c">✅</td></tr>
+            <tr><td>Audit (dry-run) blocklists</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
+            <tr><td>In-process DNSSEC validation</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
+            <tr><td>One-click update from the web interface</td><td class="c">✅ signed, rollback</td><td class="c">—</td><td class="c">✅</td></tr>
+            <tr><td>Encrypted DNS for devices (DoT / DoH / DoQ / HTTP/3)</td><td class="c">✅</td><td class="c">—</td><td class="c">✅</td></tr>
+            <tr><td>DDR — devices upgrade to encrypted DNS automatically</td><td class="c">✅</td><td class="c">—</td><td class="c">✅</td></tr>
+            <tr><td>CNAME-cloak inspection</td><td class="c">✅</td><td class="c">✅</td><td class="c">✅</td></tr>
+            <tr><td>Regex rules</td><td class="c">✅</td><td class="c">✅</td><td class="c">✅</td></tr>
+            <tr><td>Per-device rate limiting &amp; open-resolver guard</td><td class="c">✅</td><td class="c">◐</td><td class="c">✅</td></tr>
+            <tr><td>Device groups with schedules</td><td class="c">✅</td><td class="c">◐</td><td class="c">◐</td></tr>
+            <tr><td>Blocked-services catalog &amp; Safe Search</td><td class="c">✅</td><td class="c">—</td><td class="c">✅</td></tr>
+            <tr><td>Password login with two-step codes</td><td class="c">✅</td><td class="c">✅</td><td class="c">◐</td></tr>
+            <tr><td>Application log in the web interface</td><td class="c">✅</td><td class="c">✅</td><td class="c">—</td></tr>
+            <tr><td>DHCP server</td><td class="c">— by design</td><td class="c">✅</td><td class="c">✅</td></tr>
+            <tr><td>Recursive resolver</td><td class="c">— by design</td><td class="c">add-on</td><td class="c">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:.9rem;">Minos forwards to the upstream resolvers you choose rather than resolving recursively, and leaves DHCP to your router.</p>
 
       <!-- ── Quick start ── -->
       <h2 id="quick-start"><i class="bi bi-play-circle me-2" style="color:var(--accent);"></i>Quick Start</h2>
       <p>
-        Minos runs on a Raspberry Pi or any Linux box — amd64, arm64, or 32-bit ARM (Pi Zero through Pi 4 on 32-bit
-        Pi OS). Pick the install method that suits you: the one-line install script, Docker, or a build from source.
+        On a Raspberry Pi or any Linux box — amd64, arm64, or 32-bit ARM (Pi Zero through Pi 4 on 32-bit Pi OS) — one
+        line installs the latest release, the systemd unit and the updater:
       </p>
-
-      <h3 id="install-script">Install script (recommended)</h3>
-      <p>One line installs the latest release and the systemd unit:</p>
       <pre>curl -fsSL https://raw.githubusercontent.com/DanDreadless/minos/main/deploy/install.sh | sudo sh
 sudo systemctl enable --now minos</pre>
 
-      <h3 id="docker">Docker</h3>
+      <h3>Docker</h3>
       <p>Multi-arch images are published on GHCR:</p>
       <pre>docker run -d --name minos -p 53:53/udp -p 53:53/tcp -p 8080:8080 \
   -v minos-data:/data ghcr.io/dandreadless/minos:latest</pre>
-      <div class="callout"><strong>Tip:</strong> <code>deploy/</code> in the repo also has a multi-arch Dockerfile and a Compose example — <code>restart: unless-stopped</code> gives the same boot behaviour as the systemd unit.</div>
 
-      <h3 id="build">Build from source</h3>
+      <h3>Build from source</h3>
       <p>Requires Go 1.22+ and Node 20+:</p>
-      <pre>make build          # builds web UI + single binary into bin/minos
-./bin/minos serve   # starts DNS on :53 and the web UI on :8080</pre>
+      <pre>make build          # builds the web interface and one binary into bin/minos
+./bin/minos serve   # DNS on :53 and the web interface on :8080</pre>
 
       <!-- ── First run ── -->
       <h2 id="first-run"><i class="bi bi-gear me-2" style="color:var(--accent);"></i>First Run</h2>
-      <p>
-        First run writes a commented default config to <code>minos.yaml</code>. Point a device's DNS at the machine
-        running Minos and open <code>http://&lt;host&gt;:8080</code>.
-      </p>
-      <div class="callout"><strong>Local development without root:</strong> set <code>dns.listen: ":5353"</code> in the config and test with <code>dig @127.0.0.1 -p 5353 doubleclick.net</code>.</div>
-
-      <!-- ── CLI ── -->
-      <h2 id="cli"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>CLI Verbs</h2>
-      <p>The CLI talks to the running instance:</p>
-      <pre>minos status        # counters, rules, pause state
-minos pause 5m      # pause blocking for five minutes
-minos resume        # resume blocking
-minos import pihole /etc/pihole   # bring your Pi-hole settings with you</pre>
-
-      <!-- ── Deploy ── -->
-      <h2 id="deploy"><i class="bi bi-hdd-network me-2" style="color:var(--accent);"></i>Deploying on a Raspberry Pi (or any Linux box)</h2>
-      <p>
-        The install script puts the binary in <code>/usr/local/bin</code> and installs the hardened systemd unit.
-        Built from source instead?
-      </p>
-      <pre>sudo install -m 755 bin/minos /usr/local/bin/minos
-sudo cp deploy/minos.service /etc/systemd/system/</pre>
-
       <div class="step">
         <div class="step-n">1</div>
         <div class="step-b">
-          <h5>Free port 53</h5>
-          <p>Disable the <code>systemd-resolved</code> stub listener (or <code>dnsmasq</code>) so Minos can bind <code>:53</code>.</p>
+          <h5>Open the interface and set a password</h5>
+          <p>Open <code>http://&lt;host&gt;:8080</code>, then Settings → Access &amp; security. Until a password is set, anyone on your network can change Minos.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-n">2</div>
         <div class="step-b">
-          <h5>Give the machine a fixed IP</h5>
-          <p>Clients will point at this address, so it must not change.</p>
+          <h5>Choose blocklists</h5>
+          <p>Blocking → Blocklists has a curated catalog; <em>Balanced</em> is the recommended start.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-n">3</div>
         <div class="step-b">
-          <h5>Firewall ports 53 / 8080 to your LAN only</h5>
-          <p>Never expose an open resolver or the admin UI to the public internet.</p>
+          <h5>Point your devices at Minos</h5>
+          <p>Set your router's DHCP DNS option to the Minos machine and every device follows.</p>
         </div>
       </div>
       <div class="step">
         <div class="step-n">4</div>
         <div class="step-b">
-          <h5>Point your router's DHCP DNS at the machine</h5>
-          <p>Set the DHCP DNS option to the Minos host and every device on the network follows automatically.</p>
+          <h5>Watch the Query Log for a day</h5>
+          <p>If something you use breaks, find its blocked lookup and press Allow — or use <strong>Check a domain</strong> (Ctrl+K) from any page.</p>
         </div>
       </div>
+
+      <!-- ── Deploy ── -->
+      <h2 id="deploy"><i class="bi bi-hdd-network me-2" style="color:var(--accent);"></i>Raspberry Pi / Linux</h2>
       <p>
-        The step-by-step walkthrough — including host-tuning notes for busy networks — is in
+        Before the first start, free port 53 (disable the <code>systemd-resolved</code> stub listener or
+        <code>dnsmasq</code>), give the machine a fixed IP, and firewall ports 53 and 8080 to your LAN. Minos answers
+        only private networks and the networks it is connected to by default, so an accidentally exposed port never
+        makes it an open resolver. The step-by-step walkthrough is in
         <a href="https://github.com/DanDreadless/minos/blob/main/docs/getting-started.md" target="_blank">docs/getting-started.md</a>.
       </p>
+      <p>
+        The systemd unit runs Minos as an unprivileged dynamic user with a read-only system; settings and history
+        live in <code>/var/lib/minos</code>, which upgrades never touch.
+      </p>
+
+      <!-- ── Updating ── -->
+      <h2 id="updating"><i class="bi bi-arrow-repeat me-2" style="color:var(--accent);"></i>Updating</h2>
+      <p>
+        With the update check on (Settings → System), a banner announces new releases. On installs made with the
+        script, <strong>Update now</strong> does the rest:
+      </p>
+      <ol style="color:var(--muted); font-size:.875rem;">
+        <li>Downloads the release.</li>
+        <li>The version installed now checks it: signed with the Minos release key (Ed25519), the archive matching its checksum, and newer — downgrades are refused.</li>
+        <li>Keeps the current binary as <code>minos.prev</code>, installs the new one and restarts.</li>
+        <li>If the new version does not answer within 30 seconds, puts the previous one back and tells you.</li>
+      </ol>
+      <div class="callout">
+        <strong>Minos never runs as root.</strong> It only writes a request file; a small systemd helper
+        (<code>minos-update.path</code> / <code>minos-update.service</code>) does the installing, and the button
+        appears only once a password or API token protects the interface. Docker installs update with
+        <code>docker compose pull &amp;&amp; docker compose up -d</code>.
+      </div>
+      <p>Or update from the command line at any time:</p>
+      <pre>curl -fsSL https://raw.githubusercontent.com/DanDreadless/minos/main/deploy/install.sh | sudo MINOS_RESTART=1 sh</pre>
+
+      <!-- ── CLI ── -->
+      <h2 id="cli"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Command Line</h2>
+      <p>The <code>minos</code> command talks to the running instance, reading the config file for its address and credentials:</p>
+      <pre>minos status                      # counters, rules, pause state
+minos pause 5m                    # pause blocking for five minutes
+minos resume                      # resume blocking
+minos import pihole /etc/pihole   # bring your Pi-hole settings with you
+minos logs -f                     # follow Minos's own log
+minos version</pre>
+
+      <!-- ── Pages ── -->
+      <h2 id="pages"><i class="bi bi-window-sidebar me-2" style="color:var(--accent);"></i>The Interface</h2>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Page</th><th>What it is for</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Dashboard</strong></td><td>What your network did over 24 hours to 90 days, a <em>Needs attention</em> panel that appears only when something does, and host health.</td></tr>
+            <tr><td><strong>Query Log</strong></td><td>Every lookup, live and searchable over the full history: by domain or device, result, list, type and time, with typed filters such as <code>blocked type:AAAA -cdn</code>.</td></tr>
+            <tr><td><strong>Devices</strong></td><td>Every device that uses Minos, with discovered names, groups, schedules, notes and a page per device.</td></tr>
+            <tr><td><strong>Blocking</strong></td><td>Blocklists, and your own Allowed and Blocked domains and services, on three tabs.</td></tr>
+            <tr><td><strong>Local DNS</strong></td><td>Names on your own network and conditional forwarding.</td></tr>
+            <tr><td><strong>Logs</strong></td><td>Minos's own application log, live.</td></tr>
+            <tr><td><strong>Settings</strong></td><td>DNS, Filtering, Notifications, Device discovery, Access &amp; security, System, Backup &amp; import — unsaved changes are kept per tab and you are asked before leaving.</td></tr>
+            <tr><td><strong>Help</strong></td><td>Every page and every setting explained, searchable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:.9rem;">The bottom of the side menu shows whether Minos is blocking right now, with Pause blocking and Check a domain.</p>
+      <img class="shot" src="Images/minos/querylog.png" alt="The Query Log: every lookup with its device, result and the list that blocked it">
+      <p class="shot-cap">The Query Log — devices by name, the list behind each block, and Allow on the row.</p>
+      <div class="shot-pair">
+        <img class="shot" src="Images/minos/phone-dashboard.png" alt="The dashboard on a phone">
+        <img class="shot" src="Images/minos/phone-querylog.png" alt="The Query Log on a phone">
+      </div>
+      <p class="shot-cap">Every page works on a phone.</p>
+
+      <!-- ── Blocking ── -->
+      <h2 id="blocking"><i class="bi bi-funnel me-2" style="color:var(--accent);"></i>Blocking</h2>
+      <p>
+        Choose lists from the curated catalog or add any hosts, plain-domain or AdBlock list by URL. Each list shows
+        its rules, how much it blocked this week, and whether it is up to date; a list in <strong>audit</strong> mode
+        records what it would block without blocking. Allowed and Blocked hold your own rules — domains (subdomains
+        included), <code>/regex/</code> patterns, and whole services.
+      </p>
+      <img class="shot" src="Images/minos/blocking.png" alt="The Blocklists tab with three subscribed lists and the curated catalog">
+      <p class="shot-cap">Blocking → Blocklists, with the curated catalog below.</p>
+
+      <!-- ── Family ── -->
+      <h2 id="family"><i class="bi bi-people me-2" style="color:var(--accent);"></i>Devices &amp; Family</h2>
+      <ul>
+        <li><strong>Device identity</strong> — IP, MAC, vendor and a discovered name, merged into one row per physical device even as its address changes.</li>
+        <li><strong>Groups</strong> — extra allowed and blocked domains, full bypass, or no DNS at all, on schedules such as "no social media after 21:00 on school nights".</li>
+        <li><strong>Blocked services</strong> — one click blocks TikTok, YouTube, Discord and more, per group or for everyone.</li>
+        <li><strong>Safe Search</strong> — Google, Bing, DuckDuckGo and YouTube, enforced by the provider so it can't be switched off on the device.</li>
+      </ul>
+
+      <!-- ── Security ── -->
+      <h2 id="security"><i class="bi bi-lock me-2" style="color:var(--accent);"></i>Sign-in &amp; Access</h2>
+      <ul>
+        <li><strong>Password</strong> — stored only as an argon2id hash; a sign-in lasts 30 days on that browser, and <em>Sign out everywhere else</em> ends the rest. Five wrong tries from one address wait a minute.</li>
+        <li><strong>Authenticator app</strong> — optional 6-digit codes, set up by scanning a QR code.</li>
+        <li><strong>API token</strong> — for scripts and Home Assistant, alongside the password.</li>
+        <li><strong>Who may use DNS</strong> — private and local networks by default, or the networks you list; and a per-device query limit (1,000 a minute by default).</li>
+      </ul>
+      <div class="callout"><strong>Forgot the password?</strong> Delete <code>password_hash</code> from <code>minos.yaml</code> on the Minos machine and restart.</div>
 
       <!-- ── Encrypted DNS ── -->
       <h2 id="encrypted-dns"><i class="bi bi-shield-lock me-2" style="color:var(--accent);"></i>Encrypted DNS</h2>
       <p>
-        Minos forwards upstream over DoH or DoT (plaintext optional) and can also serve encrypted DNS to your clients:
-        DoT for Android Private DNS, and DoH at <code>/dns-query</code>. Bring your own certificate, or let Minos fetch
-        and renew one automatically via ACME — Let's Encrypt through Cloudflare, deSEC, DuckDNS, or RFC 2136.
+        Upstream, Minos speaks DoH, DNS over HTTP/3, DoT and DNS over QUIC, with curated presets for Cloudflare,
+        Quad9, AdGuard and others. Towards your devices it can serve DoT (Android Private DNS), DoH at
+        <code>/dns-query</code>, HTTP/3 on the same port, and DNS over QUIC — with your own certificate or one Minos
+        fetches and renews via ACME (Let's Encrypt through Cloudflare, deSEC, DuckDNS or RFC 2136).
+      </p>
+      <pre>dns:
+  tls:
+    dot_listen: ":853"
+    doh_listen: ":8443"
+    doq_listen: ":853"     # UDP — shares the number with DoT's TCP port</pre>
+      <p>
+        With a listener on, Minos answers <strong>DDR</strong> (RFC 9462), so Windows 11, iOS and macOS move to
+        encrypted DNS by themselves when the certificate covers the address they use.
       </p>
 
       <!-- ── DNSSEC ── -->
       <h2 id="dnssec"><i class="bi bi-patch-check me-2" style="color:var(--accent);"></i>DNSSEC Validation</h2>
       <p>
-        Encrypted upstreams protect the path to your resolver. They don't protect you <em>from</em> it. Since
-        <strong>v0.19.0</strong>, Minos can check signed answers itself against the DNS root of trust, so a
-        compromised, misconfigured, or simply dishonest upstream can't hand you a forged address for a signed
-        domain. Neither Pi-hole nor AdGuard Home validates in-process.
+        Encrypted upstreams protect the path to your resolver; they don't protect you <em>from</em> it. Minos can
+        check signed answers itself against the DNS root of trust, so even a dishonest upstream can't hand you a
+        forged address for a signed domain.
       </p>
-      <p>Set it in Settings, beside the upstreams, or in the config file:</p>
       <pre>dns:
   dnssec: permissive   # off | permissive | enforce</pre>
-
       <ul>
-        <li><strong>off</strong> — the default. Validation is delegated to your upstream resolvers, exactly as before.</li>
-        <li><strong>permissive</strong> — validate every forwarded answer and count the outcomes, but never block. <em>Start here</em>: it shows you what your network actually sees, with zero risk.</li>
-        <li><strong>enforce</strong> — additionally refuse answers that <em>fail</em> validation (a forged record, a stripped signature, a broken chain) with SERVFAIL. The refusal appears in the query log attributed to <code>dnssec</code>, with the reason — the same "why was this condemned" treatment as a blocklist hit.</li>
+        <li><strong>permissive</strong> — validate and record, never block. The dashboard lists the answers enforce would refuse, and warns when your upstream returns no DNSSEC records so validation is doing nothing.</li>
+        <li><strong>enforce</strong> — refuse answers that fail validation, shown in the Query Log as blocked by <code>dnssec</code> with the reason.</li>
       </ul>
-
-      <div class="callout">
-        <strong>It can't break your resolution.</strong> Answers that can't be judged either way — an upstream that
-        returns no DNSSEC records, a transient chain-fetch failure — always pass, in both modes. A misconfigured
-        upstream costs you visibility, never connectivity. Unsigned domains (still most of the internet) are
-        unaffected.
-      </div>
-
-      <h3>What it costs</h3>
-      <p>
-        One signature check per cache-missed answer: roughly <strong>50&nbsp;µs</strong> on amd64, well under a
-        millisecond on a Raspberry Pi. Cache hits and blocked queries cost nothing extra — validation happens once,
-        before the answer is cached, and the verdict is cached with it. Zone keys are validated once and reused, so
-        the full chain walk happens on the first query into a zone, not every query.
-      </p>
-
-      <h3>Under the hood</h3>
-      <ul>
-        <li>Full chain of trust: RRSIG signatures verified up through DNSKEY and DS records to the root trust anchors, which ship embedded.</li>
-        <li>NSEC and NSEC3 denial-of-existence proofs (including opt-out), wildcard next-closer proofs, and a delegation walk that tells an honestly unsigned zone from a signature-stripping attack.</li>
-        <li>Hardened against resource-exhaustion attacks from day one — KeyTrap (CVE-2023-50387) bounds on signature work and the RFC 9276 cap on NSEC3 iterations.</li>
-        <li>Clients that ask for DNSSEC (the DO bit) get the full records and a trustworthy AD bit; everyone else gets clean, stripped answers.</li>
-      </ul>
-
-      <h3>Watching it</h3>
-      <p>
-        Prometheus exposes the outcomes, which is how you decide whether to move from permissive to enforce:
-      </p>
-      <pre>minos_dnssec_results_total{status="secure"}
-minos_dnssec_results_total{status="insecure"}        # unsigned zone, nothing to check
-minos_dnssec_results_total{status="bogus"}           # would be refused in enforce mode
-minos_dnssec_results_total{status="indeterminate"}   # couldn't be judged — always passes</pre>
-      <p>
-        Run permissive for a week. If <code>bogus</code> stays at zero and <code>indeterminate</code> is low,
-        enforce is a safe switch. A high <code>indeterminate</code> count usually means the upstream isn't
-        returning DNSSEC records at all.
-      </p>
-
-      <!-- ── Family controls ── -->
-      <h2 id="family"><i class="bi bi-people me-2" style="color:var(--accent);"></i>Family Controls</h2>
-      <ul>
-        <li><strong>Device identity &amp; groups</strong> — every device (IP, MAC, vendor, and hostname where it resolves) can be placed in a group with extra rules, full bypass, or no DNS at all, plus a one-click block for any device.</li>
-        <li><strong>Blocked services</strong> — one click blocks TikTok, YouTube, Discord and more, globally or per group, with optional schedules such as "no social media after 21:00".</li>
-        <li><strong>Safe Search enforcement</strong> — Google, Bing, DuckDuckGo and YouTube, network-wide or per group, enforced by the provider so it can't be switched off on the device.</li>
-      </ul>
-
-      <!-- ── Network features ── -->
-      <h2 id="network"><i class="bi bi-diagram-3 me-2" style="color:var(--accent);"></i>Network Features</h2>
-      <ul>
-        <li><strong>Local DNS records</strong> for your LAN — <code>nas.home.lab</code>, wildcards, CNAMEs, and PTR records.</li>
-        <li><strong>Conditional forwarding</strong> — route <code>lan</code> or your reverse zone to the router.</li>
-        <li><strong>Private reverse zones</strong> answered locally (RFC 6303) — <code>192.168.x.x</code> lookups never leak to public resolvers.</li>
-      </ul>
+      <div class="callout"><strong>It can't break resolution.</strong> Answers that can't be judged either way always pass. Cost: roughly 50&nbsp;µs per cache-missed answer on amd64; cache hits and blocked queries pay nothing.</div>
 
       <!-- ── Monitoring ── -->
-      <h2 id="monitoring"><i class="bi bi-graph-up me-2" style="color:var(--accent);"></i>Dashboard, Metrics &amp; API</h2>
+      <h2 id="monitoring"><i class="bi bi-graph-up me-2" style="color:var(--accent);"></i>Logs, Metrics &amp; API</h2>
       <ul>
-        <li><strong>Dashboard</strong> — query charts, top blocked domains, and busiest clients (all clickable to drill into the full-history log), cache hit rate, and a live query log streamed over WebSocket.</li>
-        <li><strong>Live management</strong> — blocklists, allow/deny domains, upstreams, blocking mode, retention, and API token are all applied live, with no restarts.</li>
-        <li><strong>Prometheus</strong> — a scrape-only <code>/metrics</code> endpoint with a ready-made <a href="https://github.com/DanDreadless/minos/blob/main/deploy/grafana-dashboard.json" target="_blank">Grafana dashboard</a>.</li>
-        <li><strong>REST API</strong> — a fully <a href="https://github.com/DanDreadless/minos/blob/main/docs/api.md" target="_blank">documented API</a> with <a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a>; everything the UI does, your automations can do.</li>
-        <li><strong>Notifications</strong> — webhook / <a href="https://ntfy.sh" target="_blank">ntfy</a> alerts for a new device, an upstream failing or recovering, or a new release.</li>
+        <li><strong>Notifications</strong> — webhook or <a href="https://ntfy.sh" target="_blank">ntfy</a>: a new device, a list or resolver failing, DNS down (which ignores quiet hours), an update installed or rolled back, and an optional daily or weekly digest.</li>
+        <li><strong>Prometheus</strong> — scrape-only <code>/metrics</code> with a ready-made <a href="https://github.com/DanDreadless/minos/blob/main/deploy/grafana-dashboard.json" target="_blank">Grafana dashboard</a>.</li>
+        <li><strong>REST API</strong> — <a href="https://github.com/DanDreadless/minos/blob/main/docs/api.md" target="_blank">fully documented</a>, with <a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a>; everything the interface does, your automations can do.</li>
       </ul>
 
       <!-- ── Migrating in ── -->
       <h2 id="migrate"><i class="bi bi-box-arrow-in-down me-2" style="color:var(--accent);"></i>Migrating In</h2>
-      <p>Already running Pi-hole or AdGuard Home? Bring your settings across in one command:</p>
-      <pre>minos import pihole /etc/pihole</pre>
-      <p>
-        …or upload <code>gravity.db</code> / <code>AdGuardHome.yaml</code> in the UI. You can export and restore the
-        whole Minos config as YAML at any time.
-      </p>
+      <p>Bring Pi-hole or AdGuard Home settings across — blocklists, allow and block rules (regex included), local records and blocked services:</p>
+      <pre>minos import pihole /etc/pihole
+minos import adguard AdGuardHome.yaml</pre>
+      <p>…or upload <code>gravity.db</code> / <code>AdGuardHome.yaml</code> in Settings → Backup &amp; import. Imports only add; you can export and restore the whole configuration at any time.</p>
 
       <!-- ── Documentation ── -->
       <h2 id="docs"><i class="bi bi-book me-2" style="color:var(--accent);"></i>Documentation</h2>
       <ul>
-        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/getting-started.md" target="_blank">Getting started</a> — install, host prep, systemd, encrypted DNS, monitoring, and the full config reference.</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/user-guide.md" target="_blank">User guide</a> — every page and every setting, with defaults and config keys (also built into Minos as <strong>Help</strong>).</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/getting-started.md" target="_blank">Getting started</a> — install, host preparation, encrypted DNS, monitoring, upgrading and the full config reference.</li>
         <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/api.md" target="_blank">REST API reference</a> — every endpoint, with examples.</li>
-        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a> — blocking switch, sensors, bedtime automations, events on your phone.</li>
-        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">Roadmap</a> — what shipped, what's under consideration.</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/home-assistant.md" target="_blank">Home Assistant recipes</a> — blocking switch, sensors, bedtime automations.</li>
+        <li><a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">Roadmap</a> — what has shipped and what is being considered.</li>
       </ul>
 
       <!-- ── Roadmap ── -->
       <h2 id="roadmap"><i class="bi bi-signpost-split me-2" style="color:var(--accent);"></i>Roadmap</h2>
       <p>
-        Everything from the July 2026 competitive review has shipped — the resolver core (cache, dedup, serve-stale,
-        failover health, private reverse zones), family controls, the Pi-hole/AdGuard importer with a UI uploader,
-        client-facing DoT/DoH with automatic ACME certificates, metrics, notifications, and the release pipeline.
-        Two follow-up rounds from real-world use have shipped since: a bootstrap-free default upstream and a curated
-        resolver picker, clickable dashboard drill-downs and a full-width UI, rollback-safe config loading, device
-        <strong>vendor</strong> labels and <strong>mDNS</strong> hostname resolution, a full-history query log, and
-        in-app upgrade guidance. <strong>In-process <a href="#dnssec">DNSSEC validation</a> shipped in v0.19.0</strong>
-        (August 2026). Still planned is further device identity (DHCP-lease ingestion); DNS-over-QUIC is the one item
-        under consideration. Details are in
+        The October 2026 round (v0.21–v0.31) brought plain naming and a reorganised, phone-ready interface;
+        self-healing blocklists with mirrors; millisecond Query Log search and fast 90-day stats; the application log
+        and Help in the app; Extended DNS Errors, CNAME-cloak inspection, rebinding protection, access control and
+        rate limiting, DDR, regex rules, DNS over QUIC and HTTP/3; password sign-in with authenticator codes; and
+        signed one-click updates with rollback. Still under consideration: replica config sync. Details in
         <a href="https://github.com/DanDreadless/minos/blob/main/docs/roadmap.md" target="_blank">docs/roadmap.md</a>.
       </p>
 
       <!-- ── Developing ── -->
       <h2 id="developing"><i class="bi bi-code-slash me-2" style="color:var(--accent);"></i>Developing</h2>
       <p>Go 1.22+, Node 20+.</p>
-      <pre>make test    # runs the Go suite with the race detector
-make lint    # runs golangci-lint and the frontend type check
-make bench   # runs the filter engine benchmarks</pre>
-      <p>See <code>CLAUDE.md</code> in the repo for architecture, conventions, and performance budgets.</p>
+      <pre>make test    # the Go suite with the race detector
+make lint    # golangci-lint and the frontend type check
+make bench   # the filter-engine benchmarks</pre>
+      <p>See <code>CLAUDE.md</code> in the repo for the architecture, conventions and performance budgets.</p>
 
       <!-- ── License ── -->
       <h2 id="license"><i class="bi bi-file-earmark-text me-2" style="color:var(--accent);"></i>License</h2>
