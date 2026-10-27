@@ -68,7 +68,7 @@
       <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go&logoColor=white" alt="Go">
       <img src="https://img.shields.io/badge/Docker-multi--arch-2496ED?logo=docker&logoColor=white" alt="Docker">
       <img src="https://img.shields.io/badge/Raspberry%20Pi-ready-A22846?logo=raspberrypi&logoColor=white" alt="Raspberry Pi">
-      <img src="https://img.shields.io/badge/version-0.35.0-7c3aed" alt="Version">
+      <img src="https://img.shields.io/badge/version-0.36.1-7c3aed" alt="Version">
     </div>
   </div>
 </div>
@@ -136,6 +136,7 @@
         <li><strong>Every block explains itself.</strong> Each blocked lookup names the list and the rule that caught it, and <strong>Allow</strong> is on the row — never more than two clicks from seeing a block to fixing it. Or allow it for just an hour.</li>
         <li><strong>Spots infected devices.</strong> Not just domains on a list: a device looking up many random-looking domains (malware hunting for its control server), sending data out hidden in long DNS names, or reaching for known malicious domains is flagged by name — tuned on 90 days of a real home network to stay quiet when nothing is wrong.</li>
         <li><strong>Notices when blocking breaks something.</strong> A device retrying a blocked name, the way an app does when it has stopped working, shows up as <em>"Something may be broken on Living room TV"</em> with Allow, Allow 1 h and Dismiss — while ad and tracker chatter that nags all day is left out.</li>
+        <li><strong>Know what each list is worth.</strong> Minos compares your blocklists with each other and with what was really blocked: how much of each the others already cover, the lookups only it caught, and the memory removing it would free.</li>
         <li><strong>Try a list before you trust it.</strong> Audit mode shows what a new blocklist <em>would</em> block without blocking anything.</li>
         <li><strong>Undo for settings.</strong> Every change is recorded with who made it and what it touched; see the change line by line (secrets hidden) and put back any earlier version in one click.</li>
         <li><strong>Home Assistant with no YAML.</strong> Point Minos at your MQTT broker and a Minos device appears in Home Assistant: a blocking switch, pause buttons, counters, problem sensors and a Block switch for each named device — ready for a bedtime automation.</li>
@@ -187,6 +188,7 @@
           <tbody>
             <tr><td>Names the list <em>and rule</em> behind every block, with one-click allow</td><td class="c">✅</td><td class="c">◐</td><td class="c">✅</td></tr>
             <tr><td>Audit (dry-run) blocklists</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
+            <tr><td>Blocklist overlap and value report</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
             <tr><td>Flags infected devices by behaviour (DGA, DNS tunnelling)</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
             <tr><td>In-process DNSSEC validation</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
             <tr><td>Settings history with one-click undo</td><td class="c">✅</td><td class="c">—</td><td class="c">—</td></tr>
