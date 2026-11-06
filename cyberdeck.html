@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cyberdeck documentation — a CTF companion tool for Hack The Box. Tracks your progress on each box, suggests what to run next (and why), and wraps the Kali tools in a Textual TUI. You still do the hacking.">
+  <meta name="keywords" content="cyberdeck, hack the box, htb, ctf, kali linux, recon, enumeration, nmap, pentesting, textual, tui, mcp, claude code">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
+  <title>Cyberdeck - Documentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="custom.css">
+  <link rel="shortcut icon" type="image/png" href="Images/favicon.png">
+  <style>
+    .shot { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 8px; margin: 1rem 0 .4rem; }
+    .shot-cap { color: var(--muted); font-size: .78rem; margin-bottom: 1.4rem; }
+    .v-table td.k { white-space: nowrap; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">
+      <img src="Images/vault-logo.png" alt="DanDreadless">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="minos.html">Minos</a></li>
+        <li class="nav-item"><a class="nav-link" href="carapace.html">Carapace</a></li>
+        <li class="nav-item"><a class="nav-link" href="vault1337.html">Vault1337</a></li>
+        <li class="nav-item"><a class="nav-link" href="insight.html">Insight</a></li>
+        <li class="nav-item"><a class="nav-link active" href="cyberdeck.html">Cyberdeck</a></li>
+        <li class="nav-item">
+          <a class="nav-link nav-gh" href="https://github.com/DanDreadless/cyberdeck" target="_blank">
+            <i class="bi bi-github me-1"></i>GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page header ────────────────────────────────────────────────────────── -->
+<div class="hero" style="padding: 3.5rem 1rem 3rem;">
+  <div class="container">
+    <p class="s-sub mb-1" style="color:var(--muted);">A CTF companion tool &middot; Hack The Box &middot; Kali Linux</p>
+    <img src="Images/cyberdeck-logo.png" alt="Cyberdeck" style="max-width:min(520px,85vw); width:100%; height:auto; margin-bottom:1rem; filter:drop-shadow(0 0 24px rgba(0,249,252,.28));">
+    <p class="sub" style="max-width:660px; margin:0 auto 1.5rem;">
+      Cyberdeck tracks your progress on each box, suggests what to run next (and <em>why</em>), and wraps the
+      Kali tools so every command is explained and every result is kept. <em>You still do the hacking.</em>
+    </p>
+    <div class="cta">
+      <a href="#install" class="btn-v solid"><i class="bi bi-play-circle me-1"></i>Install</a>
+      <a href="#features" class="btn-v outline"><i class="bi bi-list-check me-1"></i>What It Does</a>
+      <a href="https://github.com/DanDreadless/cyberdeck" target="_blank" class="btn-v outline"><i class="bi bi-github me-1"></i>View on GitHub</a>
+    </div>
+    <div class="badge-row">
+      <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT">
+      <img src="https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white" alt="Python 3.11+">
+      <img src="https://img.shields.io/badge/Kali%20Linux-557C94?logo=kalilinux&logoColor=white" alt="Kali Linux">
+      <img src="https://img.shields.io/badge/MCP-Claude%20Code-05d9e8" alt="MCP: Claude Code">
+      <img src="https://img.shields.io/badge/version-0.0.1-7c3aed" alt="Version 0.0.1">
+    </div>
+  </div>
+</div>
+
+<!-- ── Docs body ──────────────────────────────────────────────────────────── -->
+<div class="container section">
+  <div class="docs-wrap">
+
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+      <ul class="d-nav">
+        <li class="d-group">Overview</li>
+        <li><a href="#overview">What is Cyberdeck</a></li>
+        <li><a href="#not-autopilot">What It Isn't</a></li>
+        <li><a href="#features">What It Does</a></li>
+
+        <li class="d-group">Getting Started</li>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#first-box">Your First Box</a></li>
+        <li><a href="#updating">Updating</a></li>
+
+        <li class="d-group">Using Cyberdeck</li>
+        <li><a href="#dashboard">The Dashboard</a></li>
+        <li><a href="#run-dialog">Running Tools</a></li>
+        <li><a href="#suggestions">Suggestions</a></li>
+        <li><a href="#manual">Adding What You Find</a></li>
+        <li><a href="#hosts">Hosts File &amp; New IPs</a></li>
+        <li><a href="#learning">Learning Aids</a></li>
+        <li><a href="#writeups">Journal &amp; Write-ups</a></li>
+        <li><a href="#themes">Themes</a></li>
+
+        <li class="d-group">Claude Code</li>
+        <li><a href="#mcp">MCP Server</a></li>
+
+        <li class="d-group">Reference</li>
+        <li><a href="#cli">Command Line</a></li>
+        <li><a href="#plugins">Adding a Tool</a></li>
+        <li><a href="#config">Configuration</a></li>
+        <li><a href="#safety">Safety</a></li>
+        <li><a href="#developing">Developing</a></li>
+        <li><a href="#license">License</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="docs-content">
+
+      <!-- ── Overview ── -->
+      <h2 id="overview"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>What is Cyberdeck</h2>
+      <p>
+        Most of a Hack The Box machine is enumeration: run nmap, read the output, decide which tool to run next,
+        remember the flags, copy the vhost into <code>/etc/hosts</code>, try the creds you found somewhere else&hellip;
+        Cyberdeck does that bookkeeping and the &ldquo;what next?&rdquo; so you can focus on the box.
+      </p>
+      <p>
+        It's a keyboard-driven terminal app for Kali Linux (also usable in a browser). Each box gets its own folder
+        holding everything found on it and every command run. The dashboard shows where you are, what's been found
+        and the next steps worth trying, with the reason for each.
+      </p>
+      <img class="shot" src="Images/cyberdeck/dashboard.png" alt="The Cyberdeck dashboard: progress, services, findings, ranked next steps with explanations, and the job list">
+      <p class="shot-cap">The dashboard for a box: progress on the left, findings and the next steps (with why) on the right, jobs and their output below. (Made-up box.)</p>
+      <div class="callout"><strong>Open-source (MIT):</strong> the source, issues and releases live at <a href="https://github.com/DanDreadless/cyberdeck" target="_blank">github.com/DanDreadless/cyberdeck</a>. Cyberdeck is in early, active development: it works end to end on real boxes, but expect rough edges.</div>
+
+      <!-- ── Not an autopilot ── -->
+      <h2 id="not-autopilot"><i class="bi bi-person-check me-2" style="color:var(--accent);"></i>What It Is (and Isn't)</h2>
+      <p>
+        Cyberdeck is <strong>not</strong> an autopilot. It doesn't exploit boxes or chase flags for you. It's the
+        notebook, checklist and tool launcher that sits next to your own terminal and browser:
+      </p>
+      <ul>
+        <li><strong>It tracks the box.</strong> Ports, services, versions, hostnames, URLs, users, credentials,
+          hashes, flags, notes and every command run, all in the box's folder. Progress comes from that record, so
+          you can stop and resume any time.</li>
+        <li><strong>It suggests next steps.</strong> From what's known so far, it ranks what's worth trying next and
+          explains why, with a link to learn more. You decide what to run, and can skip or snooze any suggestion.</li>
+        <li><strong>It wraps the tools.</strong> nmap, feroxbuster, ffuf, netexec, smbmap, hashcat, searchsploit and
+          40 more run through a Run dialog with presets, explained flags and a preview of the exact command. Their
+          output is saved and parsed into findings.</li>
+      </ul>
+      <p>
+        A lot of the work still happens outside it, as it should: reading the site in your browser, Burp, poking at
+        a login form, catching a reverse shell, enumerating as a user, privilege escalation. You bring what you learn
+        back into Cyberdeck (see <a href="#manual">Adding What You Find</a>), and the suggestions use it.
+      </p>
+
+      <!-- ── Features ── -->
+      <h2 id="features"><i class="bi bi-list-check me-2" style="color:var(--accent);"></i>What It Does</h2>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Feature</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td class="k"><strong>Guided recon</strong></td><td>New-box wizard, HTB VPN check, two-stage nmap (all ports, then scripts and versions on the open ones), each run approved by you and imported automatically.</td></tr>
+            <tr><td class="k"><strong>Tool plugins</strong></td><td>45+ Kali tools described in YAML: web, SMB/AD, RPC, creds, forensics, exploit research. Add your own without writing Python.</td></tr>
+            <tr><td class="k"><strong>Next-step suggestions</strong></td><td>Rules turn findings into ranked next steps with a <em>why</em>: fingerprinting a site, adding vhosts to <code>/etc/hosts</code> (diff shown first), fuzzing, SMB/AD enumeration and exploit lookups.</td></tr>
+            <tr><td class="k"><strong>Per-box findings store</strong></td><td>Services, versions, hostnames, URLs, users, credentials, hashes and flags, from tool output or added by you, each with where it came from. Secrets are masked in the UI.</td></tr>
+            <tr><td class="k"><strong>TUI and browser UI</strong></td><td>A keyboard-driven Textual dashboard. <code>cyberdeck --web</code> serves the same UI in your browser.</td></tr>
+            <tr><td class="k"><strong>Learning aids</strong></td><td>Beginner layout with a journey bar, plain-English job summaries, a glossary, per-service checklists, a graded &ldquo;I'm stuck&rdquo; flow and a rabbit-hole timer.</td></tr>
+            <tr><td class="k"><strong>Journal and write-ups</strong></td><td>The box's story builds itself from what you did. Draft a write-up (loot and your paths masked), then read and edit it in the app.</td></tr>
+            <tr><td class="k"><strong>Claude Code over MCP</strong></td><td><code>cyberdeck mcp</code> lets Claude Code read findings, preview commands and run safe tools. Anything riskier waits for your approval.</td></tr>
+            <tr><td class="k"><strong>Cyberpunk themes</strong></td><td>Five neon palettes plus every Textual theme; <code>ctrl+t</code> switches theme from any screen, with live preview.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Requirements ── -->
+      <h2 id="requirements"><i class="bi bi-clipboard-check me-2" style="color:var(--accent);"></i>Requirements</h2>
+      <ul>
+        <li><strong>Kali Linux</strong>, or another Linux with the tools you want installed.</li>
+        <li><strong>Python 3.11+</strong> and <a href="https://docs.astral.sh/uv/" target="_blank">uv</a>.</li>
+        <li><strong>nmap</strong>, plus whichever Kali tools you want Cyberdeck to drive. It detects what's installed
+          and only offers those; <code>cyberdeck doctor</code> tells you what's missing and how to fix it.</li>
+        <li>A Hack The Box VPN connection (<code>.ovpn</code>) for HTB targets.</li>
+      </ul>
+
+      <!-- ── Install ── -->
+      <h2 id="install"><i class="bi bi-download me-2" style="color:var(--accent);"></i>Install</h2>
+      <pre>curl -LsSf https://astral.sh/uv/install.sh | sh        # install uv (once)
+git clone https://github.com/DanDreadless/cyberdeck.git
+cd cyberdeck
+mkdir -p ~/.config/cyberdeck &amp;&amp; cp .env.example ~/.config/cyberdeck/.env   # your settings
+uv tool install -e .              # puts `cyberdeck` on your PATH
+uv tool install -e ".[web]"       # ...or with the browser UI</pre>
+      <p>Then check your setup:</p>
+      <pre>cyberdeck doctor                  # VPN, tools, wordlists, sudo and clock, with the fix for each problem
+cyberdeck                         # open the TUI</pre>
+
+      <!-- ── First box ── -->
+      <h2 id="first-box"><i class="bi bi-flag me-2" style="color:var(--accent);"></i>Your First Box</h2>
+      <p>
+        Cyberdeck opens on your box list: every box with its IP, when you last worked on it, and how far you got
+        (ports, versions, UDP, hosts file, user and root flags).
+      </p>
+      <img class="shot" src="Images/cyberdeck/boxes.png" alt="The Cyberdeck box list with five boxes at different stages of progress">
+      <p class="shot-cap">The box list. (Made-up boxes.)</p>
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-b">
+          <h5>Create the box</h5>
+          <p>Press <code>n</code> and give it the machine's name and IP. Cyberdeck creates a folder for it under your
+            workspace (default <code>~/Documents/htb</code>).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-b">
+          <h5>VPN check and scan</h5>
+          <p>Cyberdeck checks the box is routed through your HTB tunnel (and offers to start it if not), then offers
+            the two nmap stages. You approve each one in the Run dialog; results are imported automatically.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-b">
+          <h5>Work the box</h5>
+          <p>Use the dashboard to keep track and decide what's next: <code>a</code> does the top suggestion,
+            <code>r</code> runs any tool, and everything you find by hand goes in Loot, notes or the flag prompt.</p>
+        </div>
+      </div>
+
+      <!-- ── Updating ── -->
+      <h2 id="updating"><i class="bi bi-arrow-repeat me-2" style="color:var(--accent);"></i>Updating</h2>
+      <p>
+        The install above is editable: the <code>cyberdeck</code> command runs the code in your clone. Pull the
+        latest and restart Cyberdeck:
+      </p>
+      <pre>cd cyberdeck &amp;&amp; git pull</pre>
+      <p>If a release changes Cyberdeck's dependencies, refresh the install too:</p>
+      <pre>uv tool install -e . --reinstall     # or -e ".[web]" for the browser UI</pre>
+
+      <!-- ── Dashboard ── -->
+      <h2 id="dashboard"><i class="bi bi-window-sidebar me-2" style="color:var(--accent);"></i>The Dashboard</h2>
+      <p>Open a box from the list (<code>enter</code>). The keys you'll use most:</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Key</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td class="k"><code>a</code> / <code>enter</code></td><td>Do the top suggested next step</td></tr>
+            <tr><td class="k"><code>r</code></td><td>Run any tool</td></tr>
+            <tr><td class="k"><code>c</code></td><td>Scan (nmap stages, UDP)</td></tr>
+            <tr><td class="k"><code>h</code></td><td>Add the box's hostnames to <code>/etc/hosts</code> (diff, confirm, sudo)</td></tr>
+            <tr><td class="k"><code>l</code> / <code>n</code> / <code>W</code></td><td>Loot (add creds, users, hashes by hand with <code>a</code>), notes, write-up</td></tr>
+            <tr><td class="k"><code>k</code> / <code>!</code></td><td>Methodology checklist / &ldquo;I'm stuck&rdquo;</td></tr>
+            <tr><td class="k"><code>f</code></td><td>Record a flag</td></tr>
+            <tr><td class="k"><code>o</code></td><td>Journal: the box's story so far</td></tr>
+            <tr><td class="k"><code>ctrl+t</code></td><td>Change theme</td></tr>
+            <tr><td class="k"><code>=</code> / <code>ctrl+l</code></td><td>Reset pane sizes / redraw the screen</td></tr>
+            <tr><td class="k"><code>?</code> / <code>ctrl+p</code></td><td>Every key on this screen / search all actions</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:.9rem;">
+        Drag the dividers (or use <code>ctrl+arrows</code>) to resize the panes. Sizes are remembered and always
+        fitted to the terminal, so the findings and next steps keep a few rows however small the window.
+      </p>
+
+      <!-- ── Run dialog ── -->
+      <h2 id="run-dialog"><i class="bi bi-play-btn me-2" style="color:var(--accent);"></i>Running Tools</h2>
+      <p>
+        Every tool runs through the <strong>Run dialog</strong>: presets, each useful flag explained, extra
+        arguments, sudo on or off, and a live preview of the exact command line before anything touches the target.
+        Inputs such as the URL, domain and wordlist are pre-filled from what's been found (for example the box's
+        hostname once it's in <code>/etc/hosts</code>), and you can save your choices as a default, for every box or
+        just this one.
+      </p>
+      <p>
+        Tools that do the same job form a group: <code>dir-bruteforce</code> uses whichever of feroxbuster, gobuster,
+        dirsearch or ffuf you have and prefer. Every job's exact command, output and errors are saved in the box's
+        <code>raw/</code> folder, then parsed into findings, and you get a plain-English summary of what it found
+        (or a likely cause when it failed).
+      </p>
+
+      <!-- ── Suggestions ── -->
+      <h2 id="suggestions"><i class="bi bi-lightbulb me-2" style="color:var(--accent);"></i>Suggestions</h2>
+      <p>
+        After every change, rules look at what's known and rank the next moves, each with a short <em>why</em> and a
+        link to learn more: fingerprint the site, add its hostname to <code>/etc/hosts</code>, look for hidden paths
+        and vhosts, enumerate SMB, look up public exploits for a version, try a password you found on SMB.
+      </p>
+      <p>
+        They're suggestions: run one, <code>s</code> skip it, <code>z</code> snooze it until something new turns up,
+        or do something else entirely. If you want, <code>cyberdeck auto</code> chains the <strong>safe</strong> recon
+        ones (each command still shown). Anything tagged intrusive, brute-force or exploit only ever runs when you
+        confirm it.
+      </p>
+
+      <!-- ── Manual entry ── -->
+      <h2 id="manual"><i class="bi bi-pencil-square me-2" style="color:var(--accent);"></i>Adding What You Find</h2>
+      <p>Bring the results of your hands-on work back into Cyberdeck yourself:</p>
+      <ul>
+        <li>add credentials, users and hashes you found by hand in <strong>Loot</strong> (<code>l</code>, then
+          <code>a</code>), and record flags with <code>f</code></li>
+        <li>keep free-form notes in the box's <code>notes.md</code> (<code>n</code>)</li>
+        <li>tick checklist items you did by hand (<code>k</code>), add hostnames
+          (<code>cyberdeck hosts add &lt;name&gt;</code>), or import an nmap scan you ran yourself
+          (<code>cyberdeck import</code>)</li>
+      </ul>
+      <p>
+        The suggestions use whatever you add, the same as tool output: a password you typed in can prompt
+        &ldquo;try it on SMB&rdquo; or, on Active Directory, a Kerberoast.
+      </p>
+
+      <!-- ── Hosts & IPs ── -->
+      <h2 id="hosts"><i class="bi bi-diagram-2 me-2" style="color:var(--accent);"></i>Hosts File &amp; New IPs</h2>
+      <p>
+        Cyberdeck edits <code>/etc/hosts</code> only after showing you the exact diff. It needs your sudo password
+        (typed into sudo itself, never into Cyberdeck) and tags its lines with <code># cyberdeck:&lt;box&gt;</code>,
+        so <code>cyberdeck hosts remove</code> can cleanly take them out again.
+      </p>
+      <p>
+        HTB gives a box a new IP when it's re-spawned. Highlight it in the box list and press <code>i</code> (or run
+        <code>cyberdeck set-ip</code>): everything you found is kept, and Cyberdeck offers to move the box's hosts line
+        to the new address.
+      </p>
+
+      <!-- ── Learning ── -->
+      <h2 id="learning"><i class="bi bi-mortarboard me-2" style="color:var(--accent);"></i>Learning Aids</h2>
+      <p>New to HTB? All of these are on by default and can be switched off one by one in Settings (<code>,</code>).</p>
+      <ul>
+        <li><strong>Beginner layout</strong> (<code>b</code> switches to expert): a journey bar (Scan &rsaquo;
+          Enumerate &rsaquo; Foothold &rsaquo; User flag &rsaquo; Root flag) and a <em>Now</em> card with the next
+          step in plain words.</li>
+        <li><strong>Job summaries:</strong> what each job found and why it matters, with passwords, hashes, new
+          hostnames and versions to look up called out. Passwords spotted in tool output are offered for Loot.</li>
+        <li><strong>Glossary</strong> (<code>g</code>): underlined words such as vhost, LHOST and SUID explained in
+          plain words.</li>
+        <li><strong>Checklist</strong> (<code>k</code>): what to check per service and phase, including manual
+          checks like reading the page source or <code>sudo -l</code>, ticking itself as tools run.</li>
+        <li><strong>I'm stuck</strong> (<code>!</code>): what you haven't tried yet, then general hints for your
+          situation if you ask. Never spoilers for the box.</li>
+        <li><strong>Working on&hellip;</strong> (<code>w</code>): say what lead you're chasing and Cyberdeck warns when
+          it stops producing anything.</li>
+        <li><strong>Progress</strong> (<code>p</code> on the box list): a suggested learning path (Starting Point,
+          then easy retired boxes) and the skills you've practised.</li>
+      </ul>
+
+      <!-- ── Write-ups ── -->
+      <h2 id="writeups"><i class="bi bi-journal-text me-2" style="color:var(--accent);"></i>Journal &amp; Write-ups</h2>
+      <p>
+        Recording a flag asks three quick, optional questions: what got you in, what you'd check sooner next time,
+        and which techniques you used. They feed the box's <strong>journal</strong> (<code>o</code>) and your
+        <strong>playbook</strong> across boxes, so <em>I'm stuck</em> can say &ldquo;you've seen this before: on
+        Soccer you&hellip;&rdquo;.
+      </p>
+      <p>
+        From the journal, <code>e</code> drafts a Markdown <strong>write-up</strong> with passwords, flags and your
+        paths masked. <code>W</code> on the dashboard reads and edits it, rendered as Markdown. A
+        <code>WRITEUP.md</code> written by hand or by Claude over MCP shows up there too.
+      </p>
+
+      <!-- ── Themes ── -->
+      <h2 id="themes"><i class="bi bi-palette me-2" style="color:var(--accent);"></i>Themes</h2>
+      <p>
+        Five cyberpunk palettes (neon, the default, plus hazard, synthwave, ice and phosphor) and every built-in
+        Textual theme. <code>ctrl+t</code> opens the theme picker from any screen; moving through the list previews
+        each theme live, and <code>enter</code> keeps it.
+      </p>
+      <img class="shot" src="Images/cyberdeck/themes.png" alt="The Cyberdeck theme picker with colour swatches, previewing the synthwave theme">
+      <p class="shot-cap">The theme picker, previewing synthwave.</p>
+
+      <!-- ── MCP ── -->
+      <h2 id="mcp"><i class="bi bi-robot me-2" style="color:var(--accent);"></i>Claude Code (MCP)</h2>
+      <pre>claude mcp add cyberdeck -- cyberdeck mcp -t soccer</pre>
+      <p>
+        Claude Code can then read the box's findings and suggestions, preview commands and run <strong>safe</strong>
+        tools. You see the exact command first. Intrusive tools, anything needing sudo and every
+        <code>/etc/hosts</code> edit wait in an approvals queue (<code>p</code> in the TUI, or
+        <code>cyberdeck approvals</code>), and there's no setting to skip that. Passwords, hashes and flags are masked
+        before they reach the model.
+      </p>
+      <p>
+        Claude can also record what you find outside Cyberdeck (findings, notes, flags), so the suggestions use it.
+        For a remote client, <code>cyberdeck mcp --http 127.0.0.1:8765</code> serves over HTTP with a bearer token
+        (<code>CYBERDECK_MCP_TOKEN</code>); reach it through an SSH tunnel.
+      </p>
+
+      <!-- ── CLI ── -->
+      <h2 id="cli"><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Command Line</h2>
+      <p>Everything in the TUI works from the shell too. The most useful commands:</p>
+      <pre>cyberdeck new soccer --ip 10.129.x.x    # create the box, check the VPN, scan
+cyberdeck list                          # boxes, last opened first, with progress
+cyberdeck resume soccer                 # make it current, show progress, offer the next step
+cyberdeck set-ip 10.129.x.y             # HTB re-spawned the box
+cyberdeck scan [-s 1|2|udp]             # nmap stages via the Run dialog
+cyberdeck run whatweb                   # one tool through the Run dialog
+cyberdeck run dir-bruteforce -p quick   # your preferred of feroxbuster/gobuster/dirsearch
+cyberdeck suggest                       # next steps, with why
+cyberdeck suggest run 1                 # run one (or answer its question)
+cyberdeck auto                          # work through the safe suggestions
+cyberdeck hosts add                     # add the box's hostnames: diff, confirm, sudo
+cyberdeck show                          # services, versions, hostnames, OS
+cyberdeck flag user &lt;flag&gt;             # record a flag
+cyberdeck stuck [--hint]                # what you haven't tried yet
+cyberdeck writeup [--stdout]            # Markdown write-up, loot masked
+cyberdeck tools                         # installed tools, versions, group picks
+cyberdeck --web                         # the UI in your browser on 127.0.0.1:8000</pre>
+      <p>
+        <code>cyberdeck --help</code> lists every command. Which box a command acts on: <code>-t &lt;box&gt;</code>,
+        else the box folder you're in, else the current box (<code>cyberdeck use</code>).
+      </p>
+
+      <!-- ── Plugins ── -->
+      <h2 id="plugins"><i class="bi bi-puzzle me-2" style="color:var(--accent);"></i>Adding a Tool</h2>
+      <p>
+        Tools are YAML manifests. Copy <code>plugins/tools/_template.yaml</code> into a category folder (or
+        <code>~/.config/cyberdeck/plugins/tools/</code>), fill it in, and validate it:
+      </p>
+      <pre>cyberdeck tools check ~/.config/cyberdeck/plugins/tools/web/mytool.yaml</pre>
+      <p>
+        The template's comments explain each field, and the existing manifests are working examples. Suggestion rules
+        (<code>rules/</code>) and learning content (<code>learn/</code>) can be overridden the same way, from
+        <code>~/.config/cyberdeck/</code>.
+      </p>
+
+      <!-- ── Config ── -->
+      <h2 id="config"><i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Configuration</h2>
+      <p>Settings live in <code>~/.config/cyberdeck/.env</code>; <code>.env.example</code> lists every variable with a comment.</p>
+      <div class="v-wrap">
+        <table class="v-table">
+          <thead><tr><th>Variable</th><th>What</th></tr></thead>
+          <tbody>
+            <tr><td class="k"><code>CYBERDECK_WORKSPACE_ROOT</code></td><td>Where box folders go (default <code>~/Documents/htb</code>)</td></tr>
+            <tr><td class="k"><code>CYBERDECK_VPN_DIR</code> / <code>CYBERDECK_VPN_CONFIG</code></td><td>The folder with your HTB <code>.ovpn</code> files / one specific file</td></tr>
+            <tr><td class="k"><code>CYBERDECK_SCOPE_EXTRA</code></td><td>Extra targets to allow, beyond the HTB ranges</td></tr>
+            <tr><td class="k"><code>CYBERDECK_MCP_TOKEN</code></td><td>Bearer token for <code>cyberdeck mcp --http</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:.9rem;">
+        Preferences (layout, theme, learning aids, tool choices) are set in the TUI's Settings screen
+        (<code>,</code>) and saved to <code>~/.config/cyberdeck/config.yaml</code>.
+      </p>
+
+      <!-- ── Safety ── -->
+      <h2 id="safety"><i class="bi bi-shield-check me-2" style="color:var(--accent);"></i>Safety</h2>
+      <div class="callout"><strong>Only use Cyberdeck against systems you are authorised to test</strong>, such as Hack The Box labs.</div>
+      <ul>
+        <li>A <strong>scope guard</strong> checks every job's target. Only the HTB lab ranges
+          (<code>10.10.0.0/16</code>, <code>10.129.0.0/16</code>) are allowed by default; anything else must be added
+          explicitly with <code>CYBERDECK_SCOPE_EXTRA</code>.</li>
+        <li>Nothing intrusive, brute-force or exploit-tagged ever runs without your explicit confirmation, including
+          when Claude Code is driving.</li>
+        <li><code>/etc/hosts</code> changes are shown as a diff, need your sudo password, and are tagged so they can
+          be cleanly undone.</li>
+        <li>Loot (credentials, hashes, flags) stays in the box folder, is masked in the UI and in write-ups, and is
+          never written to global logs.</li>
+      </ul>
+
+      <!-- ── Developing ── -->
+      <h2 id="developing"><i class="bi bi-code-slash me-2" style="color:var(--accent);"></i>Developing</h2>
+      <p>Python 3.11+ and uv.</p>
+      <pre>uv sync                                      # .venv + dev dependencies from uv.lock
+uv run pytest                                # tests (no Kali tools, network or VPN needed)
+uv run ruff check . &amp;&amp; uv run ruff format .  # lint + format
+uv run mypy src                              # strict type checks</pre>
+      <p>Tests use fixtures, a fake nmap and a fake tool, so they never touch the network.</p>
+
+      <!-- ── License ── -->
+      <h2 id="license"><i class="bi bi-file-earmark-text me-2" style="color:var(--accent);"></i>License</h2>
+      <p>Cyberdeck is released under the <strong>MIT</strong> licence. See the <a href="https://github.com/DanDreadless/cyberdeck" target="_blank">repository</a> for the full text.</p>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="f-links">
+      <a href="index.html">Home</a>
+      <a href="minos.html">Minos Docs</a>
+      <a href="carapace.html">Carapace Docs</a>
+      <a href="vault1337.html">Vault1337 Docs</a>
+      <a href="insight.html">Insight Docs</a>
+      <a href="cyberdeck.html">Cyberdeck Docs</a>
+      <a href="https://github.com/DanDreadless/cyberdeck" target="_blank">Cyberdeck GitHub</a>
+      <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
+    </div>
+    <p>DanDreadless &mdash; Security Tools &mdash; &copy; <span id="yr"></span></p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  // Highlight active sidebar link on scroll
+  const links = [...document.querySelectorAll('.d-nav a')];
+  const map = links.map(a => ({ a, sec: document.querySelector(a.getAttribute('href')) })).filter(x => x.sec);
+  const spy = () => {
+    const y = window.scrollY + 90;
+    let cur = map[0];
+    for (const m of map) if (m.sec.offsetTop <= y) cur = m;
+    links.forEach(a => a.classList.remove('active'));
+    if (cur) cur.a.classList.add('active');
+  };
+  window.addEventListener('scroll', spy, { passive: true });
+  spy();
+</script>
+</body>
+</html>

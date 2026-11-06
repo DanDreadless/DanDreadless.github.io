@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Minos DNS sinkhole, Carapace safe web renderer, and the Vault1337 malware analysis toolkit — open-source security tools by DanDreadless.">
-  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, carapace, vault1337, insight, malware analysis, web threat scanner, open source, security tools">
+  <meta name="description" content="Minos DNS sinkhole, Carapace safe web renderer, the Vault1337 malware analysis toolkit, and Cyberdeck, a CTF companion for Hack The Box — open-source security tools by DanDreadless.">
+  <meta name="keywords" content="minos, dns sinkhole, pi-hole alternative, carapace, vault1337, insight, malware analysis, web threat scanner, cyberdeck, hack the box, ctf, kali, open source, security tools">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; img-src 'self' https://img.shields.io data:; font-src https://cdn.jsdelivr.net; connect-src https://cdn.jsdelivr.net;">
   <title>Vault1337</title>
@@ -31,6 +31,7 @@
         <li class="nav-item"><a class="nav-link" href="carapace.html">Carapace</a></li>
         <li class="nav-item"><a class="nav-link" href="vault1337.html">Vault1337</a></li>
         <li class="nav-item"><a class="nav-link" href="insight.html">Insight</a></li>
+        <li class="nav-item"><a class="nav-link" href="cyberdeck.html">Cyberdeck</a></li>
         <li class="nav-item">
           <a class="nav-link nav-gh" href="https://github.com/DanDreadless" target="_blank">
             <i class="bi bi-github me-1"></i>GitHub
@@ -51,6 +52,7 @@
       <a href="carapace.html" class="btn-v outline"><i class="bi bi-camera me-1"></i>Carapace</a>
       <a href="#vault1337" class="btn-v outline"><i class="bi bi-bug-fill me-1"></i>Vault1337</a>
       <a href="#insight" class="btn-v outline"><i class="bi bi-radar me-1"></i>Insight</a>
+      <a href="#cyberdeck" class="btn-v outline"><i class="bi bi-terminal me-1"></i>Cyberdeck</a>
     </div>
     <div class="badge-row">
       <img src="https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white" alt="Go">
@@ -66,9 +68,10 @@
 <section class="section" id="tools">
   <div class="container">
     <p class="s-sub mb-1">The Toolkit</p>
-    <h2 class="s-head">Four Tools. One Security Toolkit.</h2>
+    <h2 class="s-head">Five Tools. One Security Toolkit.</h2>
     <p style="color:var(--muted); font-size:.95rem; max-width:720px; margin: .5rem auto 2.5rem; text-align:center;">
-      Minos guards the network, Carapace renders the web safely, and the Vault1337 duo dissects what gets through.
+      Minos guards the network, Carapace renders the web safely, the Vault1337 duo dissects what gets through,
+      and Cyberdeck keeps you on track when you're the one breaking in.
       Self-hosted, privacy-respecting tools built on a shared design system for analysts, researchers, and defenders.
     </p>
     <div class="row g-4">
@@ -224,6 +227,45 @@
             <span class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem; opacity:.65; cursor:not-allowed;">
               <i class="bi bi-lock-fill me-1"></i>Repo Private
             </span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Cyberdeck -->
+      <div class="col-lg-6 offset-lg-3">
+        <div class="f-card" style="padding: 2rem; height:100%;">
+          <div style="display:flex; align-items:center; gap:.75rem; margin-bottom:1.2rem;">
+            <div class="f-icon" style="width:2.8rem; height:2.8rem; font-size:1.2rem; flex-shrink:0;">
+              <i class="bi bi-terminal"></i>
+            </div>
+            <div>
+              <h3 style="font-size:1.15rem; font-weight:700; margin:0;">Cyberdeck</h3>
+              <p style="color:var(--muted); font-size:.8rem; margin:0;">A CTF Companion Tool &middot; Hack The Box</p>
+            </div>
+          </div>
+          <p style="color:var(--muted); font-size:.875rem; margin-bottom:1.2rem;">
+            A terminal app for working Hack The Box machines from Kali Linux. It tracks your progress on each box,
+            suggests what to run next (and why), and wraps the Kali tools so every command is explained and every
+            result is kept. Not an autopilot: you still do the hacking.
+          </p>
+          <ul style="color:var(--muted); font-size:.82rem; padding-left:1.2rem; margin-bottom:1.4rem;">
+            <li>Per-box record of services, hostnames, URLs, creds, hashes, flags and every command run</li>
+            <li>Ranked next steps with a <em>why</em> and a link to learn more; skip, snooze or ignore any of them</li>
+            <li>45+ Kali tools through a Run dialog — presets, explained flags, the exact command before it runs</li>
+            <li>Beginner aids: plain-English job summaries, glossary, checklists, an &ldquo;I'm stuck&rdquo; flow</li>
+            <li>Claude Code over MCP, with an approvals queue for anything that isn't safe recon</li>
+          </ul>
+          <div style="display:flex; gap:.6rem; flex-wrap:wrap;">
+            <a href="cyberdeck.html" class="btn-v solid" style="font-size:.84rem; padding:.4rem 1rem;">
+              <i class="bi bi-book me-1"></i>Documentation
+            </a>
+            <a href="https://github.com/DanDreadless/cyberdeck" target="_blank" class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem;">
+              <i class="bi bi-github me-1"></i>GitHub
+            </a>
+            <a href="cyberdeck.html#install" class="btn-v outline" style="font-size:.84rem; padding:.4rem 1rem;">
+              <i class="bi bi-play-circle me-1"></i>Install
+            </a>
           </div>
         </div>
       </div>
@@ -469,6 +511,76 @@
   </div>
 </section>
 
+<!-- ── Cyberdeck detail ───────────────────────────────────────────────────── -->
+<section class="section" id="cyberdeck">
+  <div class="container">
+    <p class="s-sub mb-1">Cyberdeck — A CTF Companion Tool</p>
+    <h2 class="s-head">Do the Box. It Keeps the Notes.</h2>
+    <p style="color:var(--muted); font-size:.95rem; max-width:720px; margin:.5rem 0 1.5rem;">
+      Most of a Hack The Box machine is enumeration and bookkeeping. Cyberdeck runs the Kali tools you choose,
+      keeps everything found in the box's folder, and suggests what's worth trying next, while the hands-on work
+      stays in your own terminal and browser.
+    </p>
+    <div style="text-align:center; margin-bottom:1.5rem;">
+      <img src="Images/cyberdeck/dashboard.png" alt="The Cyberdeck dashboard" style="max-width:100%; height:auto; border:1px solid var(--border); border-radius:8px;">
+    </div>
+    <div class="row g-4 mt-1">
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-journal-check"></i></div>
+          <h5>Tracks the Box</h5>
+          <p>Ports, versions, hostnames, URLs, users, credentials, hashes, flags and notes, each with where it came from. Stop and resume any time.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-lightbulb"></i></div>
+          <h5>Suggests What's Next</h5>
+          <p>Rules rank the next moves from what's known, each with a short why and a link to learn more. You decide what runs.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-play-btn"></i></div>
+          <h5>Wraps the Tools</h5>
+          <p>nmap, feroxbuster, ffuf, netexec, hashcat and 40 more through a Run dialog showing the exact command. Output saved and parsed.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-mortarboard"></i></div>
+          <h5>Built for Learning</h5>
+          <p>Plain-English job summaries, a glossary, per-service checklists, graded hints when you're stuck, and a playbook of your own lessons.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-robot"></i></div>
+          <h5>Claude Code over MCP</h5>
+          <p>Claude reads findings and runs safe recon; intrusive tools, sudo and hosts-file edits wait for your approval. Loot is masked.</p>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-4">
+        <div class="f-card">
+          <div class="f-icon"><i class="bi bi-shield-check"></i></div>
+          <h5>Safe by Default</h5>
+          <p>A scope guard allows only the HTB ranges unless you add more, and nothing intrusive runs without your confirmation.</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="mt-4" style="display:flex; gap:.6rem; flex-wrap:wrap;">
+      <a href="cyberdeck.html" class="btn-v solid" style="font-size:.875rem; padding:.45rem 1.1rem;">
+        Full Documentation <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+      <a href="https://github.com/DanDreadless/cyberdeck" target="_blank" class="btn-v outline" style="font-size:.875rem; padding:.45rem 1.1rem;">
+        <i class="bi bi-github me-1"></i>View on GitHub
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- ── How they work together ────────────────────────────────────────────── -->
 <section class="section" id="workflow">
   <div class="container">
@@ -556,7 +668,8 @@
           and <strong style="color:var(--text);">Carapace</strong> renders suspicious pages safely — both open-source and
           on GitHub. Vault1337 runs on a Raspberry Pi 5 for personal malware research, and Insight is live at
           <a href="https://insight.vault1337.com" target="_blank">insight.vault1337.com</a> for quick URL triage before
-          visiting suspicious links.
+          visiting suspicious links. <strong style="color:var(--text);">Cyberdeck</strong> came out of working Hack The Box
+          machines from Kali: the notebook, checklist and tool launcher that sits next to your own terminal (Python, MIT).
         </p>
         <p style="color:var(--muted); font-size:.95rem;">
           <strong style="color:var(--text);">Note:</strong> the <strong style="color:var(--text);">Vault1337</strong> and
@@ -610,6 +723,14 @@
               <i class="bi bi-globe" style="color:var(--accent);"></i>
               Insight — Live Site
             </a>
+            <a href="cyberdeck.html" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
+              <i class="bi bi-terminal" style="color:var(--accent);"></i>
+              Cyberdeck Documentation
+            </a>
+            <a href="https://github.com/DanDreadless/cyberdeck" target="_blank" style="display:flex; align-items:center; gap:.6rem; color:var(--muted); text-decoration:none; font-size:.875rem; padding:.5rem .75rem; border-radius:5px; border:1px solid var(--border); transition:border-color .15s, color .15s;" onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--muted)'">
+              <i class="bi bi-github" style="color:var(--accent);"></i>
+              Cyberdeck on GitHub
+            </a>
             <div style="display:flex; align-items:center; gap:.6rem; color:var(--muted); font-size:.8rem; padding:.4rem .75rem; margin-top:.1rem;">
               <i class="bi bi-lock-fill" style="color:var(--accent);"></i>
               Vault1337 &amp; Insight source repos are currently private
@@ -632,7 +753,9 @@
       <a href="https://github.com/DanDreadless/Carapace" target="_blank">Carapace GitHub</a>
       <a href="vault1337.html">Vault1337 Docs</a>
       <a href="insight.html">Insight Docs</a>
+      <a href="cyberdeck.html">Cyberdeck Docs</a>
       <a href="https://insight.vault1337.com" target="_blank">Insight Live</a>
+      <a href="https://github.com/DanDreadless/cyberdeck" target="_blank">Cyberdeck GitHub</a>
       <a href="https://x.com/DanDreadless" target="_blank">@DanDreadless</a>
     </div>
     <p>DanDreadless &mdash; Security Tools &mdash; &copy; <span id="yr"></span></p>
